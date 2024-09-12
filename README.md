@@ -3,7 +3,6 @@
   /src
     /app
     /data
-    /repositories
     /services
     /ui
     /utils
