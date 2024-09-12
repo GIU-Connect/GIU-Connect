@@ -1,3 +1,4 @@
+```
 /lib
   /src
     /app
@@ -8,3 +9,4 @@
     /utils
   /main.dart
   /firebase_options.dart
+```
