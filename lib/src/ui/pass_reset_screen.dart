@@ -10,7 +10,8 @@ class PassResetScreen extends StatefulWidget {
 
 class _PassResetScreenState extends State<PassResetScreen> {
   final TextEditingController _emailController = TextEditingController();
-  final AuthService _authService = AuthService(); // Initialize your auth service
+  final AuthService _authService =
+      AuthService(); // Initialize your auth service
 
   void _resetPassword() async {
     String email = _emailController.text;

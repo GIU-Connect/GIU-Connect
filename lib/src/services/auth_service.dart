@@ -43,6 +43,8 @@ class AuthService {
     } catch (e) {
       throw Exception('Failed to sign up: $e');
     }
+
+    
   }
 
   Future<void> signIn({
@@ -56,8 +58,6 @@ class AuthService {
       );
 
       User? user = _auth.currentUser;
-
-      print('sign in user backent: $user');
 
       if (user != null && !user.emailVerified) {
         throw Exception('Email not verified. Verification email sent.');
@@ -85,7 +85,6 @@ class AuthService {
         return true;
       }
     } catch (e) {
-      print(e);
       throw Exception('Failed to resend verification email: $e');
     }
     return false;

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/auth_service.dart';
+import 'package:group_changing_app/src/ui/home_page_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -30,6 +31,10 @@ class _SignInScreenState extends State<SignInScreen> {
 
       try {
         await _authService.signIn(email: email, password: password);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePageScreen()),
+        );
         // Navigate to the next screen or show a success message
       } catch (e) {
         // Handle sign-in error
@@ -42,12 +47,6 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if(_auth.currentUser != null) {
-      print('user is signed in');
-    }
-    else {
-      print('user is not signed in');
-    }
 
     return Scaffold(
       appBar: AppBar(
