@@ -97,7 +97,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 if (currentTut == null || desiredTut == null) {
                   // Show a message if input is invalid
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                         content: Text('Please enter valid tutorial numbers.')),
                   );
                   return;
@@ -118,12 +118,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 );
               },
-              child: Column(
+              child:const Column(
                 children: [
-                  const Text('Search'),
-                  Text(FirebaseAuth.instance.currentUser == null
-                      ? 'Please log in to add a request'
-                      : 'Add a request'),
+                   Text('Search'),
+                  
                 ],
               ),
             ),

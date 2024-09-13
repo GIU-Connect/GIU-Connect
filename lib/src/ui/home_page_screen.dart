@@ -15,6 +15,14 @@ class HomePageScreen extends StatefulWidget {
 class _HomePageScreenState extends State<HomePageScreen> {
   void voidy() {}
 
+  User? currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    currentUser = FirebaseAuth.instance.currentUser;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -22,23 +30,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
         appBar: AppBar(
           title: const Text('Home Page'),
 
-          // debugging widget to show if the user is signed in
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(20.0),
-            child: StreamBuilder<User?>(
-              stream: FirebaseAuth.instance.authStateChanges(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Text('Loading...');
-                } else if (snapshot.hasData) {
-                  return const Text('Signed in');
-                } else {
-                  return const Text('Not signed in');
-                }
-              },
-            ),
-          ),
-          //debugging ends here
           actions: [
             IconButton(
               icon: const Icon(Icons.search),
@@ -95,6 +86,4 @@ class _HomePageScreenState extends State<HomePageScreen> {
       ),
     );
   }
-}
-            //debugging ends here
-          
+}          

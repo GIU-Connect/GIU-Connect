@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/auth_service.dart';
 
 class ResendVerificationScreen extends StatelessWidget {
+
   final AuthService _authService = AuthService();
 
   ResendVerificationScreen({super.key}); // Initialize your auth service
+
 
 
   @override

@@ -51,20 +51,24 @@ class AuthService {
   }
 
   //sign in method
-
   Future<void> signIn({
     required String email,
     required String password,
   }) async {
     try {
-      User? user = _auth.currentUser;
+      // Sign in user with email and password
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-      // we should add that if the user is already signed in and verified, we should not sign in again, this will be easy once we do the routes
-
-      //check if the email is verified
-      if (user != null && !user.emailVerified) {
+      // Check if the email is verified
+      if (!userCredential.user!.emailVerified) {
+        await userCredential.user!.sendEmailVerification();
         throw Exception('Email not verified. Verification email sent.');
       }
+
+      // User is signed in and email is verified
     } catch (e) {
       throw Exception('Failed to sign in: $e');
     }
