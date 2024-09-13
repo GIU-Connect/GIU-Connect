@@ -8,15 +8,17 @@ import './src/utils/firebase_utils.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FirebaseUtils.initializeFirebase();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ResendVerificationScreen(),
+      home: SignUpScreen(),
       // routes: {
       //   '/sign-in': (context) => SignInScreen(),
       //   '/sign-up': (context) => SignUpScreen(),

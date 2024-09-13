@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/auth_service.dart';
 
 class PassResetScreen extends StatefulWidget {
+  const PassResetScreen({super.key});
+
   @override
   _PassResetScreenState createState() => _PassResetScreenState();
 }
@@ -16,16 +18,16 @@ class _PassResetScreenState extends State<PassResetScreen> {
       bool result = await _authService.passwordReset(email: email);
       if (result) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Password reset email sent')),
+          const SnackBar(content: Text('Password reset email sent')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to send password reset email')),
+          const SnackBar(content: Text('Failed to send password reset email')),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter an email')),
+        const SnackBar(content: Text('Please enter an email')),
       );
     }
   }
@@ -34,7 +36,7 @@ class _PassResetScreenState extends State<PassResetScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Password Reset'),
+        title: const Text('Password Reset'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -42,12 +44,12 @@ class _PassResetScreenState extends State<PassResetScreen> {
           children: [
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
+              decoration: const InputDecoration(labelText: 'Email'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _resetPassword,
-              child: Text('Reset Password'),
+              child: const Text('Reset Password'),
             ),
           ],
         ),

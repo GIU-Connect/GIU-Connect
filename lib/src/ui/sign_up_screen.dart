@@ -3,6 +3,8 @@ import 'package:group_changing_app/src/services/auth_service.dart';
 
 
 class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
@@ -51,21 +53,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Sign Up')),
+      appBar: AppBar(title: const Text('Sign Up')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(controller: _emailController, decoration: InputDecoration(labelText: 'Email')),
-            TextField(controller: _passwordController, decoration: InputDecoration(labelText: 'Password'), obscureText: true),
-            TextField(controller: _phoneNumberController, decoration: InputDecoration(labelText: 'Phone Number')),
-            TextField(controller: _universityIdController, decoration: InputDecoration(labelText: 'University ID')),
-            TextField(controller: _majorController, decoration: InputDecoration(labelText: 'Major')),
-            TextField(controller: _currentTutorialController, decoration: InputDecoration(labelText: 'Current Tutorial')),
-            TextField(controller: _englishLevelController, decoration: InputDecoration(labelText: 'English Level')),
-            TextField(controller: _germanLevelController, decoration: InputDecoration(labelText: 'German Level')),
-            SizedBox(height: 20),
-            ElevatedButton(onPressed: _signUp, child: Text('Sign Up')),
+            TextField(controller: _emailController, decoration: const InputDecoration(labelText: 'Email')),
+            TextField(controller: _passwordController, decoration: const InputDecoration(labelText: 'Password'), obscureText: true),
+            TextField(controller: _phoneNumberController, decoration: const InputDecoration(labelText: 'Phone Number')),
+            TextField(controller: _universityIdController, decoration: const InputDecoration(labelText: 'University ID')),
+            TextField(controller: _majorController, decoration: const InputDecoration(labelText: 'Major')),
+            TextField(controller: _currentTutorialController, decoration: const InputDecoration(labelText: 'Current Tutorial')),
+            TextField(controller: _englishLevelController, decoration: const InputDecoration(labelText: 'English Level')),
+            TextField(controller: _germanLevelController, decoration: const InputDecoration(labelText: 'German Level')),
+            const SizedBox(height: 20),
+            ElevatedButton(onPressed: _signUp, child: const Text('Sign Up')),
           ],
         ),
       ),
