@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/auth_service.dart';
+import 'package:group_changing_app/src/ui/home_page_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -28,6 +29,10 @@ class _SignInScreenState extends State<SignInScreen> {
 
       try {
         await _authService.signIn(email: email, password: password);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePageScreen()),
+        );
         // Navigate to the next screen or show a success message
       } catch (e) {
         // Handle sign-in error
@@ -40,16 +45,10 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if(_auth.currentUser != null) {
-      print('user is signed in');
-    }
-    else {
-      print('user is not signed in');
-    }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign In'),
+        title: const Text('Sign In'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -59,7 +58,7 @@ class _SignInScreenState extends State<SignInScreen> {
             children: <Widget>[
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(labelText: 'Email'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
@@ -69,7 +68,7 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -78,10 +77,10 @@ class _SignInScreenState extends State<SignInScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _signIn,
-                child: Text('Sign In'),
+                child: const Text('Sign In'),
               ),
             ],
           ),

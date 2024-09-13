@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/auth_service.dart';
 
 class ResendVerificationScreen extends StatelessWidget {
-  final AuthService _authService = AuthService(); // Initialize your auth service
+  final AuthService _authService =
+      AuthService(); // Initialize your auth service
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +14,8 @@ class ResendVerificationScreen extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () async {
-            bool result = await _authService.resendVerificationEmail(email: _authService.currentUser!.email!);  
+            bool result = await _authService.resendVerificationEmail(
+                email: _authService.currentUser!.email!);
             if (result) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Verification email sent!')),

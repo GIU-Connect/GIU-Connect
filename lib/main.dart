@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ResendVerificationScreen(),
+      home: SignUpScreen(),
       // routes: {
       //   '/sign-in': (context) => SignInScreen(),
       //   '/sign-up': (context) => SignUpScreen(),
