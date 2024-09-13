@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/auth_service.dart';
 import 'package:group_changing_app/src/ui/home_page_screen.dart';
@@ -15,7 +14,6 @@ class _SignInScreenState extends State<SignInScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void dispose() {

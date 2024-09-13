@@ -6,6 +6,7 @@ class AuthService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final currentUser = FirebaseAuth.instance.currentUser;
 
+//sign up method
   Future<void> signUp({
     required String email,
     required String password,
@@ -16,6 +17,7 @@ class AuthService {
     required String englishLevel,
     required String germanLevel,
   }) async {
+    // Check if email is a student email
     try {
       if (!email.trim().endsWith('@student.giu-uni.de')) {
         throw Exception('Invalid email');
@@ -39,26 +41,27 @@ class AuthService {
         'germanLevel': germanLevel,
       });
 
+      // Send email verification
       await userCredential.user!.sendEmailVerification();
+
+      //catch any unexpected errors
     } catch (e) {
       throw Exception('Failed to sign up: $e');
     }
-
-    
   }
+
+  //sign in method
 
   Future<void> signIn({
     required String email,
     required String password,
   }) async {
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
       User? user = _auth.currentUser;
 
+      // we should add that if the user is already signed in and verified, we should not sign in again, this will be easy once we do the routes
+
+      //check if the email is verified
       if (user != null && !user.emailVerified) {
         throw Exception('Email not verified. Verification email sent.');
       }
@@ -74,7 +77,6 @@ class AuthService {
     } catch (e) {
       throw Exception('Failed to send password reset email: $e');
     }
-    return false;
   }
 
   Future<bool> resendVerificationEmail({required String email}) async {
