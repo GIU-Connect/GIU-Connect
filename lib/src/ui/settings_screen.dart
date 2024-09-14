@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:group_changing_app/src/ui/my_requests_screen.dart';
 import 'package:group_changing_app/src/ui/sign_up_screen.dart';
+import 'package:group_changing_app/src/widgets/my_button.dart';
 
 class SettingsScreen extends StatefulWidget {
   SettingsScreen({super.key});
@@ -16,68 +17,85 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
-      body: Center(
-        child: Column(
-          children: [
-            Column(
-              children: [
-                const SizedBox(
-                  height: 20,
-                ),
-                Text('Email: ${widget.currentUser.email}'),
-                
-                const SizedBox(
-                  height: 20,
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    widget._auth.signOut();
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => const SignUpScreen()),
-                      (Route<dynamic> route) => false,);
-                  },
-                  child: const Text('Sign Out'),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    widget._auth.sendPasswordResetEmail(
-                        email: widget.currentUser.email!);
-                  },
-                  child: const Text('Send Password Reset Email'),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    widget._auth.currentUser!.sendEmailVerification();
-                  },
-                  child: const Text('Resend Email Verification'),
-                ),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.black, // Set the AppBar background color to black
+          title: const Text(
+            'Settings',
+            style: TextStyle(
+                color: Colors.white, // Set the text color to white
+              fontWeight: FontWeight.bold, // Set the font to bold
+              fontSize: 20,
+            ),
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(20.0), // Padding for better spacing
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start, // Align items to the left
+            children: [
+              const SizedBox(height: 20),
 
-                const SizedBox(
-                  height: 20,
+              // Display the user's email in a modern text style
+              Text(
+                'Email: ${widget.currentUser.email}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => MyRequestsScreen()),
-                    );
-                  },
-                  child: const Text('My Requests'),
-                ),
-              ],
-            )
-          ],
+              ),
+
+              const SizedBox(height: 30),
+
+              // Sign Out Button
+              MyButton(
+                onTap: () {
+                  widget._auth.signOut();
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                    (Route<dynamic> route) => false,
+                  );
+                },
+                buttonName: 'Sign Out',
+              ),
+
+              const SizedBox(height: 20),
+
+              // Send Password Reset Email Button
+              MyButton(
+                onTap: () {
+                  widget._auth.sendPasswordResetEmail(
+                      email: widget.currentUser.email!);
+                },
+                buttonName: 'Send Password Reset Email',
+              ),
+
+              const SizedBox(height: 20),
+
+              // Resend Email Verification Button
+              MyButton(
+                onTap: () {
+                  widget._auth.currentUser!.sendEmailVerification();
+                },
+                buttonName: 'Resend Email Verification',
+              ),
+
+              const SizedBox(height: 20),
+
+              // Navigate to My Requests screen
+              MyButton(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => MyRequestsScreen()),
+                  );
+                },
+                buttonName: 'My Requests',
+              ),
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }

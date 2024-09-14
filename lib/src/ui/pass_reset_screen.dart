@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/auth_service.dart';
 
@@ -14,23 +15,7 @@ class _PassResetScreenState extends State<PassResetScreen> {
       AuthService(); // Initialize your auth service
 
   void _resetPassword() async {
-    String email = _emailController.text;
-    if (email.isNotEmpty) {
-      bool result = await _authService.passwordReset(email: email);
-      if (result) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password reset email sent')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to send password reset email')),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter an email')),
-      );
-    }
+    FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
   }
 
   @override

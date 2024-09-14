@@ -19,7 +19,7 @@ class AuthService {
     required String currentTutorial,
     required String firstName,
     required String lastName,
-    required String semester,
+    required String semester, required String confirmPassword,
   }) async {
     // Check if email is a student email
     try {

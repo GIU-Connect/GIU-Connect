@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:group_changing_app/src/widgets/my_button.dart';
 import 'package:group_changing_app/src/widgets/post.dart';
 import 'package:group_changing_app/src/ui/add_request_screen.dart';
 import 'package:group_changing_app/src/ui/search_screen.dart';
@@ -14,11 +15,25 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
-    void _showRequestDialog(BuildContext context,doc) {
+  void _showRequestDialog(BuildContext context, DocumentSnapshot doc) {
+    // AppBar(
+    //   automaticallyImplyLeading: true,
+    //   actions: [
+    //     IconButton(
+    //       icon: const Icon(Icons.close, color: Colors.red),
+    //       onPressed: () {
+    //         Navigator.of(context).pop();
+    //       },
+    //     ),
+    //   ],
+    // );
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
           title: const Text('Request Details'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -32,18 +47,17 @@ class _HomePageScreenState extends State<HomePageScreen> {
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Close'),
+            MyButton(
+              onTap: () => Navigator.of(context).pop(),
+              buttonName: 'Close',
             ),
-            ElevatedButton(
-              onPressed: () {
+            SizedBox(width: 10),
+            MyButton(
+              onTap: () {
                 // Handle connect action
                 Navigator.of(context).pop();
               },
-              child: const Text('Connect'),
+              buttonName: 'Connect',
             ),
           ],
         );
@@ -64,30 +78,38 @@ class _HomePageScreenState extends State<HomePageScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: false, // This removes the back button
-          title: const Text('Home Page'),
+          automaticallyImplyLeading: false, // Removes the back button
+          title: const Text(
+            'Home Page',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          backgroundColor: Colors.black, // Dark theme for consistency
           actions: [
             IconButton(
-              icon: const Icon(Icons.search),
+              icon: const Icon(Icons.search, color: Colors.white),
               onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SearchScreen()),
-          );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SearchScreen()),
+                );
               },
             ),
             IconButton(
-              icon: const Icon(Icons.person),
+              icon: const Icon(Icons.person, color: Colors.white),
               onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SettingsScreen()),
-          );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SettingsScreen()),
+                );
               },
             ),
           ],
         ),
-        body: Center(
+        body: Padding(
+          padding: const EdgeInsets.all(10.0),
           child: ListView(
             children: [
               StreamBuilder(
@@ -99,7 +121,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   return Column(
-                    // show the list of posts from the database
                     children: snapshot.data!.docs.map((doc) {
                       return Post(
                         phoneNumber: doc['phoneNumber'],
@@ -118,22 +139,21 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     }).toList(),
                   );
                 },
-              )
+              ),
             ],
           ),
         ),
-
-        // Add button to navigate to the AddRequestPage
         floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.black,
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const AddRequestPage()),
             );
           },
-          child: const Icon(Icons.add),
+          child: const Icon(Icons.add, color: Colors.white),
         ),
       ),
     );
   }
-}          
+}

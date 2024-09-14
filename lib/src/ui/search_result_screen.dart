@@ -12,7 +12,7 @@ class SearchResultScreen extends StatefulWidget {
 }
 
 class _SearchResultScreenState extends State<SearchResultScreen> {
-      void _showRequestDialog(BuildContext context,snapshot) {
+    void _showRequestDialog(BuildContext context, snapshot) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -23,8 +23,10 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Name: ${snapshot.data!.docs[0]['name']}'),
-              Text('Current Tutorial No.: ${snapshot.data!.docs[0]['currentTutNo']}'),
-              Text('Desired Tutorial No.: ${snapshot.data!.docs[0]['desiredTutNo']}'),
+              Text(
+                  'Current Tutorial No.: ${snapshot.data!.docs[0]['currentTutNo']}'),
+              Text(
+                  'Desired Tutorial No.: ${snapshot.data!.docs[0]['desiredTutNo']}'),
               Text('English Level: ${snapshot.data!.docs[0]['englishLevel']}'),
               Text('German Level: ${snapshot.data!.docs[0]['germanLevel']}'),
             ],
@@ -48,6 +50,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
       },
     );
   }
+
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -56,38 +60,44 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
         title: const Text('Search Results'),
       ),
       body: widget.results.isEmpty
-          ? Center(child:
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('No results found'),
-              Text(FirebaseAuth.instance.currentUser == null ? 'Please log in to add a request' : 'Add a request'),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push
-                  (context, MaterialPageRoute(builder: (context) => const AddRequestPage()));
-                },
-                child: const Text('Add Request'),
-              ),
-            ],
-          )
-          )
+          ? Center(
+              child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('No results found'),
+                Text(FirebaseAuth.instance.currentUser == null
+                    ? 'Please log in to add a request'
+                    : 'Add a request'),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AddRequestPage()));
+                  },
+                  child: const Text('Add Request'),
+                ),
+              ],
+            ))
           : ListView(
               children: widget.results.map((result) {
                 if (result == null || (result is Map && result.isEmpty)) {
-                    return Column(
+                  return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text('No results found'),
                       ElevatedButton(
-                      onPressed: () {
-                        Navigator.push
-                        (context, MaterialPageRoute(builder: (context) => const AddRequestPage()));
-                      },
-                      child: const Text('Add Request'),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AddRequestPage()));
+                        },
+                        child: const Text('Add Request'),
                       ),
                     ],
-                    );
+                  );
                 }
                 final resultMap = result as Map<String, dynamic>;
                 return Post(
@@ -101,7 +111,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                   germanLevel: resultMap['germanLevel'],
                   buttonText: 'Connect',
                   buttonFunction: () {
-                    _showRequestDialog(context,resultMap);
+                    _showRequestDialog(context, resultMap);
                   },
                 );
               }).toList(),

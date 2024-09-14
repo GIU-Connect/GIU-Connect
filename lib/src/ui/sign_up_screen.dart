@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/auth_service.dart';
 import 'package:group_changing_app/src/ui/sign_in_screen.dart';
+import 'package:group_changing_app/src/widgets/my_button.dart';
+import 'package:group_changing_app/src/widgets/my_textfield.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -12,6 +14,7 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _universityIdController = TextEditingController();
   final _currentTutorialController = TextEditingController();
@@ -19,16 +22,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _lastNameController = TextEditingController();
   String semester = '1';
 
-
   String major = 'CS';
-  // String englishLevel = 'AE';
-  // String germanLevel = 'G1';
 
   final _authService = AuthService();
 
   void _signUp() async {
     final email = _emailController.text;
     final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
     final phoneNumber = _phoneNumberController.text;
     final universityId = _universityIdController.text;
     final currentTutorial = _currentTutorialController.text;
@@ -36,10 +37,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final lastName = _lastNameController.text;
     final semester = this.semester;
 
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
     try {
       await _authService.signUp(
         email: email,
         password: password,
+        confirmPassword: confirmPassword,
         phoneNumber: phoneNumber,
         universityId: universityId,
         major: major,
@@ -53,9 +62,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         context,
         MaterialPageRoute(builder: (context) => const SignInScreen()),
       );
-      // Show success message or navigate to another screen
     } catch (e) {
-      // Show error message
       print(e);
     }
   }
@@ -68,34 +75,58 @@ class _SignUpScreenState extends State<SignUpScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-                controller: _firstNameController,
-                decoration: const InputDecoration(labelText: 'First Name')),
-            TextField(
-                controller: _lastNameController,
-                decoration: const InputDecoration(labelText: 'Last Name')),
-            TextField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email')),
-            TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true),
-            TextField(
-                controller: _phoneNumberController,
-                decoration: const InputDecoration(labelText: 'Phone Number')),
-            TextField(
-                controller: _universityIdController,
-                decoration: const InputDecoration(labelText: 'University ID')),
-            TextField(
-                controller: _currentTutorialController,
-                decoration: const InputDecoration(labelText: 'Current Tutorial')),
-
+            MyTextField(
+              controller: _firstNameController,
+              hintText: 'First Name',
+              obscureText: false,
+            ),
+            MyTextField(
+              controller: _lastNameController,
+              hintText: 'Last Name',
+              obscureText: false,
+            ),
+            MyTextField(
+              controller: _emailController,
+              hintText: 'Email',
+              obscureText: false,
+            ),
+            MyTextField(
+              controller: _passwordController,
+              hintText: 'Password',
+              obscureText: true,
+            ),
+            MyTextField(
+              controller: _confirmPasswordController,
+              hintText: 'Confirm Password',
+              obscureText: true,
+            ),
+            MyTextField(
+              controller: _phoneNumberController,
+              hintText: 'Phone Number',
+              obscureText: false,
+            ),
+            MyTextField(
+              controller: _universityIdController,
+              hintText: 'University ID',
+              obscureText: false,
+            ),
+            MyTextField(
+              controller: _currentTutorialController,
+              hintText: 'Current Tutorial',
+              obscureText: false,
+            ),
             // Dropdown for Major
             DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Major'),
+              decoration: const InputDecoration(hintText: 'Major'),
               value: major,
-              items: ['CS', 'BA', 'Engineering', 'Pharmaceutical Engineering', 'BI', 'Architecture']
+              items: [
+                'CS',
+                'BA',
+                'Engineering',
+                'Pharmaceutical Engineering',
+                'BI',
+                'Architecture'
+              ]
                   .map((major) => DropdownMenuItem(
                         value: major,
                         child: Text(major),
@@ -109,7 +140,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             // Dropdown for Semester
             DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Semester'),
+              decoration: const InputDecoration(hintText: 'Semester'),
               value: semester,
               items: List.generate(8, (index) => (index + 1).toString())
                   .map((semester) => DropdownMenuItem(
@@ -123,24 +154,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 });
               },
             ),
-            
-
             const SizedBox(height: 20),
-            ElevatedButton(onPressed: _signUp, child: const Text('Sign Up')),
-
+            MyButton(onTap: _signUp, buttonName: 'Sign Up'),
+            const SizedBox(height: 20),
             // Already have an account
-            TextButton(
-              onPressed: () {
+            MyButton(
+              onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const SignInScreen()),
                 );
               },
-              child: const Text('Already have an account? Sign In'),
+              buttonName: 'Already have an account? Sign In',
             ),
           ],
         ),
       ),
     );
   }
+  
 }

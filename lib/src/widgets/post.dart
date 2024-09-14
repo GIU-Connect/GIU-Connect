@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:group_changing_app/src/widgets/my_button.dart';
 
 class Post extends StatelessWidget {
   final String submitterName;
@@ -28,54 +29,118 @@ class Post extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      elevation: 5,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: const BoxDecoration(
-              color: Colors.blue,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(15.0),
-                topRight: Radius.circular(15.0),
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: const Offset(0, 3), // changes position of shadow
             ),
-            child: Text(
-              submitterName,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // User info
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    submitterName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Text(
+                    semester,
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Phone number: $phoneNumber'),
-                Text('Major: $major'),
-                Text('currentSemester: $semester'),
-                Text('Current Tutorial No.: $currentTutNo'),
-                Text('Desired Tutorial No.: $desiredTutNo'),
-                Text('English Level: $englishLevel'),
-                Text('German Level: $germanLevel'),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () => buttonFunction(),
-                  child: Text(buttonText),
+              const SizedBox(height: 10),
+              
+              // Phone and Major info with icons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Icon(Icons.phone, color: Colors.grey.shade600),
+                  const SizedBox(width: 8),
+                  Text(
+                    phoneNumber,
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  const Spacer(),
+                  Icon(Icons.school, color: Colors.grey.shade600),
+                  const SizedBox(width: 8),
+                  Text(
+                    major,
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // Tutorial Information
+              Row(
+                children: [
+                  _buildInfoChip('Current: $currentTutNo', Colors.blue),
+                  const SizedBox(width: 10),
+                  _buildInfoChip('Desired: $desiredTutNo', Colors.green),
+                ],
+              ),
+              const SizedBox(height: 10),
+              
+              // Language Levels
+              Row(
+                children: [
+                  _buildInfoChip('English: $englishLevel', Colors.orange),
+                  const SizedBox(width: 10),
+                  _buildInfoChip('German: $germanLevel', Colors.purple),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // Action Button
+              Align(
+                alignment: Alignment.centerRight,
+                child: MyButton(
+                  onTap: buttonFunction,
+                  buttonName: buttonText,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
+    );
+  }
+
+  // Helper method to create a modern info chip
+  Widget _buildInfoChip(String label, Color color) {
+    return Chip(
+      label: Text(
+        label,
+        style: const TextStyle(color: Colors.white),
+      ),
+      backgroundColor: color,
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
     );
   }
 }
