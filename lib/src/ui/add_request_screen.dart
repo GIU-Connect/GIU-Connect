@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/add_request_service.dart';
@@ -17,10 +18,7 @@ class _AddRequestPageState extends State<AddRequestPage> {
   String selectedMajor = 'CS';
   String selectedEnglish = 'AE';
   String selectedGerman = 'G1';
-  final TextEditingController nameController = TextEditingController();
   final AddRequestService _addRequestService = AddRequestService();
-
-
   // addRequest method that uses the AddRequestService to add a request
 void addRequest() async {
   // Ensure the user is logged in
@@ -47,10 +45,22 @@ void addRequest() async {
     );
     return;
   }
+  
+  // Fetch the user's name from Firestore
+  final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+  if (!userDoc.exists) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('User data not found')),
+    );
+    return;
+  }
+  final firstName = userDoc['firstName'] as String;
+  final lastName = userDoc['lastName'] as String;
+  final name = '$firstName $lastName';
 
   await _addRequestService.addRequest(
     userId: user.uid,
-    name: user.displayName ?? nameController.text,
+    name: name,
     major: selectedMajor,
     currentTutNo: int.tryParse(currentTutController.text) ?? 0,
     desiredTutNo: int.parse(desiredTutController.text),
@@ -75,12 +85,6 @@ void addRequest() async {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-
-            // Add a TextField for the user's name
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-            ),
 
             // Add a DropdownButton for the user's major
             DropdownButton<String>(
@@ -127,7 +131,7 @@ void addRequest() async {
                   selectedEnglish = newValue!;
                 });
               },
-              items: <String>['AE', 'AS', 'SM', 'CPS', 'RPW']
+              items: <String>['AE', 'AS', 'SM', 'CPS', 'RPW', 'No English']
                   .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -144,7 +148,7 @@ void addRequest() async {
                   selectedGerman = newValue!;
                 });
               },
-              items: <String>['G1', 'G2', 'G3', 'G4']
+              items: <String>['G1', 'G2', 'G3', 'G4', 'No German']
                   .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -164,3 +168,5 @@ void addRequest() async {
     );
   }
 }
+
+

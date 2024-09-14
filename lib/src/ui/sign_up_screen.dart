@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/auth_service.dart';
 import 'package:group_changing_app/src/ui/sign_in_screen.dart';
@@ -15,10 +14,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _passwordController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _universityIdController = TextEditingController();
-  final _majorController = TextEditingController();
   final _currentTutorialController = TextEditingController();
-  final _englishLevelController = TextEditingController();
-  final _germanLevelController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+
+  String major = 'CS';
+  String englishLevel = 'AE';
+  String germanLevel = 'G1';
 
   final _authService = AuthService();
 
@@ -27,10 +29,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final password = _passwordController.text;
     final phoneNumber = _phoneNumberController.text;
     final universityId = _universityIdController.text;
-    final major = _majorController.text;
     final currentTutorial = _currentTutorialController.text;
-    final englishLevel = _englishLevelController.text;
-    final germanLevel = _germanLevelController.text;
+    final firstName = _firstNameController.text;
+    final lastName = _lastNameController.text;
 
     try {
       await _authService.signUp(
@@ -42,6 +43,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         currentTutorial: currentTutorial,
         englishLevel: englishLevel,
         germanLevel: germanLevel,
+        firstName: firstName,
+        lastName: lastName,
       );
 
       Navigator.push(
@@ -64,6 +67,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: Column(
           children: [
             TextField(
+                controller: _firstNameController,
+                decoration: const InputDecoration(labelText: 'First Name')),
+            TextField(
+                controller: _lastNameController,
+                decoration: const InputDecoration(labelText: 'Last Name')),
+            TextField(
                 controller: _emailController,
                 decoration: const InputDecoration(labelText: 'Email')),
             TextField(
@@ -77,21 +86,64 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 controller: _universityIdController,
                 decoration: const InputDecoration(labelText: 'University ID')),
             TextField(
-                controller: _majorController,
-                decoration: const InputDecoration(labelText: 'Major')),
-            TextField(
                 controller: _currentTutorialController,
                 decoration: const InputDecoration(labelText: 'Current Tutorial')),
-            TextField(
-                controller: _englishLevelController,
-                decoration: const InputDecoration(labelText: 'English Level')),
-            TextField(
-                controller: _germanLevelController,
-                decoration: const InputDecoration(labelText: 'German Level')),
+
+            // Dropdown for Major
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(labelText: 'Major'),
+              value: major,
+              items: ['CS', 'BA', 'Engineering', 'Pharmaceutical Engineering', 'BI', 'Architecture']
+                  .map((major) => DropdownMenuItem(
+                        value: major,
+                        child: Text(major),
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  major = value!;
+                });
+              },
+            ),
+
+            // Dropdown for English Level
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(labelText: 'English Level'),
+              value: englishLevel,
+              items: ['AE', 'AS', 'SM', 'CPS', 'RPW']
+                  .map((level) => DropdownMenuItem(
+                        value: level,
+                        child: Text(level),
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  englishLevel = value!;
+                });
+              },
+            ),
+
+            // Dropdown for German Level
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(labelText: 'German Level'),
+              value: germanLevel,
+              items: ['G1', 'G2', 'G3', 'G4']
+                  .map((level) => DropdownMenuItem(
+                        value: level,
+                        child: Text(level),
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  germanLevel = value!;
+                });
+              },
+            ),
+
             const SizedBox(height: 20),
             ElevatedButton(onPressed: _signUp, child: const Text('Sign Up')),
 
-            //already have an account
+            // Already have an account
             TextButton(
               onPressed: () {
                 Navigator.push(
@@ -107,4 +159,3 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 }
-

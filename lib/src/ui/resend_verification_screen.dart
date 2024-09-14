@@ -36,3 +36,22 @@ class ResendVerificationScreen extends StatelessWidget {
     );
   }
 }
+/**
+ * 
+ * add connect button on the post widget
+ * 
+ * 
+ * routes 
+ * 
+ * open request button
+ * 
+ * email service to send email to the request sender when he get a match
+ * 
+
+ * 
+
+ * 
+ * (((((exception handler)))))
+ * 
+ * search on hosting on firebase 
+ */

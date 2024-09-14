@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/search_service.dart';
 import 'package:group_changing_app/src/ui/search_result_screen.dart';
@@ -9,7 +8,7 @@ class SearchScreen extends StatefulWidget {
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 
-  SearchService searchService = SearchService();
+  final SearchService searchService = SearchService();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
@@ -21,7 +20,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-
+  
     return Scaffold(
       appBar: AppBar(
         title: const Text('Search Details'),
@@ -30,11 +29,18 @@ class _SearchScreenState extends State<SearchScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
+            DropdownButtonFormField<String>(
               decoration: const InputDecoration(labelText: 'Major'),
+              value: major.isEmpty ? null : major,
+              items: ['CS', 'BA', 'Engineering', 'Pharmaceutical Engineering', 'BI', 'Architecture']
+                  .map((major) => DropdownMenuItem(
+                        value: major,
+                        child: Text(major),
+                      ))
+                  .toList(),
               onChanged: (value) {
                 setState(() {
-                  major = value;
+                  major = value!;
                 });
               },
             ),
@@ -118,12 +124,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 );
               },
-              child:const Column(
-                children: [
-                   Text('Search'),
-                  
-                ],
-              ),
+              child: const Text('Search'),
             ),
           ],
         ),

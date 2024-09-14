@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:group_changing_app/src/ui/home_page_screen.dart';
+import 'package:group_changing_app/src/ui/sign_up_screen.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -16,6 +19,8 @@ class AuthService {
     required String currentTutorial,
     required String englishLevel,
     required String germanLevel,
+    required String firstName,
+    required String lastName,
   }) async {
     // Check if email is a student email
     try {
@@ -39,6 +44,8 @@ class AuthService {
         'currentTutorial': currentTutorial,
         'englishLevel': englishLevel,
         'germanLevel': germanLevel,
+        'firstName': firstName,
+        'lastName': lastName,
       });
 
       // Send email verification
@@ -96,7 +103,10 @@ class AuthService {
     return false;
   }
 
-  Future<void> signOut() async {
+  Future<void> signOut(
+    
+  ) async {
+
     try {
       await _auth.signOut();
     } catch (e) {
