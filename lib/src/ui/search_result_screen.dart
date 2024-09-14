@@ -12,6 +12,42 @@ class SearchResultScreen extends StatefulWidget {
 }
 
 class _SearchResultScreenState extends State<SearchResultScreen> {
+      void _showRequestDialog(BuildContext context,snapshot) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Request Details'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Name: ${snapshot.data!.docs[0]['name']}'),
+              Text('Current Tutorial No.: ${snapshot.data!.docs[0]['currentTutNo']}'),
+              Text('Desired Tutorial No.: ${snapshot.data!.docs[0]['desiredTutNo']}'),
+              Text('English Level: ${snapshot.data!.docs[0]['englishLevel']}'),
+              Text('German Level: ${snapshot.data!.docs[0]['germanLevel']}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Handle connect action
+                Navigator.of(context).pop();
+              },
+              child: const Text('Connect'),
+            ),
+          ],
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -55,13 +91,18 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                 }
                 final resultMap = result as Map<String, dynamic>;
                 return Post(
+                  semester: resultMap['semester'],
                   submitterName: resultMap['name'],
                   major: resultMap['major'],
+                  phoneNumber: resultMap['phoneNumber'],
                   currentTutNo: resultMap['currentTutNo'],
                   desiredTutNo: resultMap['desiredTutNo'],
                   englishLevel: resultMap['englishLevel'],
                   germanLevel: resultMap['germanLevel'],
-                  onOpenRequest: () {},
+                  buttonText: 'Connect',
+                  buttonFunction: () {
+                    _showRequestDialog(context,resultMap);
+                  },
                 );
               }).toList(),
             ),

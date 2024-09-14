@@ -7,7 +7,10 @@ class Post extends StatelessWidget {
   final int desiredTutNo;
   final String englishLevel;
   final String germanLevel;
-  final VoidCallback onOpenRequest;
+  final String buttonText;
+  final VoidCallback buttonFunction;
+  final String semester;
+  final String phoneNumber;
 
   const Post({
     super.key,
@@ -17,44 +20,12 @@ class Post extends StatelessWidget {
     required this.desiredTutNo,
     required this.englishLevel,
     required this.germanLevel,
-    required this.onOpenRequest,
+    required this.buttonText,
+    required this.buttonFunction,
+    required this.semester,
+    required this.phoneNumber,
   });
-  void _showRequestDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Request Details'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Name: $submitterName'),
-              Text('Current Tutorial No.: $currentTutNo'),
-              Text('Desired Tutorial No.: $desiredTutNo'),
-              Text('English Level: $englishLevel'),
-              Text('German Level: $germanLevel'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Close'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // Handle connect action
-                Navigator.of(context).pop();
-              },
-              child: const Text('Connect'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -88,15 +59,17 @@ class Post extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text('Phone number: $phoneNumber'),
                 Text('Major: $major'),
+                Text('currentSemester: $semester'),
                 Text('Current Tutorial No.: $currentTutNo'),
                 Text('Desired Tutorial No.: $desiredTutNo'),
                 Text('English Level: $englishLevel'),
                 Text('German Level: $germanLevel'),
                 const SizedBox(height: 10),
                 ElevatedButton(
-                  onPressed: () => _showRequestDialog(context),
-                  child: const Text('Open Request'),
+                  onPressed: () => buttonFunction(),
+                  child: Text(buttonText),
                 ),
               ],
             ),

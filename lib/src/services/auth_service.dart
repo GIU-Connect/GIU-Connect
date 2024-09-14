@@ -17,10 +17,9 @@ class AuthService {
     required String universityId,
     required String major,
     required String currentTutorial,
-    required String englishLevel,
-    required String germanLevel,
     required String firstName,
     required String lastName,
+    required String semester,
   }) async {
     // Check if email is a student email
     try {
@@ -42,10 +41,9 @@ class AuthService {
         'universityId': universityId,
         'major': major,
         'currentTutorial': currentTutorial,
-        'englishLevel': englishLevel,
-        'germanLevel': germanLevel,
         'firstName': firstName,
         'lastName': lastName,
+        'semester': semester,
       });
 
       // Send email verification

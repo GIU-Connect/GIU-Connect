@@ -14,7 +14,42 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
-  void voidy() {}
+    void _showRequestDialog(BuildContext context,doc) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Request Details'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Name: ${doc['name']}'),
+              Text('Current Tutorial No.: ${doc['currentTutNo']}'),
+              Text('Desired Tutorial No.: ${doc['desiredTutNo']}'),
+              Text('English Level: ${doc['englishLevel']}'),
+              Text('German Level: ${doc['germanLevel']}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Handle connect action
+                Navigator.of(context).pop();
+              },
+              child: const Text('Connect'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   User? currentUser;
 
@@ -29,6 +64,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false, // This removes the back button
           title: const Text('Home Page'),
           actions: [
             IconButton(
@@ -66,13 +102,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     // show the list of posts from the database
                     children: snapshot.data!.docs.map((doc) {
                       return Post(
+                        phoneNumber: doc['phoneNumber'],
+                        semester: doc['semester'],
                         submitterName: doc['name'],
                         major: doc['major'],
                         currentTutNo: doc['currentTutNo'],
                         desiredTutNo: doc['desiredTutNo'],
                         englishLevel: doc['englishLevel'],
                         germanLevel: doc['germanLevel'],
-                        onOpenRequest: voidy,
+                        buttonText: 'Open Request',
+                        buttonFunction: () {
+                          _showRequestDialog(context, doc);
+                        },
                       );
                     }).toList(),
                   );
@@ -87,7 +128,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AddRequestPage()),
+              MaterialPageRoute(builder: (context) => const AddRequestPage()),
             );
           },
           child: const Icon(Icons.add),

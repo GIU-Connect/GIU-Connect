@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:group_changing_app/src/ui/my_requests_screen.dart';
 import 'package:group_changing_app/src/ui/sign_up_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -60,6 +60,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     widget._auth.currentUser!.sendEmailVerification();
                   },
                   child: const Text('Resend Email Verification'),
+                ),
+
+                const SizedBox(
+                  height: 20,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => MyRequestsScreen()),
+                    );
+                  },
+                  child: const Text('My Requests'),
                 ),
               ],
             )

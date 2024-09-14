@@ -17,6 +17,7 @@ class _SearchScreenState extends State<SearchScreen> {
   String desiredTutNo = '';
   String germanLevel = 'G1';
   String englishLevel = 'AE';
+  String semester = '1';
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +45,24 @@ class _SearchScreenState extends State<SearchScreen> {
                 });
               },
             ),
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(labelText: 'Semester'),
+              value: semester,
+              items: List.generate(8, (index) => (index + 1).toString())
+                  .map((sem) => DropdownMenuItem(
+                        value: sem,
+                        child: Text(sem),
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  semester = value!;
+                });
+              },
+            ),
             TextField(
               decoration:
-                  const InputDecoration(labelText: 'Current Tutorial Number'),
+                  const InputDecoration(labelText: 'Current Tutorial Number', hintText: 'Number of the tutorial you want to switch to'),
               onChanged: (value) {
                 setState(() {
                   currentTutNo = value;
@@ -55,7 +71,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             TextField(
               decoration:
-                  const InputDecoration(labelText: 'Desired Tutorial Number'),
+                  const InputDecoration(labelText: 'Desired Tutorial Number', hintText: 'Number of the tutorial you are currently in'),
               onChanged: (value) {
                 setState(() {
                   desiredTutNo = value;
@@ -115,6 +131,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   desiredTut,
                   germanLevel,
                   englishLevel,
+                  semester
                 );
 
                 Navigator.push(

@@ -17,10 +17,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _currentTutorialController = TextEditingController();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  String semester = '1';
+
 
   String major = 'CS';
-  String englishLevel = 'AE';
-  String germanLevel = 'G1';
+  // String englishLevel = 'AE';
+  // String germanLevel = 'G1';
 
   final _authService = AuthService();
 
@@ -32,6 +34,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final currentTutorial = _currentTutorialController.text;
     final firstName = _firstNameController.text;
     final lastName = _lastNameController.text;
+    final semester = this.semester;
 
     try {
       await _authService.signUp(
@@ -41,10 +44,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         universityId: universityId,
         major: major,
         currentTutorial: currentTutorial,
-        englishLevel: englishLevel,
-        germanLevel: germanLevel,
         firstName: firstName,
         lastName: lastName,
+        semester: semester,
       );
 
       Navigator.push(
@@ -105,40 +107,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 });
               },
             ),
-
-            // Dropdown for English Level
+            // Dropdown for Semester
             DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'English Level'),
-              value: englishLevel,
-              items: ['AE', 'AS', 'SM', 'CPS', 'RPW']
-                  .map((level) => DropdownMenuItem(
-                        value: level,
-                        child: Text(level),
+              decoration: const InputDecoration(labelText: 'Semester'),
+              value: semester,
+              items: List.generate(8, (index) => (index + 1).toString())
+                  .map((semester) => DropdownMenuItem(
+                        value: semester,
+                        child: Text(semester),
                       ))
                   .toList(),
               onChanged: (value) {
                 setState(() {
-                  englishLevel = value!;
+                  semester = value!;
                 });
               },
             ),
-
-            // Dropdown for German Level
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'German Level'),
-              value: germanLevel,
-              items: ['G1', 'G2', 'G3', 'G4']
-                  .map((level) => DropdownMenuItem(
-                        value: level,
-                        child: Text(level),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  germanLevel = value!;
-                });
-              },
-            ),
+            
 
             const SizedBox(height: 20),
             ElevatedButton(onPressed: _signUp, child: const Text('Sign Up')),
