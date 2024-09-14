@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:group_changing_app/src/ui/edit_account_info_screen.dart';
 import 'package:group_changing_app/src/ui/my_requests_screen.dart';
 import 'package:group_changing_app/src/ui/sign_up_screen.dart';
 import 'package:group_changing_app/src/widgets/my_button.dart';
@@ -19,11 +20,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.black, // Set the AppBar background color to black
+          backgroundColor:
+              Colors.black, // Set the AppBar background color to black
           title: const Text(
             'Settings',
             style: TextStyle(
-                color: Colors.white, // Set the text color to white
+              color: Colors.white, // Set the text color to white
               fontWeight: FontWeight.bold, // Set the font to bold
               fontSize: 20,
             ),
@@ -32,7 +34,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         body: Padding(
           padding: const EdgeInsets.all(20.0), // Padding for better spacing
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, // Align items to the left
+            crossAxisAlignment:
+                CrossAxisAlignment.start, // Align items to the left
             children: [
               const SizedBox(height: 20),
 
@@ -53,7 +56,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () {
                   widget._auth.signOut();
                   Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const SignUpScreen()),
                     (Route<dynamic> route) => false,
                   );
                 },
@@ -65,8 +69,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               // Send Password Reset Email Button
               MyButton(
                 onTap: () {
-                  widget._auth.sendPasswordResetEmail(
-                      email: widget.currentUser.email!);
+                  widget._auth
+                      .sendPasswordResetEmail(email: widget.currentUser.email!);
                 },
                 buttonName: 'Send Password Reset Email',
               ),
@@ -91,6 +95,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   );
                 },
                 buttonName: 'My Requests',
+              ),
+
+              const SizedBox(height: 20),
+
+              MyButton(
+                onTap: () async {
+                  await widget._auth.currentUser!.reload();
+                  if (widget._auth.currentUser!.emailVerified) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => EditAccountInfoScreen()),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please verify your email first.'),
+                      ),
+                    );
+                  }
+                },
+                buttonName: 'Change account info',
               ),
             ],
           ),

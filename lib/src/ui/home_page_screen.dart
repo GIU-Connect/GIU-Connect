@@ -16,17 +16,6 @@ class HomePageScreen extends StatefulWidget {
 
 class _HomePageScreenState extends State<HomePageScreen> {
   void _showRequestDialog(BuildContext context, DocumentSnapshot doc) {
-    // AppBar(
-    //   automaticallyImplyLeading: true,
-    //   actions: [
-    //     IconButton(
-    //       icon: const Icon(Icons.close, color: Colors.red),
-    //       onPressed: () {
-    //         Navigator.of(context).pop();
-    //       },
-    //     ),
-    //   ],
-    // );
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -79,31 +68,40 @@ class _HomePageScreenState extends State<HomePageScreen> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false, // Removes the back button
-          title: const Text(
-            'Home Page',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+          title: Row(
+            children: [
+              Image.asset(
+          'lib/src/assets/tut_swap1.png',
+          height: 40,
+              ),
+              const SizedBox(width: 10),
+              const Text(
+          'Home Page',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+              ),
+            ],
           ),
           backgroundColor: Colors.black, // Dark theme for consistency
           actions: [
             IconButton(
               icon: const Icon(Icons.search, color: Colors.white),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SearchScreen()),
-                );
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SearchScreen()),
+          );
               },
             ),
             IconButton(
               icon: const Icon(Icons.person, color: Colors.white),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SettingsScreen()),
-                );
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SettingsScreen()),
+          );
               },
             ),
           ],

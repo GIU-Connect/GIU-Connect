@@ -64,19 +64,6 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     );
   }
 
-  void _resetPassword() {
-    final email = _emailController.text;
-    if (email.isNotEmpty) {
-      // Implement your password reset logic here
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password reset link sent to $email')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your email address')),
-      );
-    }
-  }
 
   @override
   void dispose() {
