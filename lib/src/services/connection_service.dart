@@ -10,13 +10,28 @@ class ConnectionService {
 
   Future<void> sendConnectionRequest(
       String requestId, String connectionSenderId) async {
-        DocumentSnapshot requestSnapshot = await _firestore.collection('requests').doc(requestId).get();
-        String userId = (requestSnapshot.data() as Map<String, dynamic>)['userId'];
+    DocumentSnapshot requestSnapshot =
+        await _firestore.collection('requests').doc(requestId).get();
+    String userId = (requestSnapshot.data() as Map<String, dynamic>)['userId'];
 
-        if (connectionSenderId == userId) {
-          throw Exception('You cannot connect to a request you made.');
-        }
+    if (connectionSenderId == userId) {
+      throw Exception('You cannot connect to a request you made.');
+    }
+
     try {
+      // Check if the connection request already exists
+      QuerySnapshot existingRequests = await _firestore
+          .collection('requests')
+          .doc(requestId)
+          .collection('connectionRequests')
+          .where('connectionSenderId', isEqualTo: connectionSenderId)
+          .get();
+
+      if (existingRequests.docs.isNotEmpty) {
+        throw Exception('Connection request already exists.');
+      }
+
+      // Add new connection request
       await _firestore
           .collection('requests')
           .doc(requestId)
@@ -26,46 +41,47 @@ class ConnectionService {
         'status': 'pending',
       });
 
-      DocumentSnapshot requestSnapshot =
-          await _firestore.collection('requests').doc(requestId).get();
-      String userId =
-          (requestSnapshot.data() as Map<String, dynamic>)['userId'];
-
+      // Fetch the user and sender details
       DocumentSnapshot userSnapshot =
           await _firestore.collection('users').doc(userId).get();
       String email = (userSnapshot.data() as Map<String, dynamic>)['email'];
-      String name = (userSnapshot.data() as Map<String, dynamic>)['name'];
 
+      DocumentSnapshot connectionSenderSnapshot =
+          await _firestore.collection('users').doc(connectionSenderId).get();
+      String connectionSenderName =
+          (connectionSenderSnapshot.data() as Map<String, dynamic>)['name'];
+
+      // Send email notification
       await emailSender.sendEmail(
         recipientEmail: email,
         subject: 'New Connection Request',
         body:
-            'Hello,\n\nYou have received a new connection request from $name.\n\nBest regards,\nGIU Changing Group App Team',
+            'Hello,\n\nYou have received a new connection request from $connectionSenderName.\n\nBest regards,\nGIU Changing Group App Team',
       );
     } catch (e) {
-      // Handle the error appropriately, e.g., log it or rethrow it
-      // For example, you can use a logging package or rethrow the error
-      // Here, we'll rethrow the error for simplicity
       throw Exception('Error sending connection request: $e');
     }
   }
 
   Future<void> deleteConnection(String connectionId, String requestId) async {
-    _firestore
-        .collection('requests')
-        .doc(requestId)
-        .collection('connectionRequests')
-        .doc(connectionId)
-        .delete();
+    try {
+      await _firestore
+          .collection('requests')
+          .doc(requestId)
+          .collection('connectionRequests')
+          .doc(connectionId)
+          .delete();
+    } catch (e) {
+      throw Exception('Error deleting connection: $e');
+    }
   }
 
   Future<void> acceptConnection(String requestId, String connectionId) async {
-    // send email to slave
-    // delete all other connection requests and the request itself
+    // Implement logic
   }
 
   Future<void> rejectConnection(String id) async {
-    // send email to slave
+    // Implement logic
   }
 
   Future<Stream<QuerySnapshot<Map<String, dynamic>>>>
