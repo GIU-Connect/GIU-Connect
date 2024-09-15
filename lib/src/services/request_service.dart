@@ -13,6 +13,20 @@ class RequestService {
     required String phoneNumber,
   }) async {
     final firestore = FirebaseFirestore.instance;
+    //check if such a request already exists
+    QuerySnapshot querySnapshot = await firestore
+        .collection('requests')
+        .where('userId', isEqualTo: userId)
+        .where('currentTutNo', isEqualTo: currentTutNo)
+        .where('desiredTutNo', isEqualTo: desiredTutNo)
+        .where('germanLevel', isEqualTo: germanLevel)
+        .where('englishLevel', isEqualTo: englishLevel)
+        .where('major', isEqualTo: major)
+        .where('semester', isEqualTo: semester)
+        .get();
+    if (querySnapshot.docs.isNotEmpty) {
+      throw Exception('Request already exists');
+    }
     // Create a new document in the 'requests' collection
     await firestore.collection('requests').add({
       'userId': userId,
@@ -34,9 +48,15 @@ class RequestService {
     await firestore.collection('requests').doc(id).delete();
   }
 
-  Future<List<Object?>> search(String major, int currentTutNo, int desiredTutNo, String germanLevel,
-      String englishLevel, String semester) async {
+  Future<List<Object?>> search(String userId,int currentTutNo, int desiredTutNo, String germanLevel,
+      String englishLevel) async {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      throw Exception('User not found');
+    }
+    String major = userDoc['major'];
+    String semester = userDoc['semester'];
 
     QuerySnapshot querySnapshot = await _firestore
         .collection('requests')

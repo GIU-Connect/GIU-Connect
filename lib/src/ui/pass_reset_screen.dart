@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:group_changing_app/src/services/auth_service.dart';
 
 class PassResetScreen extends StatefulWidget {
   const PassResetScreen({super.key});
@@ -11,8 +10,7 @@ class PassResetScreen extends StatefulWidget {
 
 class _PassResetScreenState extends State<PassResetScreen> {
   final TextEditingController _emailController = TextEditingController();
-  final AuthService _authService =
-      AuthService(); // Initialize your auth service
+// Initialize your auth service
 
   void _resetPassword() async {
     FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);

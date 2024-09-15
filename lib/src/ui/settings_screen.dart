@@ -63,26 +63,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               const SizedBox(height: 20),
 
-              // Send Password Reset Email Button
-              MyButton(
-                onTap: () {
-                  widget._auth.sendPasswordResetEmail(email: widget.currentUser.email!);
-                },
-                buttonName: 'Send Password Reset Email',
-              ),
-
-              const SizedBox(height: 20),
-
-              // Resend Email Verification Button
-              MyButton(
-                onTap: () {
-                  widget._auth.currentUser!.sendEmailVerification();
-                },
-                buttonName: 'Resend Email Verification',
-              ),
-
-              const SizedBox(height: 20),
-
               // Navigate to My Requests screen
               MyButton(
                 onTap: () {

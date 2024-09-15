@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/request_service.dart';
 import 'package:group_changing_app/src/ui/search_result_screen.dart';
@@ -9,6 +10,7 @@ class SearchScreen extends StatefulWidget {
   State<SearchScreen> createState() => _SearchScreenState();
 
   final RequestService requestService = RequestService();
+  final currentUserId = FirebaseAuth.instance.currentUser!.uid;
 }
 
 class _SearchScreenState extends State<SearchScreen> {
@@ -24,45 +26,16 @@ class _SearchScreenState extends State<SearchScreen> {
   
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Search Details'),
+        title: const Text('Search in Available Requests'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Major'),
-              value: major.isEmpty ? null : major,
-              items: ['CS', 'BA', 'Engineering', 'Pharmaceutical Engineering', 'BI', 'Architecture']
-                  .map((major) => DropdownMenuItem(
-                        value: major,
-                        child: Text(major),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  major = value!;
-                });
-              },
-            ),
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Semester'),
-              value: semester,
-              items: List.generate(8, (index) => (index + 1).toString())
-                  .map((sem) => DropdownMenuItem(
-                        value: sem,
-                        child: Text(sem),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  semester = value!;
-                });
-              },
-            ),
+            
             TextField(
               decoration:
-                  const InputDecoration(labelText: 'Current Tutorial Number', hintText: 'Number of the tutorial you want to switch to'),
+                  const InputDecoration(labelText: 'From Tutorial No.', hintText: 'The tutorial you want to switch to'),
               onChanged: (value) {
                 setState(() {
                   currentTutNo = value;
@@ -71,7 +44,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             TextField(
               decoration:
-                  const InputDecoration(labelText: 'Desired Tutorial Number', hintText: 'Number of the tutorial you are currently in'),
+                  const InputDecoration(labelText: 'To Tutorial No.', hintText: 'The tutorial you are currently in'),
               onChanged: (value) {
                 setState(() {
                   desiredTutNo = value;
@@ -111,7 +84,6 @@ class _SearchScreenState extends State<SearchScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
-                // Try to parse the tutorial numbers safely
                 int? currentTut = int.tryParse(currentTutNo);
                 int? desiredTut = int.tryParse(desiredTutNo);
 
@@ -126,12 +98,11 @@ class _SearchScreenState extends State<SearchScreen> {
                 }
 
                 final results = await widget.requestService.search(
-                  major,
+                  widget.currentUserId,
                   currentTut,
                   desiredTut,
                   germanLevel,
                   englishLevel,
-                  semester
                 );
 
                 Navigator.push(
