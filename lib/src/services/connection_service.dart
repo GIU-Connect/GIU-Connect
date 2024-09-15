@@ -81,8 +81,14 @@ class ConnectionService {
   }
 
   Future<void> rejectConnection(String requestId, String connectionId) async {
-    // TODO: Implement reject connection method
+    DocumentSnapshot connectionSnapshot = await _firestore.collection('connectionRequests').doc(connectionId).get();
+    if (connectionSnapshot.get('status') != 'pending') {
+      throw Exception('Only pending connection requests can be rejected.');
+    }
+    await _firestore.collection('connectionRequests').doc(connectionId).update({'status': 'rejected'});
   }
+
+
   Future<Stream<QuerySnapshot<Map<String, dynamic>>>> showAllConnectionsForRequest(String requestId) async {
     return _firestore.collection('requests').doc(requestId).collection('connectionRequests').snapshots();
   }

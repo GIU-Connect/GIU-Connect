@@ -13,6 +13,20 @@ class RequestService {
     required String phoneNumber,
   }) async {
     final firestore = FirebaseFirestore.instance;
+    //check if such a request already exists
+    QuerySnapshot querySnapshot = await firestore
+        .collection('requests')
+        .where('userId', isEqualTo: userId)
+        .where('currentTutNo', isEqualTo: currentTutNo)
+        .where('desiredTutNo', isEqualTo: desiredTutNo)
+        .where('germanLevel', isEqualTo: germanLevel)
+        .where('englishLevel', isEqualTo: englishLevel)
+        .where('major', isEqualTo: major)
+        .where('semester', isEqualTo: semester)
+        .get();
+    if (querySnapshot.docs.isNotEmpty) {
+      throw Exception('Request already exists');
+    }
     // Create a new document in the 'requests' collection
     await firestore.collection('requests').add({
       'userId': userId,
