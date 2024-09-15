@@ -51,8 +51,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text(
-                        'Connection request submitted successfully. Email sent to request owner.'),
+                    content: Text('Connection request submitted successfully. Email sent to request owner.'),
                   ),
                 );
 
@@ -122,9 +121,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           child: ListView(
             children: [
               StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('requests')
-                    .snapshots(),
+                stream: FirebaseFirestore.instance.collection('requests').snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
