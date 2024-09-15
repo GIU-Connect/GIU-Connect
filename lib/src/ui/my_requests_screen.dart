@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/delete_request_service.dart';
+import 'package:group_changing_app/src/widgets/my_requests_post.dart';
 import 'package:group_changing_app/src/widgets/post.dart';
 
 class MyRequestsScreen extends StatefulWidget {
@@ -142,7 +143,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                       final semester = request['semester'];
                       final phoneNumber = request['phoneNumber'];
 
-                      return Post(
+                      return MyRequestsPost(
                           phoneNumber: phoneNumber,
                           semester: semester,
                           submitterName: name,

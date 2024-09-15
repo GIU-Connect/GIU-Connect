@@ -62,7 +62,14 @@ class _HomePageScreenState extends State<HomePageScreen> {
     currentUser = FirebaseAuth.instance.currentUser;
   }
 
+  late ImageProvider backgroundImage;
 
+  @override
+  void initState2() {
+    super.initState();
+    currentUser = FirebaseAuth.instance.currentUser;
+    backgroundImage = const AssetImage('lib/src/assets/wallpaper.png');
+  }
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -72,7 +79,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           title: Row(
             children: [
               Image.asset(
-          'lib/src/assets/tut_swap1.png',
+          'lib/src/assets/logo.png',
           height: 40,
               ),
               const SizedBox(width: 10),
