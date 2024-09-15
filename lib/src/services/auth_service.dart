@@ -14,8 +14,7 @@ class AuthService {
     required String universityId,
     required String major,
     required String currentTutorial,
-    required String firstName,
-    required String lastName,
+    required String name,
     required String semester, required String confirmPassword,
   }) async {
     // Check if email is a student email
@@ -38,8 +37,7 @@ class AuthService {
         'universityId': universityId,
         'major': major,
         'currentTutorial': currentTutorial,
-        'firstName': firstName,
-        'lastName': lastName,
+        'name': name,
         'semester': semester,
       });
 

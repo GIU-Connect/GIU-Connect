@@ -18,8 +18,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _phoneNumberController = TextEditingController();
   final _universityIdController = TextEditingController();
   final _currentTutorialController = TextEditingController();
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
+  final _fullNameController = TextEditingController();
   String semester = '1';
 
   String major = 'CS';
@@ -33,8 +32,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final phoneNumber = _phoneNumberController.text;
     final universityId = _universityIdController.text;
     final currentTutorial = _currentTutorialController.text;
-    final firstName = _firstNameController.text;
-    final lastName = _lastNameController.text;
+    final name = _fullNameController.text;
     final semester = this.semester;
 
     if (password != confirmPassword) {
@@ -53,8 +51,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         universityId: universityId,
         major: major,
         currentTutorial: currentTutorial,
-        firstName: firstName,
-        lastName: lastName,
+        name :name,
         semester: semester,
       );
 
@@ -76,15 +73,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: Column(
           children: [
             MyTextField(
-              controller: _firstNameController,
-              hintText: 'First Name',
+              controller: _fullNameController,
+              hintText: 'Full Name',
               obscureText: false,
             ),
-            MyTextField(
-              controller: _lastNameController,
-              hintText: 'Last Name',
-              obscureText: false,
-            ),
+          
             MyTextField(
               controller: _emailController,
               hintText: 'Email',

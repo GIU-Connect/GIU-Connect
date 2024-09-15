@@ -45,13 +45,11 @@ class _AddRequestPageState extends State<AddRequestPage> {
       );
       return;
     }
-    final firstName = userDoc['firstName'] as String;
-    final lastName = userDoc['lastName'] as String;
+    final name = userDoc['name'] as String;
     final currentTutNo = userDoc['currentTutorial'] as String;
     final major = userDoc['major'] as String;
     final semester = userDoc['semester'] as String;
     final phoneNumber = userDoc['phoneNumber'] as String;
-    final name = '$firstName $lastName';
 
     if (currentTutNo.toString() == desiredTutController.text) {
       ScaffoldMessenger.of(context).showSnackBar(

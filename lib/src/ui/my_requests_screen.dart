@@ -66,7 +66,45 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
   }
 
   late Future<QuerySnapshot<Map<String, dynamic>>> _userRequestsFuture;
+  void showConnectionsDialog(BuildContext context, String requestId) async {
+    final connectionsCollection = FirebaseFirestore.instance.collection('connections');
+    final snapshot = await connectionsCollection.where('requestId', isEqualTo: requestId).get();
 
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('My Connections'),
+          content: snapshot.docs.isEmpty
+              ? const Text('No connections found.')
+              : SizedBox(
+                  width: double.maxFinite,
+                  child: ListView(
+                    children: snapshot.docs.map((doc) {
+                      final data = doc.data();
+                      final name = data['name'];
+                      final email = data['email'];
+                      final phoneNumber = data['phoneNumber'];
+
+                      return ListTile(
+                        title: Text(name),
+                        subtitle: Text('Email: $email\nPhone: $phoneNumber'),
+                      );
+                    }).toList(),
+                  ),
+                ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
   @override
   void initState() {
     super.initState();

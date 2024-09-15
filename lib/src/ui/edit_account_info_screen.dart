@@ -140,17 +140,17 @@ class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
     );
   }
 
-  void _changeFirstName() async {
+  void _changeName() async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        TextEditingController semesterController = TextEditingController();
+        TextEditingController nameController = TextEditingController();
 
         return AlertDialog(
-          title: const Text('Change First Name'),
+          title: const Text('Change Name'),
           content: TextField(
-            controller: semesterController,
-            decoration: const InputDecoration(labelText: 'New First Name'),
+            controller: nameController,
+            decoration: const InputDecoration(labelText: 'New Name'),
           ),
           actions: [
             TextButton(
@@ -161,46 +161,10 @@ class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
             ),
             TextButton(
               onPressed: () {
-                String newFirstName = semesterController.text;
-                widget.editor.changeFirstName(
+                String newName = nameController.text;
+                widget.editor.changeName(
                   userId: widget.currentUser.uid,
-                  firstName: newFirstName,
-                );
-                Navigator.of(context).pop();
-              },
-              child: const Text('Change'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _changeLastName() async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        TextEditingController lastNameController = TextEditingController();
-
-        return AlertDialog(
-          title: const Text('Change Last Name'),
-          content: TextField(
-            controller: lastNameController,
-            decoration: const InputDecoration(labelText: 'New Last Name'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                String newFirstName = lastNameController.text;
-                widget.editor.changeLastName(
-                  userId: widget.currentUser.uid,
-                  lastName: newFirstName,
+                  name: newName,
                 );
                 Navigator.of(context).pop();
               },
@@ -350,14 +314,10 @@ class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
             ),
             const SizedBox(height: 10),
             MyButton(
-              onTap: _changeFirstName,
-              buttonName: 'Change First Name',
+              onTap: _changeName,
+              buttonName: 'Change Name',
             ),
-            const SizedBox(height: 10),
-            MyButton(
-              onTap: _changeLastName,
-              buttonName: 'Change Last Name',
-            ),
+            
             const SizedBox(height: 10),
             MyButton(
               onTap: _changeSemester,

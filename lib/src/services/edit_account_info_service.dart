@@ -2,68 +2,104 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EditAccountInfoService {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> applyChangesToMyRequests({
+    required String userId,
+    required String field,
+    required String newValue,
+  }) async {
+    QuerySnapshot querySnapshot = await _firestore
+        .collection('requests')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      await doc.reference.update({field: newValue});
+    }
+  }
+
   Future<void> changePhoneNumber({
     required String userId,
     required String oldPhoneNumber,
     required String newPhoneNumber,
   }) async {
-    _firestore.collection('users').doc(userId).update({
-      'phone_number': newPhoneNumber,
+    await _firestore.collection('users').doc(userId).update({
+      'phoneNumber': newPhoneNumber,
     });
+    await applyChangesToMyRequests(
+      userId: userId,
+      field: 'phoneNumber',
+      newValue: newPhoneNumber,
+    );
   }
+
   Future<void> changeUniversityId({
     required String userId,
     required String universityId,
-  }) async
-  {
-    _firestore.collection('users').doc(userId).update({
+  }) async {
+    await _firestore.collection('users').doc(userId).update({
       'universityId': universityId,
     });
+    await applyChangesToMyRequests(
+      userId: userId,
+      field: 'universityId',
+      newValue: universityId,
+    );
   }
 
   Future<void> changeCurrentTutorial({
     required String userId,
     required String currentTutorial,
   }) async {
-    _firestore.collection('users').doc(userId).update({
-      'current_tutorial': currentTutorial,
+    await _firestore.collection('users').doc(userId).update({
+      'currentTutorial': currentTutorial,
     });
-  } 
+    await applyChangesToMyRequests(
+      userId: userId,
+      field: 'currentTutorial',
+      newValue: currentTutorial,
+    );
+  }
 
-  Future<void> changeFirstName({
+  Future<void> changeName({
     required String userId,
-    required String firstName,
+    required String name,
   }) async {
-    _firestore.collection('users').doc(userId).update({
-      'first_name': firstName,
+    await _firestore.collection('users').doc(userId).update({
+      'name': name,
     });
-  } 
-
-  Future<void> changeLastName({
-    required String userId,
-    required String lastName,
-  }) async {
-    _firestore.collection('users').doc(userId).update({
-      'last_name': lastName,
-    });
-  } 
+    await applyChangesToMyRequests(
+      userId: userId,
+      field: 'name',
+      newValue: name,
+    );
+  }
 
   Future<void> changeSemester({
     required String userId,
     required String semester,
   }) async {
-    _firestore.collection('users').doc(userId).update({
+    await _firestore.collection('users').doc(userId).update({
       'semester': semester,
     });
-  } 
+    await applyChangesToMyRequests(
+      userId: userId,
+      field: 'semester',
+      newValue: semester,
+    );
+  }
 
   Future<void> changeMajor({
     required String userId,
     required String major,
   }) async {
-    _firestore.collection('users').doc(userId).update({
+    await _firestore.collection('users').doc(userId).update({
       'major': major,
     });
-  } 
-
+    await applyChangesToMyRequests(
+      userId: userId,
+      field: 'major',
+      newValue: major,
+    );
+  }
 }

@@ -62,6 +62,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     currentUser = FirebaseAuth.instance.currentUser;
   }
 
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
