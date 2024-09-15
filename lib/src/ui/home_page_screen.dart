@@ -6,6 +6,7 @@ import 'package:group_changing_app/src/widgets/post.dart';
 import 'package:group_changing_app/src/ui/add_request_screen.dart';
 import 'package:group_changing_app/src/ui/search_screen.dart';
 import 'package:group_changing_app/src/ui/settings_screen.dart';
+import 'package:group_changing_app/src/services/connection_service.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({super.key});
@@ -43,7 +44,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
             SizedBox(width: 10),
             MyButton(
               onTap: () {
-                // Handle connect action
+                // Send connection request
+                ConnectionService().sendConnectionRequest(
+                  doc.id,
+                  FirebaseAuth.instance.currentUser!.uid,
+                );
+
                 Navigator.of(context).pop();
               },
               buttonName: 'Connect',
@@ -70,6 +76,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     currentUser = FirebaseAuth.instance.currentUser;
     backgroundImage = const AssetImage('lib/src/assets/wallpaper.png');
   }
+
   @override
   Widget build(BuildContextut_swap1) {
     return SafeArea(
@@ -79,37 +86,37 @@ class _HomePageScreenState extends State<HomePageScreen> {
           title: Row(
             children: [
               Image.asset(
-          'lib/src/assets/tut_swap1.png',
+          'lib/src/assets/logo.png',
           height: 40,
               ),
               const SizedBox(width: 10),
               const Text(
-          'Home Page',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+                'Home Page',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ],
           ),
           backgroundColor: Colors.black, // Dark theme for consistency
           actions: [
-          //   IconButton(
-          //     icon: const Icon(Icons.search, color: Colors.white),
-          //     onPressed: () {
-          // // Navigator.push(
-          // //   context,
-          // //   MaterialPageRoute(builder: (context) => SearchScreen()),
-          // // );
-          //     },
-          //   ),
             IconButton(
-              icon: const Icon(Icons.person, color: Colors.white),
+              icon: const Icon(Icons.search, color: Colors.white),
               onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SettingsScreen()),
+            MaterialPageRoute(builder: (context) => SearchScreen()),
           );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.person, color: Colors.white),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SettingsScreen()),
+                );
               },
             ),
           ],
