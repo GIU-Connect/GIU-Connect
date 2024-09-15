@@ -86,7 +86,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           title: Row(
             children: [
               Image.asset(
-          'lib/src/assets/logo.png',
+          'lib/src/assets/tut_swap1.png',
           height: 40,
               ),
               const SizedBox(width: 10),
@@ -101,15 +101,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           ),
           backgroundColor: Colors.black, // Dark theme for consistency
           actions: [
-            IconButton(
-              icon: const Icon(Icons.search, color: Colors.white),
-              onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SearchScreen()),
-          );
-              },
-            ),
+            
             IconButton(
               icon: const Icon(Icons.person, color: Colors.white),
               onPressed: () {

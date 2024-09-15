@@ -5,7 +5,6 @@ import 'package:group_changing_app/src/services/connection_service.dart';
 import 'package:group_changing_app/src/services/delete_request_service.dart';
 import 'package:group_changing_app/src/widgets/connection_request.dart';
 import 'package:group_changing_app/src/widgets/my_requests_post.dart';
-import 'package:group_changing_app/src/widgets/post.dart';
 
 class MyRequestsScreen extends StatefulWidget {
   MyRequestsScreen({super.key});
@@ -109,6 +108,11 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
     );
   }
 
+  // Future<String> getNameFromId(String id) async {
+  //   final userDoc = await FirebaseFirestore.instance.collection('users').doc(id).get();
+  //   return userDoc.data()!['name'];
+  // }
+
 
   @override
   void initState() {
@@ -142,17 +146,40 @@ void showConnectionRequestsDialog(BuildContext context, String requestId) {
                   children: snapshot.data!.docs.map((doc) {
                     final data = doc.data();
                     final senderId = data['connectionSenderId'];
-                    final status = data['status'];
 
-                    return ConnectionRequestCard(
-                      submitterName: senderId,
-                      onAccept: () {
-                        ConnectionService().acceptConnection(requestId, doc.id);
-                        Navigator.of(context).pop();
-                      },
-                      onReject: () {
-                        ConnectionService().rejectConnection(doc.id);
-                        Navigator.of(context).pop();
+                    // Fetch the name asynchronously for each connection request
+                    return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                      future: FirebaseFirestore.instance
+                          .collection('users') // Assuming 'users' collection contains user data
+                          .doc(senderId)
+                          .get(),
+                      builder: (context, nameSnapshot) {
+                        if (nameSnapshot.connectionState == ConnectionState.waiting) {
+                          return const ListTile(
+                            title: CircularProgressIndicator(),
+                          );
+                        } else if (nameSnapshot.hasError) {
+                          return ListTile(
+                            title: Text('Error: ${nameSnapshot.error}'),
+                          );
+                        } else if (!nameSnapshot.hasData || !nameSnapshot.data!.exists) {
+                          return const ListTile(
+                            title: Text('Unknown user'),
+                          );
+                        } else {
+                          final name = nameSnapshot.data!.data()!['name'] ?? 'Unknown';
+                          return ConnectionRequestCard(
+                            submitterName: name,
+                            onAccept: () {
+                              ConnectionService().acceptConnection(requestId, doc.id);
+                              Navigator.of(context).pop();
+                            },
+                            onReject: () {
+                              ConnectionService().rejectConnection(doc.id);
+                              Navigator.of(context).pop();
+                            },
+                          );
+                        }
                       },
                     );
                   }).toList(),
@@ -173,6 +200,7 @@ void showConnectionRequestsDialog(BuildContext context, String requestId) {
     },
   );
 }
+
 
 
   @override
