@@ -69,7 +69,7 @@ flutter:
   assets:
     - lib/src/assets/tut_swap1.png
     - lib/src/assets/logo.png
-    - lib/src/assets/wallpaper.png
+    #   - lib/src/assets/wallpaper.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
