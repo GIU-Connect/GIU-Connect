@@ -20,8 +20,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor:
-              Colors.black, // Set the AppBar background color to black
+          backgroundColor: Colors.black, // Set the AppBar background color to black
           title: const Text(
             'Settings',
             style: TextStyle(
@@ -34,8 +33,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         body: Padding(
           padding: const EdgeInsets.all(20.0), // Padding for better spacing
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start, // Align items to the left
+            crossAxisAlignment: CrossAxisAlignment.start, // Align items to the left
             children: [
               const SizedBox(height: 20),
 
@@ -56,8 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () {
                   widget._auth.signOut();
                   Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                        builder: (context) => const SignUpScreen()),
+                    MaterialPageRoute(builder: (context) => const SignUpScreen()),
                     (Route<dynamic> route) => false,
                   );
                 },
@@ -69,8 +66,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               // Send Password Reset Email Button
               MyButton(
                 onTap: () {
-                  widget._auth
-                      .sendPasswordResetEmail(email: widget.currentUser.email!);
+                  widget._auth.sendPasswordResetEmail(email: widget.currentUser.email!);
                 },
                 buttonName: 'Send Password Reset Email',
               ),
@@ -97,7 +93,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 buttonName: 'My Requests',
               ),
 
-
               const SizedBox(height: 20),
 
               MyButton(
@@ -105,8 +100,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   await widget._auth.currentUser!.reload();
                   if (widget._auth.currentUser!.emailVerified) {
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (context) => EditAccountInfoScreen()),
+                      MaterialPageRoute(builder: (context) => EditAccountInfoScreen()),
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(

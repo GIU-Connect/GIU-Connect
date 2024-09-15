@@ -1,14 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../utils/error_handler.dart';
-import 'package:logger/logger.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final currentUser = FirebaseAuth.instance.currentUser;
 
-//sign up method
+  // Sign up method
   Future<void> signUp({
     required String email,
     required String password,
@@ -23,7 +22,15 @@ class AuthService {
     try {
       // Check if email is a student email
       if (!email.trim().endsWith('@student.giu-uni.de')) {
-        throw Exception('Invalid email');
+        return Future.error('Please use a student email');
+      }
+
+      // check if the university id is not in the database
+      final QuerySnapshot result =
+          await _firestore.collection('users').where('universityId', isEqualTo: universityId).get();
+      final List<DocumentSnapshot> documents = result.docs;
+      if (documents.isNotEmpty) {
+        return Future.error('University ID already exists');
       }
 
       // Sign up user with email and password
@@ -53,7 +60,7 @@ class AuthService {
     }
   }
 
-  //sign in method
+  // Sign in method
   Future<void> signIn({
     required String email,
     required String password,
@@ -67,25 +74,28 @@ class AuthService {
 
       // Check if the email is verified
       if (!userCredential.user!.emailVerified) {
-        await userCredential.user!.sendEmailVerification();
-        throw Exception('Email not verified. Verification email sent.');
+        return Future.error('Email not verified, please verify your email.');
       }
-
-      // User is signed in and email is verified
     } catch (e) {
-      throw Exception('Failed to sign in: $e');
+      AuthResultStatus status = AuthExceptionHandler.handleException(e);
+      String errorMessage = AuthExceptionHandler.generateErrorMessage(status);
+      return Future.error(errorMessage);
     }
   }
 
+  // Password reset method
   Future<bool> passwordReset({required String email}) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
       return true;
     } catch (e) {
-      throw Exception('Failed to send password reset email: $e');
+      AuthResultStatus status = AuthExceptionHandler.handleException(e);
+      String errorMessage = AuthExceptionHandler.generateErrorMessage(status);
+      return Future.error(errorMessage);
     }
   }
 
+  // Resend email verification
   Future<bool> resendVerificationEmail({required String email}) async {
     try {
       User? user = _auth.currentUser;
@@ -94,16 +104,21 @@ class AuthService {
         return true;
       }
     } catch (e) {
-      throw Exception('Failed to resend verification email: $e');
+      AuthResultStatus status = AuthExceptionHandler.handleException(e);
+      String errorMessage = AuthExceptionHandler.generateErrorMessage(status);
+      return Future.error(errorMessage);
     }
     return false;
   }
 
+  // Sign out method
   Future<void> signOut() async {
     try {
       await _auth.signOut();
     } catch (e) {
-      throw Exception('Failed to sign out: $e');
+      AuthResultStatus status = AuthExceptionHandler.handleException(e);
+      String errorMessage = AuthExceptionHandler.generateErrorMessage(status);
+      return Future.error(errorMessage);
     }
   }
 }

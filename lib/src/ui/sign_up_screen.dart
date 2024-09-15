@@ -25,7 +25,7 @@ class SignUpScreenState extends State<SignUpScreen> {
 
   String? _semester;
   String? _major;
-  bool _isLoading = true;
+  bool _isLoading = false; // Change initial state to false
 
   final AuthService _authService = AuthService();
 
@@ -66,6 +66,10 @@ class SignUpScreenState extends State<SignUpScreen> {
 
   Future<void> _signUp() async {
     if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        _isLoading = true; // Set loading to true
+      });
+
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
       final confirmPassword = _confirmPasswordController.text.trim();
@@ -75,6 +79,9 @@ class SignUpScreenState extends State<SignUpScreen> {
       final fullName = _fullNameController.text.trim();
 
       if (password != confirmPassword) {
+        setState(() {
+          _isLoading = false; // Reset loading state
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Passwords do not match')),
         );
@@ -99,18 +106,29 @@ class SignUpScreenState extends State<SignUpScreen> {
             MaterialPageRoute(builder: (context) => const SignInScreen()),
           );
         }
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please verify your email')),
+          );
+        }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                // Display the message without exception type
                 e.toString(),
-                style: const TextStyle(color: Colors.white), // Set text color to white for contrast
+                style: const TextStyle(color: Colors.white),
               ),
-              backgroundColor: Colors.red, // Set snackbar background color to red
+              backgroundColor: Colors.red,
             ),
           );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false; // Reset loading state
+          });
         }
       }
     }
@@ -200,7 +218,11 @@ class SignUpScreenState extends State<SignUpScreen> {
                         },
                       ),
                       const SizedBox(height: 20),
-                      MyButton(onTap: _signUp, buttonName: 'Sign Up'),
+                      MyButton(
+                        onTap: _signUp,
+                        buttonName: 'Sign Up',
+                        isLoading: _isLoading, // Pass loading state
+                      ),
                       const SizedBox(height: 20),
                       MyButton(
                         onTap: () {
@@ -210,6 +232,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                           );
                         },
                         buttonName: 'Already have an account? Sign In',
+                        isLoading: _isLoading, // Pass loading state (optional, if you want to disable it as well)
                       ),
                     ],
                   ),
