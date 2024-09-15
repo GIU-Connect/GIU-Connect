@@ -77,7 +77,64 @@ class ConnectionService {
   }
 
   Future<void> acceptConnection(String requestId, String connectionId) async {
-    // Implement logic
+    // Update the connection status to 'accepted'
+    await _firestore
+      .collection('requests')
+      .doc(requestId)
+      .collection('connectionRequests')
+      .doc(connectionId)
+      .update({'status': 'accepted'});
+
+      // make all other connection requests sent by this user on this request to 'inactive'
+      DocumentSnapshot connectionSnapshot = await _firestore
+        .collection('requests')
+        .doc(requestId)
+        .collection('connectionRequests')
+        .doc(connectionId)
+        .get();
+      String connectionSenderId = (connectionSnapshot.data() as Map<String, dynamic>)['connectionSenderId'];
+
+      // Update the status of all connections sent by this user on all other requests to 'inactive'
+      QuerySnapshot allConnections = await _firestore
+        .collectionGroup('connectionRequests')
+        .where('connectionSenderId', isEqualTo: connectionSenderId)
+        .where('status', isEqualTo: 'pending')
+        .get();
+
+      for (QueryDocumentSnapshot doc in allConnections.docs) {
+        if (doc.reference.parent.parent!.id != requestId) {
+        await doc.reference.update({'status': 'inactive'});
+        }
+      }
+
+      // Fetch the request owner's userId
+      DocumentSnapshot requestSnapshot = await _firestore.collection('requests').doc(requestId).get();
+      String requestOwnerId = (requestSnapshot.data() as Map<String, dynamic>)['userId'];
+
+      // Update the status of all requests made by this request owner to 'inactive'
+      QuerySnapshot ownerRequests = await _firestore
+        .collection('requests')
+        .where('userId', isEqualTo: requestOwnerId)
+        .where('status', isEqualTo: 'active')
+        .get();
+
+      for (QueryDocumentSnapshot doc in ownerRequests.docs) {
+        await doc.reference.update({'status': 'inactive'});
+      }
+
+      QuerySnapshot connectionSenderRequests = await _firestore
+        .collection('requests')
+        .where('userId', isEqualTo: connectionSenderId)
+        .where('status', isEqualTo: 'active')
+        .get();
+
+      for (QueryDocumentSnapshot doc in connectionSenderRequests.docs) {
+        await doc.reference.update({'status': 'inactive'});
+      }
+
+    
+
+    // send email to the connection sender
   }
 
   Future<void> rejectConnection(String id) async {
