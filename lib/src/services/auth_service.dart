@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../utils/error_handler.dart';
+import 'package:logger/logger.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -15,16 +17,17 @@ class AuthService {
     required String major,
     required String currentTutorial,
     required String name,
-    required String semester, required String confirmPassword,
+    required String semester,
+    required String confirmPassword,
   }) async {
-    // Check if email is a student email
     try {
+      // Check if email is a student email
       if (!email.trim().endsWith('@student.giu-uni.de')) {
         throw Exception('Invalid email');
       }
+
       // Sign up user with email and password
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -43,10 +46,10 @@ class AuthService {
 
       // Send email verification
       await userCredential.user!.sendEmailVerification();
-
-      //catch any unexpected errors
     } catch (e) {
-      throw Exception('Failed to sign up: $e');
+      AuthResultStatus status = AuthExceptionHandler.handleException(e);
+      String errorMessage = AuthExceptionHandler.generateErrorMessage(status);
+      return Future.error(errorMessage);
     }
   }
 
@@ -96,10 +99,7 @@ class AuthService {
     return false;
   }
 
-  Future<void> signOut(
-    
-  ) async {
-
+  Future<void> signOut() async {
     try {
       await _auth.signOut();
     } catch (e) {

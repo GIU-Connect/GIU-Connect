@@ -102,7 +102,14 @@ class SignUpScreenState extends State<SignUpScreen> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Sign up failed. Please try again.')),
+            SnackBar(
+              content: Text(
+                // Display the message without exception type
+                e.toString(),
+                style: const TextStyle(color: Colors.white), // Set text color to white for contrast
+              ),
+              backgroundColor: Colors.red, // Set snackbar background color to red
+            ),
           );
         }
       }
