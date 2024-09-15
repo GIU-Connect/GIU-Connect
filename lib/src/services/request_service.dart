@@ -48,9 +48,15 @@ class RequestService {
     await firestore.collection('requests').doc(id).delete();
   }
 
-  Future<List<Object?>> search(String major, int currentTutNo, int desiredTutNo, String germanLevel,
-      String englishLevel, String semester) async {
+  Future<List<Object?>> search(String userId,int currentTutNo, int desiredTutNo, String germanLevel,
+      String englishLevel) async {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      throw Exception('User not found');
+    }
+    String major = userDoc['major'];
+    String semester = userDoc['semester'];
 
     QuerySnapshot querySnapshot = await _firestore
         .collection('requests')

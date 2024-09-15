@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/ui/add_request_screen.dart';
+import 'package:group_changing_app/src/widgets/my_button.dart';
 import 'package:group_changing_app/src/widgets/post.dart';
 
 class SearchResultScreen extends StatefulWidget {
@@ -64,18 +65,24 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
               child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('No results found'),
+                const Text(
+                  'No results found',
+                  style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.red,
+                  ),
+                ),
                 Text(FirebaseAuth.instance.currentUser == null
                     ? 'Please log in to add a request'
-                    : 'Add a request'),
-                ElevatedButton(
-                  onPressed: () {
+                    : ''),
+                MyButton(
+                  onTap: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const AddRequestPage()));
                   },
-                  child: const Text('Add Request'),
+                  buttonName: 'Add Request',
                 ),
               ],
             ))
