@@ -14,33 +14,17 @@ class EditAccountInfoScreen extends StatefulWidget {
 }
 
 class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
-  // void _changePassword() async {
-  //   widget._auth.sendPasswordResetuserId(user.userId!);
-  // }
-  void _changePhoneNumber() async {
+  void _showDialog({
+    required String title,
+    required Widget content,
+    required VoidCallback onChange,
+  }) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        TextEditingController oldPhoneNumberController =
-            TextEditingController();
-        TextEditingController newPhoneNumberController =
-            TextEditingController();
-
         return AlertDialog(
-          title: const Text('Change Phone Number'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: oldPhoneNumberController,
-                decoration: const InputDecoration(labelText: 'Old Phone Number'),
-              ),
-              TextField(
-                controller: newPhoneNumberController,
-                decoration: const InputDecoration(labelText: 'New Phone Number'),
-              ),
-            ],
-          ),
+          title: Text(title),
+          content: content,
           actions: [
             TextButton(
               onPressed: () {
@@ -50,220 +34,148 @@ class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
             ),
             TextButton(
               onPressed: () {
-                String oldPhoneNumber = oldPhoneNumberController.text;
-                String newPhoneNumber = newPhoneNumberController.text;
-                widget.editor.changePhoneNumber(
-                  userId: widget.currentUser.uid,
-                  oldPhoneNumber: oldPhoneNumber,
-                  newPhoneNumber: newPhoneNumber,
-                );
+                onChange();
                 Navigator.of(context).pop();
               },
               child: const Text('Change'),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  void _changePhoneNumber() async {
+    TextEditingController newPhoneNumberController = TextEditingController();
+
+    _showDialog(
+      title: 'Change Phone Number',
+      content: TextField(
+        controller: newPhoneNumberController,
+        decoration: const InputDecoration(labelText: 'New Phone Number'),
+      ),
+      onChange: () {
+        String newPhoneNumber = newPhoneNumberController.text;
+        widget.editor.changePhoneNumber(
+          userId: widget.currentUser.uid,
+          oldPhoneNumber: '', // Placeholder since oldPhoneNumber is not used
+          newPhoneNumber: newPhoneNumber,
         );
       },
     );
   }
 
   void _changeUniversityId() async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        TextEditingController universityIdController = TextEditingController();
+    TextEditingController universityIdController = TextEditingController();
 
-        return AlertDialog(
-          title: const Text('Change University ID'),
-          content: TextField(
-            controller: universityIdController,
-            decoration: const InputDecoration(labelText: 'New University ID'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                String newUniversityId = universityIdController.text;
-                widget.editor.changeUniversityId(
-                  userId: widget.currentUser.uid,
-                  universityId: newUniversityId,
-                );
-                Navigator.of(context).pop();
-              },
-              child: const Text('Change'),
-            ),
-          ],
+    _showDialog(
+      title: 'Change University ID',
+      content: TextField(
+        controller: universityIdController,
+        decoration: const InputDecoration(labelText: 'New University ID'),
+      ),
+      onChange: () {
+        String newUniversityId = universityIdController.text;
+        widget.editor.changeUniversityId(
+          userId: widget.currentUser.uid,
+          universityId: newUniversityId,
         );
       },
     );
   }
 
   void _changeCurrentTutorial() async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        TextEditingController currentTutorialController =
-            TextEditingController();
+    TextEditingController currentTutorialController = TextEditingController();
 
-        return AlertDialog(
-          title: const Text('Change Current Tutorial'),
-          content: TextField(
-            controller: currentTutorialController,
-            decoration: const InputDecoration(labelText: 'New Tutorial Number'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                String newTutorial = currentTutorialController.text;
-                widget.editor.changeCurrentTutorial(
-                  userId: widget.currentUser.uid,
-                  currentTutorial: newTutorial,
-                );
-                Navigator.of(context).pop();
-              },
-              child: const Text('Change'),
-            ),
-          ],
+    _showDialog(
+      title: 'Change Current Tutorial',
+      content: TextField(
+        controller: currentTutorialController,
+        decoration: const InputDecoration(labelText: 'New Tutorial Number'),
+      ),
+      onChange: () {
+        String newTutorial = currentTutorialController.text;
+        widget.editor.changeCurrentTutorial(
+          userId: widget.currentUser.uid,
+          currentTutorial: newTutorial,
         );
       },
     );
   }
 
   void _changeName() async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        TextEditingController nameController = TextEditingController();
+    TextEditingController nameController = TextEditingController();
 
-        return AlertDialog(
-          title: const Text('Change Name'),
-          content: TextField(
-            controller: nameController,
-            decoration: const InputDecoration(labelText: 'New Name'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                String newName = nameController.text;
-                widget.editor.changeName(
-                  userId: widget.currentUser.uid,
-                  name: newName,
-                );
-                Navigator.of(context).pop();
-              },
-              child: const Text('Change'),
-            ),
-          ],
+    _showDialog(
+      title: 'Change Name',
+      content: TextField(
+        controller: nameController,
+        decoration: const InputDecoration(labelText: 'New Name'),
+      ),
+      onChange: () {
+        String newName = nameController.text;
+        widget.editor.changeName(
+          userId: widget.currentUser.uid,
+          name: newName,
         );
       },
     );
   }
 
   void _changeSemester() async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        TextEditingController semesterController = TextEditingController();
+    TextEditingController semesterController = TextEditingController();
 
-        return AlertDialog(
-          title: const Text('Change Semester'),
-          content: TextField(
-            controller: semesterController,
-            decoration: const InputDecoration(labelText: 'New Semester No.'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                String newSemester = semesterController.text;
-                widget.editor.changeSemester(
-                  userId: widget.currentUser.uid,
-                  semester: newSemester,
-                );
-                Navigator.of(context).pop();
-              },
-              child: const Text('Change'),
-            ),
-          ],
+    _showDialog(
+      title: 'Change Semester',
+      content: TextField(
+        controller: semesterController,
+        decoration: const InputDecoration(labelText: 'New Semester No.'),
+      ),
+      onChange: () {
+        String newSemester = semesterController.text;
+        widget.editor.changeSemester(
+          userId: widget.currentUser.uid,
+          semester: newSemester,
         );
       },
     );
   }
 
   void _changeMajor() async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        String selectedMajor = 'Computer Science';
-        List<String> majors = [
-          'Computer Science',
-          'Electrical Engineering',
-          'Mechanical Engineering',
-          'Civil Engineering',
-          'Business Administration',
-          'Economics',
-          'Psychology',
-          'Biology',
-          'Chemistry',
-          'Physics'
-        ];
+    String selectedMajor = 'Computer Science';
+    List<String> majors = [
+      'Computer Science',
+      'Electrical Engineering',
+      'Mechanical Engineering',
+      'Civil Engineering',
+      'Business Administration',
+      'Economics',
+      'Psychology',
+      'Biology',
+      'Chemistry',
+      'Physics'
+    ];
 
-        return AlertDialog(
-          title: const Text('Change Major'),
-          content: DropdownButton<String>(
-            value: selectedMajor,
-            onChanged: (String? newValue) {
-              setState(() {
-                selectedMajor = newValue!;
-              });
-            },
-            items: majors.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                widget.editor.changeMajor(
-                  userId: widget.currentUser.uid,
-                  major: selectedMajor,
-                );
-                Navigator.of(context).pop();
-              },
-              child: const Text('Change'),
-            ),
-          ],
+    _showDialog(
+      title: 'Change Major',
+      content: DropdownButton<String>(
+        value: selectedMajor,
+        onChanged: (String? newValue) {
+          setState(() {
+            selectedMajor = newValue!;
+          });
+        },
+        items: majors.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+      ),
+      onChange: () {
+        widget.editor.changeMajor(
+          userId: widget.currentUser.uid,
+          major: selectedMajor,
         );
       },
     );
@@ -292,8 +204,33 @@ class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
             const SizedBox(height: 20),
             MyButton(
               onTap: () {
-                widget._auth
-                    .sendPasswordResetEmail(email: widget.currentUser.email!);
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Change Email'),
+                      content: const Text(
+                          'Please contact the admin at aly.abdelmoneim@student.giu-uni.de to change your email address.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              buttonName: 'Change email',
+            ),
+            const SizedBox(height: 10),
+            MyButton(
+              onTap: () {
+                widget._auth.sendPasswordResetEmail(
+                  email: widget.currentUser.email!,
+                );
               },
               buttonName: 'Send Password Reset userId',
             ),
@@ -317,7 +254,6 @@ class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
               onTap: _changeName,
               buttonName: 'Change Name',
             ),
-            
             const SizedBox(height: 10),
             MyButton(
               onTap: _changeSemester,
