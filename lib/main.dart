@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/ui/sign_up_screen.dart';
 import './src/utils/firebase_utils.dart';
+import './src/utils/email_sender.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
