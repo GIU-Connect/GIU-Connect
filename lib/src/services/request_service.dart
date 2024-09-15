@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RequestService {
-    Future<void> addRequest({
+  Future<void> addRequest({
     required String userId,
     required String name,
     required int currentTutNo,
@@ -22,7 +22,7 @@ class RequestService {
       'germanLevel': germanLevel,
       'englishLevel': englishLevel,
       'major': major,
-      'semester' : semester,
+      'semester': semester,
       'phoneNumber': phoneNumber,
       'timestamp': FieldValue.serverTimestamp(),
       'status': 'active',
@@ -34,9 +34,8 @@ class RequestService {
     await firestore.collection('requests').doc(id).delete();
   }
 
-
-  Future<List<Object?>> search(String major, int currentTutNo, int desiredTutNo,
-      String germanLevel, String englishLevel, String semester) async {
+  Future<List<Object?>> search(String major, int currentTutNo, int desiredTutNo, String germanLevel,
+      String englishLevel, String semester) async {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
     QuerySnapshot querySnapshot = await _firestore

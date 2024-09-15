@@ -23,8 +23,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
     final requestCollection = FirebaseFirestore.instance.collection('requests');
     String userId = FirebaseAuth.instance.currentUser!.uid;
 
-    final snapshot =
-        await requestCollection.where('userId', isEqualTo: userId).get();
+    final snapshot = await requestCollection.where('userId', isEqualTo: userId).get();
     return snapshot;
   }
 
@@ -113,97 +112,92 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
   //   return userDoc.data()!['name'];
   // }
 
-
   @override
   void initState() {
     super.initState();
     _userRequestsFuture = fetchUserRequests();
   }
 
-void showConnectionRequestsDialog(BuildContext context, String requestId) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Connection Requests'),
-        content: FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          future: FirebaseFirestore.instance
-              .collection('requests')
-              .doc(requestId)
-              .collection('connectionRequests')
-              .get(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Text('No connection requests found.');
-            } else {
-              return SizedBox(
-                width: double.maxFinite,
-                child: ListView(
-                  children: snapshot.data!.docs.map((doc) {
-                    final data = doc.data();
-                    final senderId = data['connectionSenderId'];
+  void showConnectionRequestsDialog(BuildContext context, String requestId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Connection Requests'),
+          content: FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
+            future: FirebaseFirestore.instance
+                .collection('connectionRequests')
+                .where('requestId', isEqualTo: requestId)
+                .get(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return const Text('No connection requests found.');
+              } else {
+                return SizedBox(
+                  width: double.maxFinite,
+                  child: ListView(
+                    children: snapshot.data!.docs.map((doc) {
+                      final data = doc.data();
+                      final senderId = data['connectionSenderId'];
 
-                    // Fetch the name asynchronously for each connection request
-                    return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                      future: FirebaseFirestore.instance
-                          .collection('users') // Assuming 'users' collection contains user data
-                          .doc(senderId)
-                          .get(),
-                      builder: (context, nameSnapshot) {
-                        if (nameSnapshot.connectionState == ConnectionState.waiting) {
-                          return const ListTile(
-                            title: CircularProgressIndicator(),
-                          );
-                        } else if (nameSnapshot.hasError) {
-                          return ListTile(
-                            title: Text('Error: ${nameSnapshot.error}'),
-                          );
-                        } else if (!nameSnapshot.hasData || !nameSnapshot.data!.exists) {
-                          return const ListTile(
-                            title: Text('Unknown user'),
-                          );
-                        } else {
-
-                          final name = nameSnapshot.data!.data()!['name'] ?? 'Unknown';
-                          return ConnectionRequestCard(
-                            submitterName: name,
-                            status: data['status'],
-                            onAccept: () {
-                              ConnectionService().acceptConnection(requestId, doc.id);
-                              Navigator.of(context).pop();
-                            },
-                            onReject: () {
-                              ConnectionService().rejectConnection(requestId, doc.id);
-                              Navigator.of(context).pop();
-                            },
-                          );
-                        }
-                      },
-                    );
-                  }).toList(),
-                ),
-              );
-            }
-          },
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Close'),
-            onPressed: () {
-              Navigator.of(context).pop();
+                      // Fetch the name asynchronously for each connection request
+                      return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                        future: FirebaseFirestore.instance
+                            .collection('users') // Assuming 'users' collection contains user data
+                            .doc(senderId)
+                            .get(),
+                        builder: (context, nameSnapshot) {
+                          if (nameSnapshot.connectionState == ConnectionState.waiting) {
+                            return const ListTile(
+                              title: CircularProgressIndicator(),
+                            );
+                          } else if (nameSnapshot.hasError) {
+                            return ListTile(
+                              title: Text('Error: ${nameSnapshot.error}'),
+                            );
+                          } else if (!nameSnapshot.hasData || !nameSnapshot.data!.exists) {
+                            return const ListTile(
+                              title: Text('Unknown user'),
+                            );
+                          } else {
+                            final name = nameSnapshot.data!.data()!['name'] ?? 'Unknown';
+                            return ConnectionRequestCard(
+                              submitterName: name,
+                              status: data['status'],
+                              onAccept: () {
+                                ConnectionService().acceptConnection(requestId, doc.id);
+                                Navigator.of(context).pop();
+                              },
+                              onReject: () {
+                                ConnectionService().rejectConnection(requestId, doc.id);
+                                Navigator.of(context).pop();
+                              },
+                            );
+                          }
+                        },
+                      );
+                    }).toList(),
+                  ),
+                );
+              }
             },
           ),
-        ],
-      );
-    },
-  );
-}
-
-
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -248,9 +242,9 @@ void showConnectionRequestsDialog(BuildContext context, String requestId) {
                           buttonText: 'delete request',
                           deleteButtonFunction: () {
                             showDeleteConfirmationDialog(context, request.id);
-                          }, connectionRequestButtonFunction: () => showConnectionRequestsDialog(context, request.id),
+                          },
+                          connectionRequestButtonFunction: () => showConnectionRequestsDialog(context, request.id),
                           isActive: request['status'] == 'active');
-                          
                     }).toList(),
                   );
                 }
