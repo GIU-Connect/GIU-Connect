@@ -144,7 +144,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         buttonFunction: () {
                           _showRequestDialog(context, doc);
                         },
-                        children: [],
+                        
+                        isActive: doc['status'] == 'active',
                       );
                     }).toList(),
                   );

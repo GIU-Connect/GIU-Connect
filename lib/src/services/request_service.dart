@@ -25,6 +25,7 @@ class RequestService {
       'semester' : semester,
       'phoneNumber': phoneNumber,
       'timestamp': FieldValue.serverTimestamp(),
+      'status': 'active',
     });
   }
 

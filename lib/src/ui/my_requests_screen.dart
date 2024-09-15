@@ -171,12 +171,13 @@ void showConnectionRequestsDialog(BuildContext context, String requestId) {
                           final name = nameSnapshot.data!.data()!['name'] ?? 'Unknown';
                           return ConnectionRequestCard(
                             submitterName: name,
+                            status: data['status'],
                             onAccept: () {
                               ConnectionService().acceptConnection(requestId, doc.id);
                               Navigator.of(context).pop();
                             },
                             onReject: () {
-                              ConnectionService().rejectConnection(doc.id);
+                              ConnectionService().rejectConnection(requestId, doc.id);
                               Navigator.of(context).pop();
                             },
                           );
@@ -247,7 +248,8 @@ void showConnectionRequestsDialog(BuildContext context, String requestId) {
                           buttonText: 'delete request',
                           deleteButtonFunction: () {
                             showDeleteConfirmationDialog(context, request.id);
-                          }, connectionRequestButtonFunction: () => showConnectionRequestsDialog(context, request.id));
+                          }, connectionRequestButtonFunction: () => showConnectionRequestsDialog(context, request.id),
+                          isActive: request['status'] == 'active');
                           
                     }).toList(),
                   );

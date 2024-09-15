@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/widgets/my_button.dart';
 
@@ -14,6 +13,7 @@ class MyRequestsPost extends StatelessWidget {
   final VoidCallback connectionRequestButtonFunction;
   final String semester;
   final String phoneNumber;
+  final bool isActive; // New field for status (active/inactive)
 
   const MyRequestsPost({
     super.key,
@@ -28,7 +28,13 @@ class MyRequestsPost extends StatelessWidget {
     required this.semester,
     required this.phoneNumber,
     required this.connectionRequestButtonFunction,
+    required this.isActive, // Required status
   });
+
+  // Helper to get the status color
+  Color _getStatusColor() {
+    return isActive ? Colors.green : Colors.red; // Green for active, Red for inactive
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,16 +58,31 @@ class MyRequestsPost extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // User info and status circle
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    submitterName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.black,
-                    ),
+                  Row(
+                    children: [
+                      // Status circle
+                      Container(
+                        width: 16.0,
+                        height: 16.0,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _getStatusColor(), // Circle color based on active/inactive
+                        ),
+                      ),
+                      const SizedBox(width: 10.0), // Spacing between circle and name
+                      Text(
+                        submitterName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
                   ),
                   Text(
                     semester,
@@ -73,7 +94,8 @@ class MyRequestsPost extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              
+
+              // Phone and Major info with icons
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -98,6 +120,7 @@ class MyRequestsPost extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
+              // Tutorial Information
               Row(
                 children: [
                   _buildInfoChip('Current: $currentTutNo', Colors.blue),
@@ -106,7 +129,8 @@ class MyRequestsPost extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              
+
+              // Language Levels
               Row(
                 children: [
                   _buildInfoChip('English: $englishLevel', Colors.orange),
@@ -116,6 +140,7 @@ class MyRequestsPost extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
+              // Action Buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

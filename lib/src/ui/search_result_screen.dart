@@ -101,6 +101,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                 }
                 final resultMap = result as Map<String, dynamic>;
                 return Post(
+                  
                   semester: resultMap['semester'],
                   submitterName: resultMap['name'],
                   major: resultMap['major'],
@@ -112,7 +113,9 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                   buttonText: 'Connect',
                   buttonFunction: () {
                     _showRequestDialog(context, resultMap);
-                  }, children: [],
+                  },
+                   isActive: (resultMap['status'] == 'active'),
+                  // children: [],
                 );
               }).toList(),
             ),

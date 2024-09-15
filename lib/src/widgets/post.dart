@@ -12,6 +12,7 @@ class Post extends StatelessWidget {
   final VoidCallback buttonFunction;
   final String semester;
   final String phoneNumber;
+  final bool isActive; // New field for status (active/inactive)
 
   const Post({
     super.key,
@@ -24,8 +25,14 @@ class Post extends StatelessWidget {
     required this.buttonText,
     required this.buttonFunction,
     required this.semester,
-    required this.phoneNumber, required List<Post> children,
+    required this.phoneNumber,
+    required this.isActive, // Required status
   });
+
+  // Helper to get the status color
+  Color _getStatusColor() {
+    return isActive ? Colors.green : Colors.red; // Green for active, Red for inactive
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,17 +56,31 @@ class Post extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // User info
+              // User info and status circle
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    submitterName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.black,
-                    ),
+                  Row(
+                    children: [
+                      // Status circle
+                      Container(
+                        width: 16.0,
+                        height: 16.0,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _getStatusColor(), // Circle color based on active/inactive
+                        ),
+                      ),
+                      const SizedBox(width: 10.0), // Spacing between circle and name
+                      Text(
+                        submitterName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
                   ),
                   Text(
                     semester,
@@ -71,7 +92,7 @@ class Post extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              
+
               // Phone and Major info with icons
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -106,7 +127,7 @@ class Post extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              
+
               // Language Levels
               Row(
                 children: [
