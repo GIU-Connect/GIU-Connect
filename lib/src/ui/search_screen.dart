@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:group_changing_app/src/services/search_service.dart';
+import 'package:group_changing_app/src/services/request_service.dart';
 import 'package:group_changing_app/src/ui/search_result_screen.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -8,7 +8,7 @@ class SearchScreen extends StatefulWidget {
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 
-  final SearchService searchService = SearchService();
+  final RequestService requestService = RequestService();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
@@ -125,7 +125,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   return;
                 }
 
-                final results = await widget.searchService.search(
+                final results = await widget.requestService.search(
                   major,
                   currentTut,
                   desiredTut,

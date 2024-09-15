@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:group_changing_app/src/services/edit_account_info_service.dart';
+import 'package:group_changing_app/src/services/user_service.dart';
 import 'package:group_changing_app/src/widgets/my_button.dart';
 
 class EditAccountInfoScreen extends StatefulWidget {

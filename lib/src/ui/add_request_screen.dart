@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:group_changing_app/src/services/add_request_service.dart';
+import 'package:group_changing_app/src/services/request_service.dart';
 import 'package:group_changing_app/src/widgets/my_button.dart';
 import 'home_page_screen.dart';
 import 'package:group_changing_app/src/widgets/my_textfield.dart';
@@ -17,7 +17,7 @@ class _AddRequestPageState extends State<AddRequestPage> {
   final TextEditingController desiredTutController = TextEditingController();
   String selectedEnglish = 'AE';
   String selectedGerman = 'G1';
-  final AddRequestService _addRequestService = AddRequestService();
+  final RequestService _addRequestService = RequestService();
 
   void addRequest() async {
     final user = FirebaseAuth.instance.currentUser;

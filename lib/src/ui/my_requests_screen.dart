@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/connection_service.dart';
-import 'package:group_changing_app/src/services/delete_request_service.dart';
+import 'package:group_changing_app/src/services/request_service.dart';
 import 'package:group_changing_app/src/widgets/connection_request.dart';
 import 'package:group_changing_app/src/widgets/my_requests_post.dart';
 
@@ -11,7 +11,7 @@ class MyRequestsScreen extends StatefulWidget {
 
   @override
   State<MyRequestsScreen> createState() => _MyRequestsScreenState();
-  DeleteRequestService _deleteRequestService = DeleteRequestService();
+  RequestService _deleteRequestService = RequestService();
   String requestID = '';
 }
 
