@@ -10,6 +10,12 @@ class ConnectionService {
 
   Future<void> sendConnectionRequest(
       String requestId, String connectionSenderId) async {
+        DocumentSnapshot requestSnapshot = await _firestore.collection('requests').doc(requestId).get();
+        String userId = (requestSnapshot.data() as Map<String, dynamic>)['userId'];
+
+        if (connectionSenderId == userId) {
+          throw Exception('You cannot connect to a request you made.');
+        }
     try {
       await _firestore
           .collection('requests')

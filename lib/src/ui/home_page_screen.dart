@@ -45,10 +45,27 @@ class _HomePageScreenState extends State<HomePageScreen> {
             MyButton(
               onTap: () {
                 // Send connection request
-                ConnectionService().sendConnectionRequest(
-                  doc.id,
-                  FirebaseAuth.instance.currentUser!.uid,
-                );
+                try {
+                  ConnectionService().sendConnectionRequest(
+                    doc.id,
+                    FirebaseAuth.instance.currentUser!.uid,
+                  );
+                } catch (e) {
+                  if (e == 'You cannot connect to a request you made.') {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text('You cannot connect to a request you made.'),
+                        ),
+                      );
+                  } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Error sending connection request.'),
+                        ),
+                      );
+                  }
+                 }
 
                 Navigator.of(context).pop();
               },
@@ -69,7 +86,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   late ImageProvider backgroundImage;
-  
+
   @override
   void initState2() {
     super.initState();
@@ -86,8 +103,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
           title: Row(
             children: [
               Image.asset(
-          'lib/src/assets/tut_swap1.png',
-          height: 40,
+                'lib/src/assets/tut_swap1.png',
+                height: 40,
               ),
               const SizedBox(width: 10),
               const Text(
@@ -101,7 +118,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
           ),
           backgroundColor: Colors.black, // Dark theme for consistency
           actions: [
-            
             IconButton(
               icon: const Icon(Icons.person, color: Colors.white),
               onPressed: () {
@@ -139,7 +155,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         buttonText: 'Open Request',
                         buttonFunction: () {
                           _showRequestDialog(context, doc);
-                        }, children: [],
+                        },
+                        children: [],
                       );
                     }).toList(),
                   );
@@ -148,7 +165,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
             ],
           ),
         ),
-        
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.black,
           onPressed: () {

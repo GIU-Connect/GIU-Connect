@@ -167,6 +167,7 @@ void showConnectionRequestsDialog(BuildContext context, String requestId) {
                             title: Text('Unknown user'),
                           );
                         } else {
+
                           final name = nameSnapshot.data!.data()!['name'] ?? 'Unknown';
                           return ConnectionRequestCard(
                             submitterName: name,
