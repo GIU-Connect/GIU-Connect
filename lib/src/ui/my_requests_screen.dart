@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:group_changing_app/src/services/connection_service.dart';
 import 'package:group_changing_app/src/services/delete_request_service.dart';
+import 'package:group_changing_app/src/widgets/connection_request.dart';
 import 'package:group_changing_app/src/widgets/my_requests_post.dart';
 import 'package:group_changing_app/src/widgets/post.dart';
 
@@ -114,6 +116,65 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
     _userRequestsFuture = fetchUserRequests();
   }
 
+void showConnectionRequestsDialog(BuildContext context, String requestId) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Connection Requests'),
+        content: FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          future: FirebaseFirestore.instance
+              .collection('requests')
+              .doc(requestId)
+              .collection('connectionRequests')
+              .get(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return const Text('No connection requests found.');
+            } else {
+              return SizedBox(
+                width: double.maxFinite,
+                child: ListView(
+                  children: snapshot.data!.docs.map((doc) {
+                    final data = doc.data();
+                    final senderId = data['connectionSenderId'];
+                    final status = data['status'];
+
+                    return ConnectionRequestCard(
+                      submitterName: senderId,
+                      onAccept: () {
+                        ConnectionService().acceptConnection(requestId, doc.id);
+                        Navigator.of(context).pop();
+                      },
+                      onReject: () {
+                        ConnectionService().rejectConnection(doc.id);
+                        Navigator.of(context).pop();
+                      },
+                    );
+                  }).toList(),
+                ),
+              );
+            }
+          },
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,9 +216,10 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                           englishLevel: englishLevel,
                           germanLevel: germanLevel,
                           buttonText: 'delete request',
-                          buttonFunction: () {
+                          deleteButtonFunction: () {
                             showDeleteConfirmationDialog(context, request.id);
-                          });
+                          }, connectionRequestButtonFunction: () => showConnectionRequestsDialog(context, request.id));
+                          
                     }).toList(),
                   );
                 }

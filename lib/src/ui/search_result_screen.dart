@@ -112,7 +112,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                   buttonText: 'Connect',
                   buttonFunction: () {
                     _showRequestDialog(context, resultMap);
-                  },
+                  }, children: [],
                 );
               }).toList(),
             ),

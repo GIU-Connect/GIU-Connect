@@ -24,7 +24,7 @@ class Post extends StatelessWidget {
     required this.buttonText,
     required this.buttonFunction,
     required this.semester,
-    required this.phoneNumber,
+    required this.phoneNumber, required List<Post> children,
   });
 
   @override

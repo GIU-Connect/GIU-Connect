@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/widgets/my_button.dart';
 
@@ -9,7 +10,8 @@ class MyRequestsPost extends StatelessWidget {
   final String englishLevel;
   final String germanLevel;
   final String buttonText;
-  final VoidCallback buttonFunction;
+  final VoidCallback deleteButtonFunction;
+  final VoidCallback connectionRequestButtonFunction;
   final String semester;
   final String phoneNumber;
 
@@ -22,9 +24,10 @@ class MyRequestsPost extends StatelessWidget {
     required this.englishLevel,
     required this.germanLevel,
     required this.buttonText,
-    required this.buttonFunction,
+    required this.deleteButtonFunction,
     required this.semester,
     required this.phoneNumber,
+    required this.connectionRequestButtonFunction,
   });
 
   @override
@@ -117,30 +120,12 @@ class MyRequestsPost extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   MyButton(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text("My Connections"),
-                            content: const Text("This is my connections."),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Close"),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
+                    onTap: connectionRequestButtonFunction,
                     buttonName: "Connection Requests",
                   ),
                   
                   MyButton(
-                    onTap: buttonFunction,
+                    onTap: deleteButtonFunction,
                     buttonName: buttonText,
                   ),
                 ],
