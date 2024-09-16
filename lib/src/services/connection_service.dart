@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:group_changing_app/src/services/request_service.dart';
+import 'package:logger/logger.dart';
 import '../utils/email_sender.dart';
 
 class ConnectionService {
@@ -14,25 +15,25 @@ class ConnectionService {
       DocumentSnapshot requestSnapshot = await _firestore.collection('requests').doc(requestId).get();
       Map<String, dynamic> requestData = requestSnapshot.data() as Map<String, dynamic>;
       String userId = requestData['userId'];
-      DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(userId).get();
+      DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(connectionSenderId).get();
 
       if (connectionSenderId == userId) {
         throw Exception('You cannot connect to a request you made.');
       }
 
-      if (requestData['status'] == 'inactive') {
+      if (requestData['status'].toString() == 'inactive') {
         throw Exception('Cannot send connection request: request is inactive.');
       }
 
-      if (requestData['major'] != userSnapshot.get('major')) {
+      if (requestData['major'].toString() != userSnapshot.get('major').toString()) {
         throw Exception('Cannot send connection request: user has a different major.');
       }
 
-      if (requestData['semester'] != userSnapshot.get('semester')) {
+      if (requestData['semester'].toString() != userSnapshot.get('semester').toString()) {
         throw Exception('Cannot send connection request: user has a different semester.');
       }
 
-      if (requestData['desiredTutNo'] != userSnapshot.get('currentTutorial')) {
+      if (requestData['desiredTutNo'].toString() != userSnapshot.get('currentTutorial').toString()) {
         throw Exception('Cannot send connection request: user has a different desired tutorial number.');
       }
 

@@ -36,7 +36,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
       await ConnectionService().sendConnectionRequest(requestId, currentUser!.uid);
       _showSnackBar('Connection request sent successfully.');
     } catch (e) {
-      _showSnackBar('Failed to send connection request.', isError: true);
+      _showSnackBar(e.toString(), isError: true);
     } finally {
       setState(() {
         _loadingStates[requestId] = false;
