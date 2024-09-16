@@ -54,8 +54,22 @@ class RequestService {
   }
 
   Future<void> deleteRequest(String id) async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    await firestore.collection('requests').doc(id).delete();
+    final firestore = FirebaseFirestore.instance;
+    await firestore.collection('requests').doc(id).update({
+      'status': 'inactive',
+    });
+    DocumentSnapshot requestDoc = await firestore.collection('requests').doc(id).get();
+    String userId = requestDoc['userId'];
+
+    DocumentReference userRef = firestore.collection('users').doc(userId);
+    await firestore.runTransaction((transaction) async {
+      DocumentSnapshot userSnapshot = await transaction.get(userRef);
+      if (!userSnapshot.exists) {
+        throw Exception('User not found');
+      }
+      int numberOfActiveRequests = userSnapshot['numberOfActiveRequests'];
+      transaction.update(userRef, {'numberOfActiveRequests': numberOfActiveRequests - 1});
+    });
   }
 
   Future<List<Map<String, dynamic>>> search(
