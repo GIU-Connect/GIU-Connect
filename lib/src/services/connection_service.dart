@@ -52,8 +52,16 @@ class ConnectionService {
     }
   }
 
-  Future<void> deleteConnection(String connectionId, String requestId) async {
-    // TODO: Implement delete connection method
+  Future<void> deleteConnection(String connectionId) async {
+    try {
+      DocumentSnapshot connectionSnapshot = await _firestore.collection('connectionRequests').doc(connectionId).get();
+      if (connectionSnapshot.get('status') != 'pending') {
+        throw Exception('Only pending connection requests can be deleted.');
+      }
+      await _firestore.collection('connectionRequests').doc(connectionId).delete();
+    } catch (e) {
+      throw Exception('Error deleting connection: $e');
+    }
   }
 
   Future<void> acceptConnection(String requestId, String connectionId) async {
@@ -89,8 +97,15 @@ class ConnectionService {
   }
 
 
-  Future<Stream<QuerySnapshot<Map<String, dynamic>>>> showAllConnectionsForRequest(String requestId) async {
-    return _firestore.collection('requests').doc(requestId).collection('connectionRequests').snapshots();
+  // Future<Stream<QuerySnapshot<Map<String, dynamic>>>> showAllConnectionsForRequest(String requestId) async {
+  //   return _firestore.collection('requests').doc(requestId).collection('connectionRequests').snapshots();
+  // }
+
+  Future<Stream<QuerySnapshot<Map<String, dynamic>>>> showAllConnectionsForUser(String userId) async {
+    return _firestore
+      .collection('connectionRequests')
+      .where('connectionSenderId', isEqualTo: userId)
+      .snapshots();
   }
 
   // Helper method to update requests and connection requests to inactive
