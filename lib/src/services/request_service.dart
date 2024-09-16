@@ -37,7 +37,22 @@ class RequestService {
     if (userDoc['numberOfActiveRequests'] >= 3) {
       throw Exception('You cannot have more than 3 active requests');
     }
-    // Create a new document in the 'requests' collection
+    QuerySnapshot oppositeRequestSnapshot = await firestore
+      .collection('requests')
+      .where('currentTutNo', isEqualTo: desiredTutNo)
+      .where('desiredTutNo', isEqualTo: currentTutNo)
+      .where('germanLevel', isEqualTo: germanLevel)
+      .where('englishLevel', isEqualTo: englishLevel)
+      .where('major', isEqualTo: major)
+      .where('semester', isEqualTo: semester)
+      .get();
+    if (oppositeRequestSnapshot.docs.isNotEmpty) {
+      throw Exception('A matching opposite request already exists');
+    }
+
+    await firestore.collection('users').doc(userId).update({
+      'numberOfActiveRequests': FieldValue.increment(1),
+    });
     await firestore.collection('requests').add({
       'userId': userId,
       'name': name,
