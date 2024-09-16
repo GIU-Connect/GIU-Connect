@@ -124,7 +124,10 @@ class ConnectionService {
   }
 
   Future<Stream<QuerySnapshot<Map<String, dynamic>>>> showAllConnectionsForUser(String userId) async {
-    return _firestore.collection('connectionRequests').where('connectionSenderId', isEqualTo: userId).snapshots();
+    return _firestore
+        .collection('connectionRequests')
+        .where('connectionSenderId', isEqualTo: userId)
+        .where('status', whereIn: ['active', 'pending', 'rejected']).snapshots();
   }
 
   Future<void> _updateRequestsToInactiveUsingMethods(String userId) async {
