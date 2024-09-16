@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/widgets/button_widget.dart';
 
-class MyConnectionRequest extends StatelessWidget {
+class MyConnectionRequest extends StatefulWidget {
   final String requestOwner;
   final int fromTut;
   final int toTut;
@@ -14,6 +14,27 @@ class MyConnectionRequest extends StatelessWidget {
     required this.toTut,
     required this.onDelete,
   }) : super(key: key);
+
+  @override
+  _MyConnectionRequestState createState() => _MyConnectionRequestState();
+}
+
+class _MyConnectionRequestState extends State<MyConnectionRequest> {
+  bool _isLoading = false; // Track loading state
+
+  void _handleDelete() async {
+    setState(() {
+      _isLoading = true; // Start loading
+    });
+
+    await Future.delayed(const Duration(seconds: 2)); // Simulate delete operation
+
+    widget.onDelete(); // Call the delete callback
+
+    setState(() {
+      _isLoading = false; // End loading after the operation
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,28 +50,29 @@ class MyConnectionRequest extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Request Owner: $requestOwner',
+              'Request Owner: ${widget.requestOwner}',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             const Divider(),
             const SizedBox(height: 12),
             Text(
-              'From Tut: $fromTut',
+              'From Tut: ${widget.fromTut}',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
-              'To Tut: $toTut',
+              'To Tut: ${widget.toTut}',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 16),
             Align(
               alignment: Alignment.centerRight,
               child: CustomButton(
-                onPressed: onDelete,
+                onPressed: _isLoading ? () {} : _handleDelete, // Disable button while loading
                 text: 'Delete Connection',
-                isActive: true,
+                isActive: !_isLoading, // Button active when not loading
+                isLoading: _isLoading, // Pass the loading state
               ),
             ),
           ],

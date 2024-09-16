@@ -6,62 +6,48 @@ import 'package:group_changing_app/src/widgets/my_connection_request.dart';
 import 'package:group_changing_app/src/widgets/button_widget.dart';
 
 class MyConnectionsScreen extends StatefulWidget {
-  MyConnectionsScreen({super.key});
+  const MyConnectionsScreen({super.key});
 
   @override
   State<MyConnectionsScreen> createState() => _MyConnectionsScreenState();
-  FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  FirebaseAuth _auth = FirebaseAuth.instance;
-  ConnectionService _connectionService = ConnectionService();
 }
 
 class _MyConnectionsScreenState extends State<MyConnectionsScreen> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final ConnectionService _connectionService = ConnectionService();
   late Future<Stream<QuerySnapshot<Map<String, dynamic>>>> _connectionsFuture;
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _connectionsFuture = _connectionService.showAllConnectionsForUser(_auth.currentUser!.uid);
+  }
 
   Future<MyConnectionRequest> _buildConnectionRequest(DocumentSnapshot<Map<String, dynamic>> snapshot) async {
     final data = snapshot.data();
-
-    if (data == null) {
-      throw Exception("Snapshot data is null");
-    }
-
-    final requestId = data['requestId'];
-    if (requestId == null) {
-      throw Exception("Request ID is missing");
-    }
-
-    final requestSnapshot = await widget._firestore.collection('requests').doc(requestId).get();
-
-    if (!requestSnapshot.exists || requestSnapshot.data() == null) {
-      throw Exception("Request does not exist or has no data");
-    }
-
-    final requestData = requestSnapshot.data();
+    final requestId = data?['requestId'];
     final userId = data?['connectionSenderId'];
 
-    if (userId == null) {
-      throw Exception("User ID is missing");
+    if (requestId == null || userId == null) {
+      throw Exception("Invalid data in snapshot.");
     }
 
-    final userSnapshot = await widget._firestore.collection('users').doc(userId).get();
-
-    if (!userSnapshot.exists) {
-      throw Exception("User does not exist or has no data1");
-    }
-    if (userSnapshot.data() == null) {
-      throw Exception("User does not exist or has no data2 ");
-    }
-
+    final requestSnapshot = await _firestore.collection('requests').doc(requestId).get();
+    final requestData = requestSnapshot.data();
+    final userSnapshot = await _firestore.collection('users').doc(userId).get();
     final userData = userSnapshot.data();
-    final requestOwnerName = userData?['name'] ?? 'Unknown';
-    final oldTut = requestData?['currentTutNo'] ?? -1;
-    final newTut = requestData?['desiredTutNo'] ?? -1;
+
+    if (requestData == null || userData == null) {
+      throw Exception("Failed to fetch request or user data.");
+    }
 
     return MyConnectionRequest(
-      requestOwner: requestOwnerName,
-      fromTut: oldTut,
-      toTut: newTut,
+      requestOwner: userData['name'] ?? 'Unknown',
+      fromTut: requestData['currentTutNo'] ?? -1,
+      toTut: requestData['desiredTutNo'] ?? -1,
       onDelete: () => _showDeleteConfirmationDialog(snapshot.id),
     );
   }
@@ -69,38 +55,33 @@ class _MyConnectionsScreenState extends State<MyConnectionsScreen> {
   Future<void> _showDeleteConfirmationDialog(String connectionId) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // user must tap button!
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Delete Connection'),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Are you sure you want to delete this connection?'),
-              ],
-            ),
-          ),
+          content: const Text('Are you sure you want to delete this connection?'),
           actions: <Widget>[
             CustomButton(
               text: 'Cancel',
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               isActive: true,
             ),
             CustomButton(
               text: 'Delete',
               onPressed: () async {
-                setState(() {
-                  _isLoading = true;
-                });
-                await widget._connectionService.deleteConnection(connectionId);
-                Navigator.of(context).pop();
-                setState(() {
-                  _connectionsFuture =
-                      widget._connectionService.showAllConnectionsForUser(widget._auth.currentUser!.uid);
-                  _isLoading = false;
-                });
+                setState(() => _isLoading = true);
+                try {
+                  await _connectionService.deleteConnection(connectionId);
+                  _showSnackBar('Connection deleted successfully.');
+                  setState(() {
+                    _connectionsFuture = _connectionService.showAllConnectionsForUser(_auth.currentUser!.uid);
+                  });
+                } catch (e) {
+                  _showSnackBar('Failed to delete connection.', isError: true);
+                } finally {
+                  setState(() => _isLoading = false);
+                  Navigator.of(context).pop();
+                }
               },
               isActive: true,
             ),
@@ -110,15 +91,20 @@ class _MyConnectionsScreenState extends State<MyConnectionsScreen> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _connectionsFuture = widget._connectionService.showAllConnectionsForUser(widget._auth.currentUser!.uid);
+  void _showSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+        backgroundColor: isError ? Colors.red : Colors.green,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldMessengerKey,
       appBar: AppBar(
         title: const Text('My Connections'),
       ),
@@ -131,46 +117,41 @@ class _MyConnectionsScreenState extends State<MyConnectionsScreen> {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData) {
+                } else if (!snapshot.hasData || snapshot.data == null) {
                   return const Center(child: Text('No connections found.'));
-                } else {
-                  return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                    stream: snapshot.data,
-                    builder: (context, streamSnapshot) {
-                      if (streamSnapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (streamSnapshot.hasError) {
-                        return Center(child: Text('Error: ${streamSnapshot.error}'));
-                      } else if (!streamSnapshot.hasData || streamSnapshot.data!.docs.isEmpty) {
-                        return const Center(child: Text('No connections found.'));
-                      } else {
-                        return ListView.builder(
-                          itemCount: streamSnapshot.data!.docs.length,
-                          itemBuilder: (context, index) {
-                            final docSnapshot = streamSnapshot.data!.docs[index];
+                }
 
-                            return FutureBuilder<MyConnectionRequest>(
-                              future: _buildConnectionRequest(docSnapshot),
-                              builder: (context, requestSnapshot) {
-                                if (requestSnapshot.connectionState == ConnectionState.waiting) {
-                                  return const ListTile(
-                                    title: Text('Loading...'),
-                                  );
-                                } else if (requestSnapshot.hasError) {
-                                  return ListTile(
-                                    title: Text('Error: ${requestSnapshot.error}'),
-                                  );
-                                } else {
-                                  return requestSnapshot.data!;
-                                }
-                              },
-                            );
+                return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: snapshot.data,
+                  builder: (context, streamSnapshot) {
+                    if (streamSnapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (streamSnapshot.hasError) {
+                      return Center(child: Text('Error: ${streamSnapshot.error}'));
+                    } else if (!streamSnapshot.hasData || streamSnapshot.data!.docs.isEmpty) {
+                      return const Center(child: Text('No connections found.'));
+                    }
+
+                    return ListView.builder(
+                      itemCount: streamSnapshot.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        final docSnapshot = streamSnapshot.data!.docs[index];
+                        return FutureBuilder<MyConnectionRequest>(
+                          future: _buildConnectionRequest(docSnapshot),
+                          builder: (context, requestSnapshot) {
+                            if (requestSnapshot.connectionState == ConnectionState.waiting) {
+                              return const ListTile(title: Text('Loading...'));
+                            } else if (requestSnapshot.hasError) {
+                              return ListTile(title: Text('Error: ${requestSnapshot.error}'));
+                            } else {
+                              return requestSnapshot.data!;
+                            }
                           },
                         );
-                      }
-                    },
-                  );
-                }
+                      },
+                    );
+                  },
+                );
               },
             ),
     );
