@@ -21,15 +21,19 @@ class ConnectionService {
       }
 
       if (requestData['status'] == 'inactive') {
-        throw Exception('Cannot send connection request to an inactive request.');
+        throw Exception('Cannot send connection request: request is inactive.');
       }
 
       if (requestData['major'] != userSnapshot.get('major')) {
-        throw Exception('Cannot send connection request to a user with a different major.');
+        throw Exception('Cannot send connection request: user has a different major.');
       }
 
       if (requestData['semester'] != userSnapshot.get('semester')) {
-        throw Exception('Cannot send connection request to a user with a different semester.');
+        throw Exception('Cannot send connection request: user has a different semester.');
+      }
+
+      if (requestData['desiredTutNo'] != userSnapshot.get('currentTutorial')) {
+        throw Exception('Cannot send connection request: user has a different desired tutorial number.');
       }
 
       QuerySnapshot existingRequests = await _firestore
@@ -88,13 +92,16 @@ class ConnectionService {
         throw Exception('Only pending connection requests can be accepted.');
       }
 
-      // Update requests and connection requests statuses to inactive for both users
       await _updateRequestsToInactiveUsingMethods(masterId);
       await _updateRequestsToInactiveUsingMethods(slaveId);
 
       await _firestore.collection('connectionRequests').doc(connectionId).update({'status': 'accepted'});
 
-      // TODO: Implement email sending to master
+      await emailSender.sendEmail(
+        recipientEmail: (await _firestore.collection('users').doc(slaveId).get()).get('email'),
+        subject: 'Connection Request Accepted',
+        body: 'Hello,\n\nYour connection request has been accepted.\n\nBest regards,\nGIU Changing Group App Team',
+      );
     } catch (e) {
       throw Exception('Error accepting connection: $e');
     }
@@ -106,32 +113,22 @@ class ConnectionService {
       throw Exception('Only pending connection requests can be rejected.');
     }
     await _firestore.collection('connectionRequests').doc(connectionId).update({'status': 'rejected'});
+
+    String slaveId = connectionSnapshot.get('connectionSenderId');
+
+    await emailSender.sendEmail(
+      recipientEmail: (await _firestore.collection('users').doc(slaveId).get()).get('email'),
+      subject: 'Connection Request Rejected',
+      body: 'Hello,\n\nYour connection request has been rejected.\n\nBest regards,\nGIU Changing Group App Team',
+    );
   }
 
   Future<Stream<QuerySnapshot<Map<String, dynamic>>>> showAllConnectionsForUser(String userId) async {
     return _firestore
-      .collection('connectionRequests')
-      .where('connectionSenderId', isEqualTo: userId)
-      .snapshots();
+        .collection('connectionRequests')
+        .where('connectionSenderId', isEqualTo: userId)
+        .where('status', whereIn: ['active', 'pending', 'rejected']).snapshots();
   }
-
-  // Helper method to update requests and connection requests to inactive
-  // Future<void> _updateRequestsToInactive(String userId) async {
-  //   try {
-  //     QuerySnapshot requests = await _firestore.collection('requests').where('userId', isEqualTo: userId).get();
-  //     QuerySnapshot connectionRequests =
-  //         await _firestore.collection('connectionRequests').where('connectionSenderId', isEqualTo: userId).get();
-
-  //     for (var doc in requests.docs) {
-  //       await doc.reference.update({'status': 'inactive'});
-  //     }
-  //     for (var doc in connectionRequests.docs) {
-  //       await doc.reference.update({'status': 'inactive'});
-  //     }
-  //   } catch (e) {
-  //     throw Exception('Error updating requests to inactive: $e');
-  //   }
-  // }
 
   Future<void> _updateRequestsToInactiveUsingMethods(String userId) async {
     try {
@@ -150,5 +147,4 @@ class ConnectionService {
       throw Exception('Error updating requests to inactive using methods: $e');
     }
   }
-
 }
