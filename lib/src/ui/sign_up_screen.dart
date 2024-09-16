@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:group_changing_app/src/services/auth_service.dart';
-import 'package:group_changing_app/src/ui/home_page_screen.dart';
-import 'package:group_changing_app/src/ui/sign_in_screen.dart';
-import 'package:group_changing_app/src/widgets/my_button.dart';
-import 'package:group_changing_app/src/widgets/my_textfield.dart';
+import '../services/auth_service.dart';
+import 'sign_in_screen.dart';
+import '../widgets/input_field.dart';
+import '../widgets/dropdown_widget.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -13,92 +12,93 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class SignUpScreenState extends State<SignUpScreen> {
-  final _formKey = GlobalKey<FormState>();
-
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-  final TextEditingController _phoneNumberController = TextEditingController();
-  final TextEditingController _universityIdController = TextEditingController();
-  final TextEditingController _currentTutorialController = TextEditingController();
-  final TextEditingController _fullNameController = TextEditingController();
-
-  String? _semester;
-  String? _major;
-  bool _isLoading = false; // Change initial state to false
-
-  final AuthService _authService = AuthService();
+  late String email, password, confirmPassword, phoneNumber, universityId, currentTutorial, fullName;
+  String? emailError, passwordError, phoneError, universityIdError, tutorialError, fullNameError;
+  String? semester, major;
+  bool isLoading = false;
+  final AuthService authService = AuthService();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkIfLoggedIn();
+    email = '';
+    password = '';
+    confirmPassword = '';
+    phoneNumber = '';
+    universityId = '';
+    currentTutorial = '';
+    fullName = '';
+
+    resetErrorText();
+  }
+
+  void resetErrorText() {
+    setState(() {
+      emailError = passwordError = phoneError = universityIdError = tutorialError = fullNameError = null;
     });
   }
 
-  Future<void> _checkIfLoggedIn() async {
-    if (_authService.currentUser != null && _authService.currentUser!.emailVerified) {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePageScreen()),
-        );
-      }
-    } else if (_authService.currentUser != null && !_authService.currentUser!.emailVerified) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please verify your email')),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const SignInScreen()),
-        );
-      }
-    } else {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+  bool validate() {
+    resetErrorText();
+
+    bool isValid = true;
+    if (email.isEmpty || !RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email)) {
+      setState(() {
+        emailError = 'Invalid email';
+      });
+      isValid = false;
     }
+    if (password.isEmpty || password != confirmPassword) {
+      setState(() {
+        passwordError = password != confirmPassword ? 'Passwords do not match' : 'Please enter a password';
+      });
+      isValid = false;
+    }
+    if (phoneNumber.isEmpty) {
+      setState(() {
+        phoneError = 'Please enter a phone number';
+      });
+      isValid = false;
+    }
+    if (universityId.isEmpty) {
+      setState(() {
+        universityIdError = 'Please enter your university ID';
+      });
+      isValid = false;
+    }
+    if (currentTutorial.isEmpty) {
+      setState(() {
+        tutorialError = 'Please enter your current tutorial';
+      });
+      isValid = false;
+    }
+    if (fullName.isEmpty) {
+      setState(() {
+        fullNameError = 'Please enter your full name';
+      });
+      isValid = false;
+    }
+
+    return isValid;
   }
 
-  Future<void> _signUp() async {
-    if (_formKey.currentState?.validate() ?? false) {
+  Future<void> submit() async {
+    if (validate()) {
       setState(() {
-        _isLoading = true; // Set loading to true
+        isLoading = true;
       });
 
-      final email = _emailController.text.trim();
-      final password = _passwordController.text.trim();
-      final confirmPassword = _confirmPasswordController.text.trim();
-      final phoneNumber = _phoneNumberController.text.trim();
-      final universityId = _universityIdController.text.trim();
-      final currentTutorial = _currentTutorialController.text.trim();
-      final fullName = _fullNameController.text.trim();
-
-      if (password != confirmPassword) {
-        setState(() {
-          _isLoading = false; // Reset loading state
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Passwords do not match')),
-        );
-        return;
-      }
-
       try {
-        await _authService.signUp(
+        await authService.signUp(
           email: email,
           password: password,
           confirmPassword: confirmPassword,
           phoneNumber: phoneNumber,
           universityId: universityId,
-          major: _major ?? '',
+          major: major ?? '',
           currentTutorial: currentTutorial,
           name: fullName,
-          semester: _semester ?? '',
+          semester: semester ?? '',
         );
         if (mounted) {
           Navigator.pushReplacement(
@@ -106,20 +106,11 @@ class SignUpScreenState extends State<SignUpScreen> {
             MaterialPageRoute(builder: (context) => const SignInScreen()),
           );
         }
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please verify your email')),
-          );
-        }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                e.toString(),
-                style: const TextStyle(color: Colors.white),
-              ),
+              content: Text(e.toString(), style: const TextStyle(color: Colors.white)),
               backgroundColor: Colors.red,
             ),
           );
@@ -127,7 +118,7 @@ class SignUpScreenState extends State<SignUpScreen> {
       } finally {
         if (mounted) {
           setState(() {
-            _isLoading = false; // Reset loading state
+            isLoading = false;
           });
         }
       }
@@ -136,64 +127,83 @@ class SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
+    return isLoading
         ? const Scaffold(body: Center(child: CircularProgressIndicator()))
         : Scaffold(
-            appBar: AppBar(title: const Text('Sign Up')),
-            body: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      MyTextField(
-                        controller: _fullNameController,
-                        hintText: 'Full Name',
-                        obscureText: false,
-                        validator: (value) => value == null || value.isEmpty ? 'Please enter your full name' : null,
-                      ),
-                      MyTextField(
-                        controller: _emailController,
-                        hintText: 'Email',
-                        obscureText: false,
-                        validator: (value) => value == null || value.isEmpty ? 'Please enter your email' : null,
-                      ),
-                      MyTextField(
-                        controller: _passwordController,
-                        hintText: 'Password',
-                        obscureText: true,
-                        validator: (value) => value == null || value.isEmpty ? 'Please enter your password' : null,
-                      ),
-                      MyTextField(
-                        controller: _confirmPasswordController,
-                        hintText: 'Confirm Password',
-                        obscureText: true,
-                        validator: (value) => value == null || value.isEmpty ? 'Please confirm your password' : null,
-                      ),
-                      MyTextField(
-                        controller: _phoneNumberController,
-                        hintText: 'Phone Number',
-                        obscureText: false,
-                        validator: (value) => value == null || value.isEmpty ? 'Please enter your phone number' : null,
-                      ),
-                      MyTextField(
-                        controller: _universityIdController,
-                        hintText: 'University ID',
-                        obscureText: false,
-                        validator: (value) => value == null || value.isEmpty ? 'Please enter your university ID' : null,
-                      ),
-                      MyTextField(
-                        controller: _currentTutorialController,
-                        hintText: 'Current Tutorial',
-                        obscureText: false,
-                        validator: (value) =>
-                            value == null || value.isEmpty ? 'Please enter your current tutorial' : null,
-                      ),
-                      _buildDropdown(
-                        'Choose Major',
-                        _major,
-                        [
+            backgroundColor: Colors.black,
+            body: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Create Account',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Sign up to get started!',
+                      style: TextStyle(fontSize: 16, color: Colors.white.withAlpha((255 * .6).toInt())),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    InputField(
+                      labelText: 'Full Name',
+                      onChanged: (value) => setState(() => fullName = value),
+                      errorText: fullNameError,
+                      keyboardType: TextInputType.text,
+                      autoFocus: true,
+                    ),
+                    const SizedBox(height: 16),
+                    InputField(
+                      labelText: 'Email',
+                      onChanged: (value) => setState(() => email = value),
+                      errorText: emailError,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 16),
+                    InputField(
+                      labelText: 'Password',
+                      onChanged: (value) => setState(() => password = value),
+                      errorText: passwordError,
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 16),
+                    InputField(
+                      labelText: 'Confirm Password',
+                      onChanged: (value) => setState(() => confirmPassword = value),
+                      errorText: passwordError,
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 16),
+                    InputField(
+                      labelText: 'Phone Number',
+                      onChanged: (value) => setState(() => phoneNumber = value),
+                      errorText: phoneError,
+                      keyboardType: TextInputType.phone,
+                    ),
+                    const SizedBox(height: 16),
+                    InputField(
+                      labelText: 'University ID',
+                      onChanged: (value) => setState(() => universityId = value),
+                      errorText: universityIdError,
+                      keyboardType: TextInputType.text,
+                    ),
+                    const SizedBox(height: 16),
+                    InputField(
+                      labelText: 'Current Tutorial',
+                      onChanged: (value) => setState(() => currentTutorial = value),
+                      errorText: tutorialError,
+                      keyboardType: TextInputType.text,
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownWidget(
+                        hint: 'Choose Major',
+                        value: major,
+                        items: const [
                           'Informatics and Computer Science',
                           'Business Administration',
                           'Engineering',
@@ -201,90 +211,47 @@ class SignUpScreenState extends State<SignUpScreen> {
                           'Business Informatics',
                           'Architecture',
                         ],
-                        (value) {
-                          setState(() {
-                            _major = value;
-                          });
-                        },
+                        onChanged: (value) => setState(() => major = value)),
+                    const SizedBox(height: 16),
+                    DropdownWidget(
+                        hint: 'Choose Semester',
+                        value: semester,
+                        items: List.generate(8, (index) => (index + 1).toString()),
+                        onChanged: (value) => setState(() => semester = value)),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: 200, // Set the desired width
+                      child: ElevatedButton(
+                        onPressed: submit,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          textStyle: const TextStyle(fontSize: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text('Sign Up'),
                       ),
-                      _buildDropdown(
-                        'Choose Semester',
-                        _semester,
-                        List.generate(8, (index) => (index + 1).toString()),
-                        (value) {
-                          setState(() {
-                            _semester = value;
-                          });
-                        },
+                    ),
+                    const SizedBox(height: 24),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SignInScreen()),
+                        );
+                      },
+                      child: const Text(
+                        'Already have an account? Sign In',
+                        style: TextStyle(color: Colors.blue),
                       ),
-                      const SizedBox(height: 20),
-                      MyButton(
-                        onTap: _signUp,
-                        buttonName: 'Sign Up',
-                        isLoading: _isLoading, // Pass loading state
-                      ),
-                      const SizedBox(height: 20),
-                      MyButton(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const SignInScreen()),
-                          );
-                        },
-                        buttonName: 'Already have an account? Sign In',
-                        isLoading: _isLoading, // Pass loading state (optional, if you want to disable it as well)
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
           );
-  }
-
-  Widget _buildDropdown(
-    String hint,
-    String? value,
-    List<String> items,
-    ValueChanged<String?> onChanged,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25.0),
-      child: DropdownButtonFormField<String>(
-        decoration: InputDecoration(
-          enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.shade400),
-          ),
-          fillColor: Colors.grey.shade200,
-          filled: true,
-          hintText: hint,
-          hintStyle: TextStyle(color: Colors.grey[500]),
-        ),
-        value: value,
-        items: items
-            .map((item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(item),
-                ))
-            .toList(),
-        onChanged: onChanged,
-        validator: (value) => value == null ? 'Please select $hint' : null,
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    _phoneNumberController.dispose();
-    _universityIdController.dispose();
-    _currentTutorialController.dispose();
-    _fullNameController.dispose();
-    super.dispose();
   }
 }

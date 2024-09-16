@@ -1,167 +1,226 @@
 import 'package:flutter/material.dart';
-import 'package:group_changing_app/src/widgets/my_button.dart';
 
 class Post extends StatelessWidget {
+  final String phoneNumber;
+  final String semester;
   final String submitterName;
   final String major;
   final int currentTutNo;
   final int desiredTutNo;
   final String englishLevel;
   final String germanLevel;
+  final bool isActive;
   final String buttonText;
-  final VoidCallback buttonFunction;
-  final String semester;
-  final String phoneNumber;
-  final bool isActive; // New field for status (active/inactive)
 
   const Post({
     super.key,
+    required this.phoneNumber,
+    required this.semester,
     required this.submitterName,
     required this.major,
     required this.currentTutNo,
     required this.desiredTutNo,
     required this.englishLevel,
     required this.germanLevel,
+    required this.isActive,
     required this.buttonText,
-    required this.buttonFunction,
-    required this.semester,
-    required this.phoneNumber,
-    required this.isActive, // Required status
   });
-
-  // Helper to get the status color
-  Color _getStatusColor() {
-    return isActive ? Colors.green : Colors.red; // Green for active, Red for inactive
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: const Offset(0, 3), // changes position of shadow
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // User info and status circle
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      // Status circle
-                      Container(
-                        width: 16.0,
-                        height: 16.0,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _getStatusColor(), // Circle color based on active/inactive
-                        ),
-                      ),
-                      const SizedBox(width: 10.0), // Spacing between circle and name
-                      Text(
-                        submitterName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    semester,
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
+    final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
 
-              // Phone and Major info with icons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Icon(Icons.phone, color: Colors.grey.shade600),
-                  const SizedBox(width: 8),
-                  Text(
-                    phoneNumber,
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  const Spacer(),
-                  Icon(Icons.school, color: Colors.grey.shade600),
-                  const SizedBox(width: 8),
-                  Text(
-                    major,
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Tutorial Information
-              Row(
-                children: [
-                  _buildInfoChip('Current: $currentTutNo', Colors.blue),
-                  const SizedBox(width: 10),
-                  _buildInfoChip('Desired: $desiredTutNo', Colors.green),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              // Language Levels
-              Row(
-                children: [
-                  _buildInfoChip('English: $englishLevel', Colors.orange),
-                  const SizedBox(width: 10),
-                  _buildInfoChip('German: $germanLevel', Colors.purple),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Action Button
-              Align(
-                alignment: Alignment.centerRight,
-                child: MyButton(
-                  onTap: buttonFunction,
-                  buttonName: buttonText,
-                ),
-              ),
-            ],
-          ),
-        ),
+    return Card(
+      color: Colors.grey[900],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      elevation: 5.0,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: screenWidth > 1000 // Adjust breakpoint as needed
+            ? _buildLargeScreenLayout(theme)
+            : _buildSmallScreenLayout(theme),
       ),
     );
   }
 
-  // Helper method to create a modern info chip
-  Widget _buildInfoChip(String label, Color color) {
-    return Chip(
-      label: Text(
-        label,
-        style: const TextStyle(color: Colors.white),
-      ),
-      backgroundColor: color,
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+  Widget _buildLargeScreenLayout(ThemeData theme) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // User details section
+        CircleAvatar(
+          backgroundColor: theme.colorScheme.primary,
+          child: Text(
+            submitterName[0].toUpperCase(),
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
+        const SizedBox(width: 12.0),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                submitterName,
+                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis, // Add ellipsis for long names
+              ),
+              Text('Major: $major', style: theme.textTheme.bodyLarge),
+              Text('Semester: $semester', style: theme.textTheme.bodyLarge),
+            ],
+          ),
+        ),
+
+        // Center section with rectangles and button
+        SizedBox(
+          width: 400,
+          height: 80,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center, // Center horizontally
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(4.0),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 4.0),
+                    child: Text(
+                      'Current Tutorial: $currentTutNo',
+                      style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(width: 10.0),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.orange,
+                      borderRadius: BorderRadius.circular(4.0),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+                    child: Text(
+                      'Desired Tutorial: $desiredTutNo',
+                      style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+
+        // Right section with English and German levels
+        const Spacer(), // Fill remaining space
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('English: $englishLevel', style: theme.textTheme.bodyLarge),
+            Text('German: $germanLevel', style: theme.textTheme.bodyLarge),
+            Center(
+              child: CustomButton(
+                text: buttonText,
+                isActive: isActive,
+              ),
+            )
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSmallScreenLayout(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // User details section (now in a Column)
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: theme.colorScheme.primary,
+                  child: Text(
+                    submitterName[0].toUpperCase(),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+                const SizedBox(width: 12.0),
+                Expanded(
+                  child: Text(
+                    submitterName,
+                    style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis, // Add ellipsis for long names
+                  ),
+                ),
+              ],
+            ),
+            Text('Major: $major', style: theme.textTheme.bodyLarge),
+            Text('Semester: $semester', style: theme.textTheme.bodyLarge),
+          ],
+        ),
+        const SizedBox(height: 12.0),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center, // Center the rectangles
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(4.0),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: Text(
+                'Current: $currentTutNo',
+                style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white),
+              ),
+            ),
+            const SizedBox(width: 8.0),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.orange,
+                borderRadius: BorderRadius.circular(4.0),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: Text(
+                'Desired: $desiredTutNo',
+                style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12.0),
+        Text('English: $englishLevel', style: theme.textTheme.bodyLarge),
+        Text('German: $germanLevel', style: theme.textTheme.bodyLarge),
+        Center(
+          child: CustomButton(
+            text: buttonText,
+            isActive: isActive,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class CustomButton extends StatelessWidget {
+  final String text;
+  final bool isActive;
+
+  const CustomButton({
+    super.key,
+    required this.text,
+    required this.isActive,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: isActive ? () {} : null,
+      child: Text(text),
     );
   }
 }

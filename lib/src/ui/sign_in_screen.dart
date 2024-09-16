@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/auth_service.dart';
 import 'package:group_changing_app/src/ui/forget_password_screen.dart';
 import 'package:group_changing_app/src/ui/home_page_screen.dart';
-import 'package:group_changing_app/src/widgets/my_button.dart';
-import 'package:group_changing_app/src/widgets/my_textfield.dart';
+import 'package:group_changing_app/src/ui/sign_up_screen.dart'; // Import the SignUpScreen
+import 'package:group_changing_app/src/widgets/button_widget.dart';
+import 'package:group_changing_app/src/widgets/input_field.dart';
 import 'package:group_changing_app/src/utils/no_animation_page_route.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -118,52 +119,83 @@ class SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     _checkUserStatus();
+    // if logged in redirect to HomePageScreen
+    if (_isLoggedIn && _isEmailVerified) {
+      return const HomePageScreen();
+    }
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign In')),
+      backgroundColor: Colors.black,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: SingleChildScrollView(
+          : Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: Form(
+                  key: _formKey,
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      MyTextField(
+                      const Text(
+                        'Sign In',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Enter your credentials to access your account',
+                        style: TextStyle(fontSize: 16, color: Colors.white.withAlpha((255 * .6).toInt())),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      InputField(
+                        labelText: 'Email',
                         controller: _emailController,
-                        hintText: 'Email',
-                        obscureText: false,
-                        validator: (value) => value == null || value.isEmpty ? 'Please enter your email' : null,
+                        keyboardType: TextInputType.emailAddress,
+                        // Remove errorText from InputField
                       ),
-                      const SizedBox(height: 20),
-                      MyTextField(
+                      const SizedBox(height: 16),
+                      InputField(
+                        labelText: 'Password',
                         controller: _passwordController,
-                        hintText: 'Password',
                         obscureText: true,
-                        validator: (value) => value == null || value.isEmpty ? 'Please enter your password' : null,
+                        // Remove errorText from InputField
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
                       MyButton(
-                        onTap: _signIn,
-                        buttonName: 'Sign In',
+                        onPressed: _signIn,
+                        buttonText: 'Sign In',
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
                       MyButton(
-                        onTap: () {
+                        onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => const ForgetPasswordScreen()),
                           );
                         },
-                        buttonName: 'Forgot Password?',
+                        buttonText: 'Forgot Password?',
                       ),
-                      const SizedBox(height: 20),
-                      // Show resend email verification button if logged in but email not verified
+                      const SizedBox(height: 24),
                       if (_isLoggedIn && !_isEmailVerified)
                         MyButton(
-                          onTap: _resendEmailVerification,
-                          buttonName: 'Resend Verification Email',
+                          onPressed: _resendEmailVerification,
+                          buttonText: 'Resend Verification Email',
                         ),
+                      const SizedBox(height: 24),
+                      // New Link Text
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SignUpScreen()), // Navigate to SignUpScreen
+                          );
+                        },
+                        child: const Text(
+                          "Don't have an account? Sign Up",
+                          style: TextStyle(color: Colors.blueAccent),
+                        ),
+                      ),
                     ],
                   ),
                 ),
