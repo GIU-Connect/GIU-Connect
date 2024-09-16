@@ -56,7 +56,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('requests').snapshots(),
+          stream: FirebaseFirestore.instance.collection('requests').where('status',isEqualTo:'active').snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator());

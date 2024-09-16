@@ -10,7 +10,7 @@ class EditAccountInfoScreen extends StatefulWidget {
   State<EditAccountInfoScreen> createState() => _EditAccountInfoScreenState();
   User currentUser = FirebaseAuth.instance.currentUser!;
   EditAccountInfoService editor = EditAccountInfoService();
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 }
 
 class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {

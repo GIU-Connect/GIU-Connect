@@ -50,15 +50,15 @@ class RequestService {
 
   Future<List<Object?>> search(String userId,int currentTutNo, int desiredTutNo, String germanLevel,
       String englishLevel) async {
-    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-    DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    DocumentSnapshot userDoc = await firestore.collection('users').doc(userId).get();
     if (!userDoc.exists) {
       throw Exception('User not found');
     }
     String major = userDoc['major'];
     String semester = userDoc['semester'];
 
-    QuerySnapshot querySnapshot = await _firestore
+    QuerySnapshot querySnapshot = await firestore
         .collection('requests')
         .where('major', isEqualTo: major)
         .where('currentTutNo', isEqualTo: currentTutNo)
