@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/request_service.dart';
-import 'package:group_changing_app/src/widgets/my_button.dart';
+import 'package:group_changing_app/src/widgets/button_widget.dart';
 import 'home_page_screen.dart';
 
 class AddRequestPage extends StatefulWidget {
@@ -150,9 +150,10 @@ class _AddRequestPageState extends State<AddRequestPage> {
             const SizedBox(height: 20),
 
             // Submit button
-            MyButton(
-              onTap: addRequest,
-              buttonName: 'Submit Request',
+            CustomButton(
+              onPressed: addRequest,
+              text: 'Submit Request',
+              isActive: true,
             ),
           ],
         ),

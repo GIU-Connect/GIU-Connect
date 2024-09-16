@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:group_changing_app/src/widgets/my_button.dart';
+import 'package:group_changing_app/src/widgets/button_widget.dart';
 
 class MyRequestsPost extends StatelessWidget {
   final String submitterName;
@@ -46,7 +46,7 @@ class MyRequestsPost extends StatelessWidget {
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withAlpha((0.2 * 255).toInt()),
               spreadRadius: 5,
               blurRadius: 7,
               offset: const Offset(0, 3),
@@ -144,14 +144,15 @@ class MyRequestsPost extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  MyButton(
-                    onTap: connectionRequestButtonFunction,
-                    buttonName: "Connection Requests",
+                  CustomButton(
+                    onPressed: connectionRequestButtonFunction,
+                    text: "Connection Requests",
+                    isActive: true,
                   ),
-                  
-                  MyButton(
-                    onTap: deleteButtonFunction,
-                    buttonName: buttonText,
+                  CustomButton(
+                    onPressed: deleteButtonFunction,
+                    text: buttonText,
+                    isActive: true,
                   ),
                 ],
               ),

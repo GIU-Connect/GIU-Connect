@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:group_changing_app/src/widgets/button_widget.dart';
 
 class Post extends StatelessWidget {
   final String phoneNumber;
@@ -11,6 +12,8 @@ class Post extends StatelessWidget {
   final String germanLevel;
   final bool isActive;
   final String buttonText;
+  final bool isLoading; // New parameter for loading state
+  final VoidCallback onPressed;
 
   const Post({
     super.key,
@@ -24,6 +27,8 @@ class Post extends StatelessWidget {
     required this.germanLevel,
     required this.isActive,
     required this.buttonText,
+    required this.isLoading, // Add isLoading parameter
+    required this.onPressed,
   });
 
   @override
@@ -39,9 +44,7 @@ class Post extends StatelessWidget {
       elevation: 5.0,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-        child: screenWidth > 1000 // Adjust breakpoint as needed
-            ? _buildLargeScreenLayout(theme)
-            : _buildSmallScreenLayout(theme),
+        child: screenWidth > 1000 ? _buildLargeScreenLayout(theme) : _buildSmallScreenLayout(theme),
       ),
     );
   }
@@ -50,11 +53,10 @@ class Post extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // User details section
         CircleAvatar(
           backgroundColor: theme.colorScheme.primary,
           child: Text(
-            submitterName[0].toUpperCase(),
+            submitterName.isNotEmpty ? submitterName[0].toUpperCase() : '?',
             style: const TextStyle(color: Colors.white),
           ),
         ),
@@ -66,23 +68,21 @@ class Post extends StatelessWidget {
               Text(
                 submitterName,
                 style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis, // Add ellipsis for long names
+                overflow: TextOverflow.ellipsis,
               ),
               Text('Major: $major', style: theme.textTheme.bodyLarge),
               Text('Semester: $semester', style: theme.textTheme.bodyLarge),
             ],
           ),
         ),
-
-        // Center section with rectangles and button
         SizedBox(
           width: 400,
           height: 80,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.center, // Center horizontally
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
                     decoration: BoxDecoration(
@@ -112,9 +112,7 @@ class Post extends StatelessWidget {
             ],
           ),
         ),
-
-        // Right section with English and German levels
-        const Spacer(), // Fill remaining space
+        const Spacer(),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -124,6 +122,8 @@ class Post extends StatelessWidget {
               child: CustomButton(
                 text: buttonText,
                 isActive: isActive,
+                isLoading: isLoading, // Pass loading state
+                onPressed: onPressed,
               ),
             )
           ],
@@ -136,7 +136,6 @@ class Post extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // User details section (now in a Column)
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -145,7 +144,7 @@ class Post extends StatelessWidget {
                 CircleAvatar(
                   backgroundColor: theme.colorScheme.primary,
                   child: Text(
-                    submitterName[0].toUpperCase(),
+                    submitterName.isNotEmpty ? submitterName[0].toUpperCase() : '?',
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
@@ -154,7 +153,7 @@ class Post extends StatelessWidget {
                   child: Text(
                     submitterName,
                     style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis, // Add ellipsis for long names
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -165,7 +164,7 @@ class Post extends StatelessWidget {
         ),
         const SizedBox(height: 12.0),
         Row(
-          mainAxisAlignment: MainAxisAlignment.center, // Center the rectangles
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
               decoration: BoxDecoration(
@@ -199,28 +198,11 @@ class Post extends StatelessWidget {
           child: CustomButton(
             text: buttonText,
             isActive: isActive,
+            isLoading: isLoading, // Pass loading state
+            onPressed: onPressed,
           ),
         ),
       ],
-    );
-  }
-}
-
-class CustomButton extends StatelessWidget {
-  final String text;
-  final bool isActive;
-
-  const CustomButton({
-    super.key,
-    required this.text,
-    required this.isActive,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: isActive ? () {} : null,
-      child: Text(text),
     );
   }
 }

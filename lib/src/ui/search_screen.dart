@@ -23,7 +23,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-  
     return Scaffold(
       appBar: AppBar(
         title: const Text('Search in Available Requests'),
@@ -32,7 +31,6 @@ class _SearchScreenState extends State<SearchScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            
             TextField(
               decoration:
                   const InputDecoration(labelText: 'From Tutorial No.', hintText: 'The tutorial you want to switch to'),
@@ -91,8 +89,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 if (currentTut == null || desiredTut == null) {
                   // Show a message if input is invalid
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Please enter valid tutorial numbers.')),
+                    const SnackBar(content: Text('Please enter valid tutorial numbers.')),
                   );
                   return;
                 }

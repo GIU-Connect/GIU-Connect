@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 
 class EmailSender {
   final String apiUrl;
@@ -22,7 +23,7 @@ class EmailSender {
     });
 
     try {
-      final response = await http.post(
+      await http.post(
         Uri.parse(apiUrl),
         headers: {
           'Content-Type': 'application/json',
@@ -30,15 +31,8 @@ class EmailSender {
         },
         body: payload,
       );
-
-      // if (response.statusCode == 200) {
-      //   // print('Email sent successfully: ${response.body}');
-      // } else {
-      //   print('Failed to send email. Status code: ${response.statusCode}');
-      //   print('Response body: ${response.body}');
-      // }
     } catch (e) {
-      print('Error sending email: $e');
+      Logger().e('Failed to send email: $e');
     }
   }
 }

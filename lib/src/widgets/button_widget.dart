@@ -1,34 +1,35 @@
 import 'package:flutter/material.dart';
 
-class MyButton extends StatelessWidget {
+class CustomButton extends StatelessWidget {
+  final String text;
+  final bool isActive;
+  final bool isLoading; // New parameter
   final VoidCallback onPressed;
-  final String buttonText;
-  final double width;
 
-  const MyButton({
-    required this.onPressed,
-    required this.buttonText,
-    this.width = 200,
+  const CustomButton({
     super.key,
+    required this.text,
+    required this.isActive,
+    this.isLoading = false, // Default value is false
+    required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: width, // Set the desired width
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          textStyle: const TextStyle(fontSize: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-        child: Text(buttonText),
+    return ElevatedButton(
+      onPressed: isActive ? (isLoading ? null : onPressed) : null,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isLoading ? Colors.grey : null, // Grey color when loading
       ),
+      child: isLoading
+          ? const SizedBox(
+              width: 24.0,
+              height: 24.0,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            )
+          : Text(text),
     );
   }
 }

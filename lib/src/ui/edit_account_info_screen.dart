@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/user_service.dart';
-import 'package:group_changing_app/src/widgets/my_button.dart';
+import 'package:group_changing_app/src/widgets/button_widget.dart';
 
 class EditAccountInfoScreen extends StatefulWidget {
   EditAccountInfoScreen({super.key});
@@ -202,8 +202,8 @@ class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-            MyButton(
-              onTap: () {
+            CustomButton(
+              onPressed: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -223,46 +223,54 @@ class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
                   },
                 );
               },
-              buttonName: 'Change email',
+              text: 'Change email',
+              isActive: true,
             ),
             const SizedBox(height: 10),
-            MyButton(
-              onTap: () {
+            CustomButton(
+              onPressed: () {
                 widget._auth.sendPasswordResetEmail(
                   email: widget.currentUser.email!,
                 );
               },
-              buttonName: 'Send Password Reset userId',
+              text: 'Send Password Reset userId',
+              isActive: true,
             ),
             const SizedBox(height: 10),
-            MyButton(
-              onTap: _changePhoneNumber,
-              buttonName: 'Change Phone Number',
+            CustomButton(
+              onPressed: _changePhoneNumber,
+              text: 'Change Phone Number',
+              isActive: true,
             ),
             const SizedBox(height: 10),
-            MyButton(
-              onTap: _changeUniversityId,
-              buttonName: 'Change University ID',
+            CustomButton(
+              onPressed: _changeUniversityId,
+              text: 'Change University ID',
+              isActive: true,
             ),
             const SizedBox(height: 10),
-            MyButton(
-              onTap: _changeCurrentTutorial,
-              buttonName: 'Change Current Tutorial',
+            CustomButton(
+              onPressed: _changeCurrentTutorial,
+              text: 'Change Current Tutorial',
+              isActive: true,
             ),
             const SizedBox(height: 10),
-            MyButton(
-              onTap: _changeName,
-              buttonName: 'Change Name',
+            CustomButton(
+              onPressed: _changeName,
+              text: 'Change Name',
+              isActive: true,
             ),
             const SizedBox(height: 10),
-            MyButton(
-              onTap: _changeSemester,
-              buttonName: 'Change Semester',
+            CustomButton(
+              onPressed: _changeSemester,
+              text: 'Change Semester',
+              isActive: true,
             ),
             const SizedBox(height: 10),
-            MyButton(
-              onTap: _changeMajor,
-              buttonName: 'Change Major',
+            CustomButton(
+              onPressed: _changeMajor,
+              text: 'Change Major',
+              isActive: true,
             ),
           ],
         ),
