@@ -18,7 +18,11 @@ class MyConnectionRequest extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.all(12.0),
+      elevation: 4.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -26,24 +30,26 @@ class MyConnectionRequest extends StatelessWidget {
           children: [
             Text(
               'Request Owner: $requestOwner',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
+            const Divider(),
+            const SizedBox(height: 12),
             Text(
               'From Tut: $fromTut',
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
               'To Tut: $toTut',
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 16),
             Align(
               alignment: Alignment.centerRight,
               child: CustomButton(
                 onPressed: onDelete,
-                text: 'Delete Connection on this Request',
+                text: 'Delete Connection',
                 isActive: true,
               ),
             ),

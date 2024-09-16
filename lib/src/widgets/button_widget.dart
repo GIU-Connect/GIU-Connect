@@ -17,7 +17,7 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: isActive ? (isLoading ? null : onPressed) : null,
+      onPressed: isActive ? (isLoading ? null : onPressed) : null, // Disable while loading
       style: ElevatedButton.styleFrom(
         backgroundColor: isLoading ? Colors.grey : null, // Grey color when loading
       ),
@@ -27,6 +27,7 @@ class CustomButton extends StatelessWidget {
               height: 24.0,
               child: CircularProgressIndicator(
                 color: Colors.white,
+                strokeWidth: 2.0, // Adjust thickness for better aesthetics
               ),
             )
           : Text(text),

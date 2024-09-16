@@ -17,6 +17,7 @@ class MyConnectionsScreen extends StatefulWidget {
 
 class _MyConnectionsScreenState extends State<MyConnectionsScreen> {
   late Future<Stream<QuerySnapshot<Map<String, dynamic>>>> _connectionsFuture;
+  bool _isLoading = false;
 
   Future<MyConnectionRequest> _buildConnectionRequest(DocumentSnapshot<Map<String, dynamic>> snapshot) async {
     final data = snapshot.data();
@@ -90,11 +91,15 @@ class _MyConnectionsScreenState extends State<MyConnectionsScreen> {
             CustomButton(
               text: 'Delete',
               onPressed: () async {
+                setState(() {
+                  _isLoading = true;
+                });
                 await widget._connectionService.deleteConnection(connectionId);
                 Navigator.of(context).pop();
                 setState(() {
                   _connectionsFuture =
                       widget._connectionService.showAllConnectionsForUser(widget._auth.currentUser!.uid);
+                  _isLoading = false;
                 });
               },
               isActive: true,
@@ -115,57 +120,59 @@ class _MyConnectionsScreenState extends State<MyConnectionsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Connections'),
+        title: const Text('My Connections'),
       ),
-      body: FutureBuilder<Stream<QuerySnapshot<Map<String, dynamic>>>>(
-        future: _connectionsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData) {
-            return Center(child: Text('No connections found.'));
-          } else {
-            return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: snapshot.data,
-              builder: (context, streamSnapshot) {
-                if (streamSnapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (streamSnapshot.hasError) {
-                  return Center(child: Text('Error: ${streamSnapshot.error}'));
-                } else if (!streamSnapshot.hasData || streamSnapshot.data!.docs.isEmpty) {
-                  return Center(child: Text('No connections found.'));
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : FutureBuilder<Stream<QuerySnapshot<Map<String, dynamic>>>>(
+              future: _connectionsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData) {
+                  return const Center(child: Text('No connections found.'));
                 } else {
-                  return ListView.builder(
-                    itemCount: streamSnapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      final docSnapshot = streamSnapshot.data!.docs[index];
+                  return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                    stream: snapshot.data,
+                    builder: (context, streamSnapshot) {
+                      if (streamSnapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (streamSnapshot.hasError) {
+                        return Center(child: Text('Error: ${streamSnapshot.error}'));
+                      } else if (!streamSnapshot.hasData || streamSnapshot.data!.docs.isEmpty) {
+                        return const Center(child: Text('No connections found.'));
+                      } else {
+                        return ListView.builder(
+                          itemCount: streamSnapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            final docSnapshot = streamSnapshot.data!.docs[index];
 
-                      return FutureBuilder<MyConnectionRequest>(
-                        future: _buildConnectionRequest(docSnapshot),
-                        builder: (context, requestSnapshot) {
-                          if (requestSnapshot.connectionState == ConnectionState.waiting) {
-                            return ListTile(
-                              title: Text('Loading...'),
+                            return FutureBuilder<MyConnectionRequest>(
+                              future: _buildConnectionRequest(docSnapshot),
+                              builder: (context, requestSnapshot) {
+                                if (requestSnapshot.connectionState == ConnectionState.waiting) {
+                                  return const ListTile(
+                                    title: Text('Loading...'),
+                                  );
+                                } else if (requestSnapshot.hasError) {
+                                  return ListTile(
+                                    title: Text('Error: ${requestSnapshot.error}'),
+                                  );
+                                } else {
+                                  return requestSnapshot.data!;
+                                }
+                              },
                             );
-                          } else if (requestSnapshot.hasError) {
-                            return ListTile(
-                              title: Text('Error: ${requestSnapshot.error}'),
-                            );
-                          } else {
-                            return requestSnapshot.data!;
-                          }
-                        },
-                      );
+                          },
+                        );
+                      }
                     },
                   );
                 }
               },
-            );
-          }
-        },
-      ),
+            ),
     );
   }
 }

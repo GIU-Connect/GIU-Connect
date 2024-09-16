@@ -17,7 +17,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
   User? currentUser;
   late Future<List<Map<String, dynamic>>> activeRequestsFuture;
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-  final Map<String, bool> _loadingStates = {}; // Map to track loading states
+  final Map<String, bool> _loadingStates = {};
 
   @override
   void initState() {
@@ -28,7 +28,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   void _handleConnectionRequest(String requestId) async {
     setState(() {
-      _loadingStates[requestId] = true; // Set loading state to true
+      _loadingStates[requestId] = true;
     });
 
     try {
@@ -38,19 +38,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
       _showSnackBar('Failed to send connection request.', isError: true);
     } finally {
       setState(() {
-        _loadingStates[requestId] = false; // Set loading state to false
+        _loadingStates[requestId] = false;
       });
     }
   }
 
   void _showSnackBar(String message, {bool isError = false}) {
-    // Use the scaffold messenger key to show the snackbar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: const Duration(seconds: 2), // Increase duration if needed
-        behavior: SnackBarBehavior.floating, // Ensure it's floating above other elements
-        backgroundColor: isError ? Colors.red : Colors.green, // Set color based on error state
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: isError ? Colors.red : Colors.green,
       ),
     );
   }
@@ -62,10 +61,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     return Scaffold(
       key: _scaffoldMessengerKey,
       appBar: AppBar(
-        title: Text(
-          'Home Page',
-          style: theme.textTheme.titleLarge,
-        ),
+        title: Text('Home Page', style: theme.textTheme.titleLarge),
         actions: [
           IconButton(
             icon: Icon(Icons.search, color: theme.iconTheme.color),
@@ -122,10 +118,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     germanLevel: request['germanLevel'],
                     isActive: request['status'] == 'active',
                     buttonText: 'Connect',
-                    isLoading: isLoading, // Pass loading state
-                    onPressed: () {
-                      _handleConnectionRequest(requestId);
-                    },
+                    isLoading: isLoading,
+                    onPressed: () => _handleConnectionRequest(requestId),
                   ),
                 );
               },
