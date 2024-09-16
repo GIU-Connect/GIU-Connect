@@ -3,27 +3,32 @@ import 'package:flutter/material.dart';
 class MyButton extends StatelessWidget {
   final VoidCallback onTap;
   final String buttonName;
-  final bool isLoading; // Add this parameter
+  final bool isLoading;
+  final Color color;
 
   const MyButton({
     required this.onTap,
     required this.buttonName,
-    this.isLoading = false, // Default to false
+    this.isLoading = false,
+    this.color = Colors.purple, // Default to purple to match design
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    // make the style black and the text white
     return ElevatedButton(
-      style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all<Color>(Colors.black),
-        foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30), // Rounded corners
+        ),
+        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
       ),
-      onPressed: isLoading ? null : onTap, // Disable button when loading
+      onPressed: isLoading ? null : onTap,
       child: isLoading
-          ? const CircularProgressIndicator() // Show progress indicator when loading
-          : Text(buttonName),
+          ? const CircularProgressIndicator(color: Colors.white)
+          : Text(buttonName, style: const TextStyle(color: Colors.white)),
     );
   }
 }

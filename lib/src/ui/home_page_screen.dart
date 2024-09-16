@@ -1,11 +1,10 @@
+// Main Home Page Screen
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:group_changing_app/src/widgets/my_button.dart';
-import 'package:group_changing_app/src/widgets/post.dart';
 import 'package:group_changing_app/src/ui/search_screen.dart';
 import 'package:group_changing_app/src/ui/settings_screen.dart';
-import 'package:group_changing_app/src/services/connection_service.dart';
+import 'package:group_changing_app/src/widgets/post.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({super.key});
@@ -15,56 +14,6 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
-  void _showRequestDialog(BuildContext context, DocumentSnapshot doc) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          title: const Text('Request Details'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Name: ${doc['name']}'),
-              Text('Current Tutorial No.: ${doc['currentTutNo']}'),
-              Text('Desired Tutorial No.: ${doc['desiredTutNo']}'),
-              Text('English Level: ${doc['englishLevel']}'),
-              Text('German Level: ${doc['germanLevel']}'),
-            ],
-          ),
-          actions: [
-            MyButton(
-              onTap: () => Navigator.of(context).pop(),
-              buttonName: 'Close',
-            ),
-            const SizedBox(width: 10),
-            MyButton(
-              onTap: () {
-                // Send connection request
-                ConnectionService().sendConnectionRequest(
-                  doc.id,
-                  FirebaseAuth.instance.currentUser!.uid,
-                );
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Connection request submitted successfully. Email sent to request owner.'),
-                  ),
-                );
-
-                Navigator.of(context).pop();
-              },
-              buttonName: 'Connect',
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   User? currentUser;
 
   @override
@@ -73,93 +22,72 @@ class _HomePageScreenState extends State<HomePageScreen> {
     currentUser = FirebaseAuth.instance.currentUser;
   }
 
-  late ImageProvider backgroundImage;
-
-  void initState2() {
-    super.initState();
-    currentUser = FirebaseAuth.instance.currentUser;
-    backgroundImage = const AssetImage('lib/src/assets/wallpaper.png');
-  }
-
   @override
-  Widget build(buildcontextutSwap1) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false, // Removes the back button
-          title: Row(
-            children: [
-              Image.asset(
-                'lib/src/assets/tut_swap1.png',
-                height: 40,
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                'Home Page',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ],
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Home Page',
+          style: theme.textTheme.titleLarge,
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search, color: theme.iconTheme.color),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SearchScreen()),
+              );
+            },
           ),
-          backgroundColor: Colors.black, // Dark theme for consistency
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.person, color: Colors.white),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SettingsScreen()),
+          IconButton(
+            icon: Icon(Icons.settings, color: theme.iconTheme.color),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingsScreen()),
+              );
+            },
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance.collection('requests').snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final docs = snapshot.data!.docs;
+            if (docs.isEmpty) {
+              return Center(child: Text('No requests available.', style: theme.textTheme.bodyLarge));
+            }
+
+            return ListView.builder(
+              itemCount: docs.length,
+              itemBuilder: (context, index) {
+                final doc = docs[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Post(
+                    phoneNumber: doc['phoneNumber'],
+                    semester: doc['semester'],
+                    submitterName: doc['name'],
+                    major: doc['major'],
+                    currentTutNo: doc['currentTutNo'],
+                    desiredTutNo: doc['desiredTutNo'],
+                    englishLevel: doc['englishLevel'],
+                    germanLevel: doc['germanLevel'],
+                    isActive: doc['status'] == 'active',
+                    buttonText: 'Connect',
+                  ),
                 );
               },
-            ),
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: ListView(
-            children: [
-              StreamBuilder(
-                stream: FirebaseFirestore.instance.collection('requests').snapshots(),
-                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  return Column(
-                    children: snapshot.data!.docs.map((doc) {
-                      return Post(
-                        phoneNumber: doc['phoneNumber'],
-                        semester: doc['semester'],
-                        submitterName: doc['name'],
-                        major: doc['major'],
-                        currentTutNo: doc['currentTutNo'],
-                        desiredTutNo: doc['desiredTutNo'],
-                        englishLevel: doc['englishLevel'],
-                        germanLevel: doc['germanLevel'],
-                        buttonText: 'Open Request',
-                        buttonFunction: () {
-                          _showRequestDialog(context, doc);
-                        },
-                        
-                        isActive: doc['status'] == 'active',
-                      );
-                    }).toList(),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.black,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => SearchScreen()),
             );
           },
-          child: const Icon(Icons.search, color: Colors.white),
         ),
       ),
     );

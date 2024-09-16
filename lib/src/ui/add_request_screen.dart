@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/request_service.dart';
 import 'package:group_changing_app/src/widgets/my_button.dart';
 import 'home_page_screen.dart';
-import 'package:group_changing_app/src/widgets/my_textfield.dart';
+import 'package:group_changing_app/src/widgets/input_field.dart';
 
 class AddRequestPage extends StatefulWidget {
   const AddRequestPage({super.key});
@@ -35,10 +35,7 @@ class _AddRequestPageState extends State<AddRequestPage> {
       return;
     }
 
-    final userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .get();
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
     if (!userDoc.exists) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('User data not found')),
@@ -53,9 +50,7 @@ class _AddRequestPageState extends State<AddRequestPage> {
 
     if (currentTutNo.toString() == desiredTutController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'Current and Desired Tutorial Numbers cannot be the same')),
+        const SnackBar(content: Text('Current and Desired Tutorial Numbers cannot be the same')),
       );
       return;
     }
@@ -88,11 +83,11 @@ class _AddRequestPageState extends State<AddRequestPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            MyTextField(
-              controller: desiredTutController,
-              hintText: 'Desired Tutorial No.',
-              obscureText: false,
-            ),
+            // MyTextField(
+            //   controller: desiredTutController,
+            //   hintText: 'Desired Tutorial No.',
+            //   obscureText: false,
+            // ),
 
             const SizedBox(height: 20),
 
@@ -143,8 +138,7 @@ class _AddRequestPageState extends State<AddRequestPage> {
                       selectedGerman = newValue!;
                     });
                   },
-                  items: <String>['G1', 'G2', 'G3', 'G4', 'No German']
-                      .map<DropdownMenuItem<String>>((String value) {
+                  items: <String>['G1', 'G2', 'G3', 'G4', 'No German'].map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
