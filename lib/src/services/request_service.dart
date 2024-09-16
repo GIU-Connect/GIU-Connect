@@ -23,6 +23,7 @@ class RequestService {
         .where('englishLevel', isEqualTo: englishLevel)
         .where('major', isEqualTo: major)
         .where('semester', isEqualTo: semester)
+        .where('status', isEqualTo: 'active')
         .get();
     if (querySnapshot.docs.isNotEmpty) {
       throw Exception('Request already exists');
@@ -38,14 +39,14 @@ class RequestService {
       throw Exception('You cannot have more than 3 active requests');
     }
     QuerySnapshot oppositeRequestSnapshot = await firestore
-      .collection('requests')
-      .where('currentTutNo', isEqualTo: desiredTutNo)
-      .where('desiredTutNo', isEqualTo: currentTutNo)
-      .where('germanLevel', isEqualTo: germanLevel)
-      .where('englishLevel', isEqualTo: englishLevel)
-      .where('major', isEqualTo: major)
-      .where('semester', isEqualTo: semester)
-      .get();
+        .collection('requests')
+        .where('currentTutNo', isEqualTo: desiredTutNo)
+        .where('desiredTutNo', isEqualTo: currentTutNo)
+        .where('germanLevel', isEqualTo: germanLevel)
+        .where('englishLevel', isEqualTo: englishLevel)
+        .where('major', isEqualTo: major)
+        .where('semester', isEqualTo: semester)
+        .get();
     if (oppositeRequestSnapshot.docs.isNotEmpty) {
       throw Exception('A matching opposite request already exists');
     }

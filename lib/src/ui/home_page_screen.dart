@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:group_changing_app/src/ui/add_request_screen.dart'; // Import the AddRequestPage
 import 'package:group_changing_app/src/ui/search_screen.dart';
 import 'package:group_changing_app/src/ui/settings_screen.dart';
 import 'package:group_changing_app/src/widgets/post.dart';
@@ -126,6 +127,17 @@ class _HomePageScreenState extends State<HomePageScreen> {
             );
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddRequestPage()),
+          );
+        },
+        backgroundColor: Colors.blue,
+        tooltip: 'Add Request',
+        child: const Icon(Icons.add),
       ),
     );
   }

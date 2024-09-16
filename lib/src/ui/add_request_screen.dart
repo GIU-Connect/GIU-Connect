@@ -3,161 +3,145 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/request_service.dart';
 import 'package:group_changing_app/src/widgets/button_widget.dart';
+import 'package:group_changing_app/src/widgets/input_field.dart'; // Ensure this widget is available
+import 'package:group_changing_app/src/widgets/dropdown_widget.dart'; // Ensure this widget is available
 import 'home_page_screen.dart';
 
 class AddRequestPage extends StatefulWidget {
   const AddRequestPage({super.key});
 
   @override
-  _AddRequestPageState createState() => _AddRequestPageState();
+  AddRequestPageState createState() => AddRequestPageState();
 }
 
-class _AddRequestPageState extends State<AddRequestPage> {
+class AddRequestPageState extends State<AddRequestPage> {
   final TextEditingController desiredTutController = TextEditingController();
   String selectedEnglish = 'AE';
   String selectedGerman = 'G1';
   final RequestService _addRequestService = RequestService();
+  bool isLoading = false;
 
   void addRequest() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not logged in')),
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        showError('User not logged in');
+        return;
+      }
+
+      if (desiredTutController.text.isEmpty) {
+        showError('Please fill all fields');
+        return;
+      }
+
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      if (!userDoc.exists) {
+        showError('User data not found');
+        return;
+      }
+      final name = userDoc['name'] as String;
+      final currentTutNo = userDoc['currentTutorial'] as String;
+      final major = userDoc['major'] as String;
+      final semester = userDoc['semester'] as String;
+      final phoneNumber = userDoc['phoneNumber'] as String;
+
+      if (currentTutNo.toString() == desiredTutController.text) {
+        showError('Current and Desired Tutorial Numbers cannot be the same');
+        return;
+      }
+
+      await _addRequestService.addRequest(
+        phoneNumber: phoneNumber,
+        userId: user.uid,
+        name: name,
+        major: major,
+        currentTutNo: int.parse(currentTutNo),
+        desiredTutNo: int.parse(desiredTutController.text),
+        englishLevel: selectedEnglish,
+        germanLevel: selectedGerman,
+        semester: semester,
       );
-      return;
+
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePageScreen()),
+        );
+      }
+    } catch (e) {
+      showError(e.toString());
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
+  }
 
-    if (desiredTutController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
-      );
-      return;
-    }
-
-    final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-    if (!userDoc.exists) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User data not found')),
-      );
-      return;
-    }
-    final name = userDoc['name'] as String;
-    final currentTutNo = userDoc['currentTutorial'] as String;
-    final major = userDoc['major'] as String;
-    final semester = userDoc['semester'] as String;
-    final phoneNumber = userDoc['phoneNumber'] as String;
-
-    if (currentTutNo.toString() == desiredTutController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Current and Desired Tutorial Numbers cannot be the same')),
-      );
-      return;
-    }
-
-    await _addRequestService.addRequest(
-      phoneNumber: phoneNumber,
-      userId: user.uid,
-      name: name,
-      major: major,
-      currentTutNo: int.parse(currentTutNo),
-      desiredTutNo: int.parse(desiredTutController.text),
-      englishLevel: selectedEnglish,
-      germanLevel: selectedGerman,
-      semester: semester,
-    );
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const HomePageScreen()),
+  void showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: const TextStyle(color: Colors.white)),
+        backgroundColor: Colors.red,
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Request Page'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // MyTextField(
-            //   controller: desiredTutController,
-            //   hintText: 'Desired Tutorial No.',
-            //   obscureText: false,
-            // ),
-
-            const SizedBox(height: 20),
-
-            // Dropdown for English Level with consistent width
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade400),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  value: selectedEnglish,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedEnglish = newValue!;
-                    });
-                  },
-                  items: <String>['AE', 'AS', 'SM', 'CPS', 'RPW', 'No English']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
+    return isLoading
+        ? const Scaffold(body: Center(child: CircularProgressIndicator()))
+        : Scaffold(
+            backgroundColor: Colors.black,
+            body: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Add Request',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    InputField(
+                      controller: desiredTutController,
+                      labelText: 'Desired Tutorial No.',
+                      errorText: null,
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownWidget(
+                      hint: 'Choose English Level',
+                      value: selectedEnglish,
+                      items: const ['AE', 'AS', 'SM', 'CPS', 'RPW', 'No English'],
+                      onChanged: (value) => setState(() => selectedEnglish = value as String),
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownWidget(
+                      hint: 'Choose German Level',
+                      value: selectedGerman,
+                      items: const ['G1', 'G2', 'G3', 'G4', 'No German'],
+                      onChanged: (value) => setState(() => selectedGerman = value as String),
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: 200,
+                      child: CustomButton(
+                        onPressed: addRequest,
+                        text: 'Submit Request',
+                        isActive: true,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-
-            const SizedBox(height: 20),
-
-            // Dropdown for German Level with consistent width
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade400),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  value: selectedGerman,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedGerman = newValue!;
-                    });
-                  },
-                  items: <String>['G1', 'G2', 'G3', 'G4', 'No German'].map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Submit button
-            CustomButton(
-              onPressed: addRequest,
-              text: 'Submit Request',
-              isActive: true,
-            ),
-          ],
-        ),
-      ),
-    );
+          );
   }
 }
