@@ -55,10 +55,12 @@ class ConnectionService {
   Future<void> deleteConnection(String connectionId) async {
     try {
       DocumentSnapshot connectionSnapshot = await _firestore.collection('connectionRequests').doc(connectionId).get();
-      if (connectionSnapshot.get('status') != 'pending') {
-        throw Exception('Only pending connection requests can be deleted.');
+
+      if (!connectionSnapshot.exists) {
+        throw Exception('Connection request does not exist.');
       }
-      await _firestore.collection('connectionRequests').doc(connectionId).delete();
+
+      await _firestore.collection('connectionRequests').doc(connectionId).update({'status': 'inactive'});
     } catch (e) {
       throw Exception('Error deleting connection: $e');
     }
