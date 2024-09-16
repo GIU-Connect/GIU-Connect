@@ -130,6 +130,22 @@ class RequestService {
     }).toList();
   }
 
+  Future<List<Map<String, dynamic>>> getActiveRequestsForUser(String userId) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    QuerySnapshot querySnapshot = await firestore
+        .collection('requests')
+        .where('userId', isEqualTo: userId)
+        .where('status', isEqualTo: 'active')
+        .get();
+    return querySnapshot.docs.map((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      return {
+        'id': doc.id, // Add the document ID
+        ...data, // Spread the document data
+      };
+    }).toList();
+  }
+
   Future<void> editRequest({
     required String requestId,
     required String userId,
@@ -170,5 +186,10 @@ class RequestService {
       'phoneNumber': phoneNumber,
       'timestamp': FieldValue.serverTimestamp(),
     });
+  }
+
+  // get all connection requests for a request
+  Stream<QuerySnapshot<Map<String, dynamic>>> showAllConnectionsForRequest(String requestId) {
+    return FirebaseFirestore.instance.collection('connections').where('requestId', isEqualTo: requestId).snapshots();
   }
 }
