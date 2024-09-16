@@ -13,6 +13,7 @@ class ConnectionService {
       DocumentSnapshot requestSnapshot = await _firestore.collection('requests').doc(requestId).get();
       Map<String, dynamic> requestData = requestSnapshot.data() as Map<String, dynamic>;
       String userId = requestData['userId'];
+      DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(userId).get();
 
       if (connectionSenderId == userId) {
         throw Exception('You cannot connect to a request you made.');
@@ -20,6 +21,14 @@ class ConnectionService {
 
       if (requestData['status'] == 'inactive') {
         throw Exception('Cannot send connection request to an inactive request.');
+      }
+
+      if (requestData['major'] != userSnapshot.get('major')) {
+        throw Exception('Cannot send connection request to a user with a different major.');
+      }
+
+      if (requestData['semester'] != userSnapshot.get('semester')) {
+        throw Exception('Cannot send connection request to a user with a different semester.');
       }
 
       QuerySnapshot existingRequests = await _firestore
