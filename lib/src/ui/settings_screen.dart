@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:group_changing_app/src/ui/edit_account_info_screen.dart';
+import 'package:group_changing_app/src/ui/my_connections_screen.dart';
 import 'package:group_changing_app/src/ui/my_requests_screen.dart';
 import 'package:group_changing_app/src/ui/sign_up_screen.dart';
 import 'package:group_changing_app/src/widgets/my_button.dart';
@@ -92,6 +93,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
                 buttonName: 'Change account info',
               ),
+
+              const SizedBox(height: 20),
+
+              MyButton(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => MyConnectionsScreen()),
+                  );
+                },
+                buttonName: 'My Connections',
+              ),
+
+              
             ],
           ),
         ),

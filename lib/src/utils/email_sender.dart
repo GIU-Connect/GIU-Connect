@@ -31,12 +31,12 @@ class EmailSender {
         body: payload,
       );
 
-      if (response.statusCode == 200) {
-        print('Email sent successfully: ${response.body}');
-      } else {
-        print('Failed to send email. Status code: ${response.statusCode}');
-        print('Response body: ${response.body}');
-      }
+      // if (response.statusCode == 200) {
+      //   // print('Email sent successfully: ${response.body}');
+      // } else {
+      //   print('Failed to send email. Status code: ${response.statusCode}');
+      //   print('Response body: ${response.body}');
+      // }
     } catch (e) {
       print('Error sending email: $e');
     }
