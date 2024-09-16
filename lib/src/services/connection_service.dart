@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:group_changing_app/src/services/request_service.dart';
 import '../utils/email_sender.dart';
 
 class ConnectionService {
@@ -88,8 +89,8 @@ class ConnectionService {
       }
 
       // Update requests and connection requests statuses to inactive for both users
-      await _updateRequestsToInactive(masterId);
-      await _updateRequestsToInactive(slaveId);
+      await _updateRequestsToInactiveUsingMethods(masterId);
+      await _updateRequestsToInactiveUsingMethods(slaveId);
 
       await _firestore.collection('connectionRequests').doc(connectionId).update({'status': 'accepted'});
 
@@ -109,26 +110,45 @@ class ConnectionService {
 
   Future<Stream<QuerySnapshot<Map<String, dynamic>>>> showAllConnectionsForUser(String userId) async {
     return _firestore
-        .collection('connectionRequests')
-        .where('connectionSenderId', isEqualTo: userId)
-        .where('status', whereIn: ['pending', 'accepted', 'rejected']).snapshots();
+      .collection('connectionRequests')
+      .where('connectionSenderId', isEqualTo: userId)
+      .snapshots();
   }
 
   // Helper method to update requests and connection requests to inactive
-  Future<void> _updateRequestsToInactive(String userId) async {
+  // Future<void> _updateRequestsToInactive(String userId) async {
+  //   try {
+  //     QuerySnapshot requests = await _firestore.collection('requests').where('userId', isEqualTo: userId).get();
+  //     QuerySnapshot connectionRequests =
+  //         await _firestore.collection('connectionRequests').where('connectionSenderId', isEqualTo: userId).get();
+
+  //     for (var doc in requests.docs) {
+  //       await doc.reference.update({'status': 'inactive'});
+  //     }
+  //     for (var doc in connectionRequests.docs) {
+  //       await doc.reference.update({'status': 'inactive'});
+  //     }
+  //   } catch (e) {
+  //     throw Exception('Error updating requests to inactive: $e');
+  //   }
+  // }
+
+  Future<void> _updateRequestsToInactiveUsingMethods(String userId) async {
     try {
       QuerySnapshot requests = await _firestore.collection('requests').where('userId', isEqualTo: userId).get();
       QuerySnapshot connectionRequests =
           await _firestore.collection('connectionRequests').where('connectionSenderId', isEqualTo: userId).get();
 
       for (var doc in requests.docs) {
-        await doc.reference.update({'status': 'inactive'});
+        RequestService requestService = RequestService();
+        await requestService.deleteRequest(doc.id);
       }
       for (var doc in connectionRequests.docs) {
-        await doc.reference.update({'status': 'inactive'});
+        await deleteConnection(doc.id);
       }
     } catch (e) {
-      throw Exception('Error updating requests to inactive: $e');
+      throw Exception('Error updating requests to inactive using methods: $e');
     }
   }
+
 }
