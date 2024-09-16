@@ -49,6 +49,7 @@ class AuthService {
         'currentTutorial': currentTutorial,
         'name': name,
         'semester': semester,
+        'numberOfActiveRequests': 0,
       });
 
       // Send email verification
