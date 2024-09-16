@@ -4,14 +4,14 @@ import 'package:group_changing_app/src/ui/edit_account_info_screen.dart';
 import 'package:group_changing_app/src/ui/my_connections_screen.dart';
 import 'package:group_changing_app/src/ui/my_requests_screen.dart';
 import 'package:group_changing_app/src/ui/sign_up_screen.dart';
-import 'package:group_changing_app/src/widgets/my_button.dart';
+import 'package:group_changing_app/src/widgets/button_widget.dart';
 
 class SettingsScreen extends StatefulWidget {
   SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   User currentUser = FirebaseAuth.instance.currentUser!;
 }
 
@@ -51,33 +51,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 30),
 
               // Sign Out Button
-              MyButton(
-                onTap: () {
+              CustomButton(
+                onPressed: () {
                   widget._auth.signOut();
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (context) => const SignUpScreen()),
                     (Route<dynamic> route) => false,
                   );
                 },
-                buttonName: 'Sign Out',
+                text: 'Sign Out',
+                isActive: true,
               ),
 
               const SizedBox(height: 20),
 
               // Navigate to My Requests screen
-              MyButton(
-                onTap: () {
+              CustomButton(
+                onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => MyRequestsScreen()),
                   );
                 },
-                buttonName: 'My Requests',
+                text: 'My Requests',
+                isActive: true,
               ),
 
               const SizedBox(height: 20),
 
-              MyButton(
-                onTap: () async {
+              CustomButton(
+                onPressed: () async {
                   await widget._auth.currentUser!.reload();
                   if (widget._auth.currentUser!.emailVerified) {
                     Navigator.of(context).push(
@@ -91,21 +93,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     );
                   }
                 },
-                buttonName: 'Change account info',
+                text: 'Change account info',
+                isActive: true,
               ),
 
               const SizedBox(height: 20),
 
-              MyButton(
-                onTap: () {
+              CustomButton(
+                onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => MyConnectionsScreen()),
                   );
                 },
-                buttonName: 'My Connections',
+                text: 'My Connections',
+                isActive: true,
               ),
-
-              
             ],
           ),
         ),

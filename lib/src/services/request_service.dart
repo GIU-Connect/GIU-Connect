@@ -27,6 +27,16 @@ class RequestService {
     if (querySnapshot.docs.isNotEmpty) {
       throw Exception('Request already exists');
     }
+    if (currentTutNo == desiredTutNo) {
+      throw Exception('Current and desired tutorial numbers cannot be the same');
+    }
+    DocumentSnapshot userDoc = await firestore.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      throw Exception('User not found');
+    }
+    if (userDoc['numberOfActiveRequests'] >= 3) {
+      throw Exception('You cannot have more than 3 active requests');
+    }
     // Create a new document in the 'requests' collection
     await firestore.collection('requests').add({
       'userId': userId,
@@ -62,17 +72,17 @@ class RequestService {
     });
   }
 
-  Future<List<Object?>> search(String userId,int currentTutNo, int desiredTutNo, String germanLevel,
-      String englishLevel) async {
-    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-    DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+  Future<List<Map<String, dynamic>>> search(
+      String userId, int currentTutNo, int desiredTutNo, String germanLevel, String englishLevel) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    DocumentSnapshot userDoc = await firestore.collection('users').doc(userId).get();
     if (!userDoc.exists) {
       throw Exception('User not found');
     }
     String major = userDoc['major'];
     String semester = userDoc['semester'];
 
-    QuerySnapshot querySnapshot = await _firestore
+    QuerySnapshot querySnapshot = await firestore
         .collection('requests')
         .where('major', isEqualTo: major)
         .where('currentTutNo', isEqualTo: currentTutNo)
@@ -82,6 +92,67 @@ class RequestService {
         .where('semester', isEqualTo: semester)
         .get();
 
-    return querySnapshot.docs.map((doc) => doc.data()).toList();
+    // Include the document ID in the result
+    return querySnapshot.docs.map((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      return {
+        'id': doc.id, // Add the document ID
+        ...data, // Spread the document data
+      };
+    }).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getActiveRequests() async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    QuerySnapshot querySnapshot = await firestore.collection('requests').where('status', isEqualTo: 'active').get();
+    return querySnapshot.docs.map((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      return {
+        'id': doc.id, // Add the document ID
+        ...data, // Spread the document data
+      };
+    }).toList();
+  }
+
+  Future<void> editRequest({
+    required String requestId,
+    required String userId,
+    required String name,
+    required int currentTutNo,
+    required int desiredTutNo,
+    required String germanLevel,
+    required String englishLevel,
+    required String major,
+    required String semester,
+    required String phoneNumber,
+  }) async {
+    final firestore = FirebaseFirestore.instance;
+
+    DocumentSnapshot requestDoc = await firestore.collection('requests').doc(requestId).get();
+    if (!requestDoc.exists) {
+      throw Exception('Request not found');
+    }
+
+    if (currentTutNo == desiredTutNo) {
+      throw Exception('Current and desired tutorial numbers cannot be the same');
+    }
+
+    DocumentSnapshot userDoc = await firestore.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      throw Exception('User not found');
+    }
+
+    await firestore.collection('requests').doc(requestId).update({
+      'userId': userId,
+      'name': name,
+      'currentTutNo': currentTutNo,
+      'desiredTutNo': desiredTutNo,
+      'germanLevel': germanLevel,
+      'englishLevel': englishLevel,
+      'major': major,
+      'semester': semester,
+      'phoneNumber': phoneNumber,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
   }
 }

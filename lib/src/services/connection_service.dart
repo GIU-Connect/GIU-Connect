@@ -98,16 +98,11 @@ class ConnectionService {
     await _firestore.collection('connectionRequests').doc(connectionId).update({'status': 'rejected'});
   }
 
-
-  // Future<Stream<QuerySnapshot<Map<String, dynamic>>>> showAllConnectionsForRequest(String requestId) async {
-  //   return _firestore.collection('requests').doc(requestId).collection('connectionRequests').snapshots();
-  // }
-
   Future<Stream<QuerySnapshot<Map<String, dynamic>>>> showAllConnectionsForUser(String userId) async {
     return _firestore
-      .collection('connectionRequests')
-      .where('connectionSenderId', isEqualTo: userId)
-      .snapshots();
+        .collection('connectionRequests')
+        .where('connectionSenderId', isEqualTo: userId)
+        .where('status', whereIn: ['pending', 'accepted', 'rejected']).snapshots();
   }
 
   // Helper method to update requests and connection requests to inactive

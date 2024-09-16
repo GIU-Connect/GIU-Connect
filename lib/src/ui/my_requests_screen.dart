@@ -11,7 +11,7 @@ class MyRequestsScreen extends StatefulWidget {
 
   @override
   State<MyRequestsScreen> createState() => _MyRequestsScreenState();
-  RequestService _deleteRequestService = RequestService();
+  final RequestService _deleteRequestService = RequestService();
   String requestID = '';
 }
 

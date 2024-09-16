@@ -6,7 +6,7 @@ class ConnectionRequestCard extends StatelessWidget {
   final VoidCallback onAccept;
   final VoidCallback onReject;
 
-  ConnectionRequestCard({
+  const ConnectionRequestCard({super.key, 
     required this.submitterName,
     required this.status, // Status is required now
     required this.onAccept,
@@ -69,10 +69,10 @@ class ConnectionRequestCard extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: onReject,
-                  child: const Text('Reject'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                   ),
+                  child: const Text('Reject'),
                 ),
               ],
             ),

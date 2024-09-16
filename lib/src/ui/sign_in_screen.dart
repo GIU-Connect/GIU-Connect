@@ -162,25 +162,28 @@ class SignInScreenState extends State<SignInScreen> {
                         // Remove errorText from InputField
                       ),
                       const SizedBox(height: 24),
-                      MyButton(
+                      CustomButton(
                         onPressed: _signIn,
-                        buttonText: 'Sign In',
+                        text: 'Sign In',
+                        isActive: true,
                       ),
                       const SizedBox(height: 24),
-                      MyButton(
+                      CustomButton(
                         onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => const ForgetPasswordScreen()),
                           );
                         },
-                        buttonText: 'Forgot Password?',
+                        text: 'Forgot Password?',
+                        isActive: true,
                       ),
                       const SizedBox(height: 24),
                       if (_isLoggedIn && !_isEmailVerified)
-                        MyButton(
+                        CustomButton(
                           onPressed: _resendEmailVerification,
-                          buttonText: 'Resend Verification Email',
+                          text: 'Resend Verification Email',
+                          isActive: true,
                         ),
                       const SizedBox(height: 24),
                       // New Link Text
