@@ -98,7 +98,7 @@ class ConnectionService {
       await _firestore.collection('connectionRequests').doc(connectionId).update({'status': 'accepted'});
 
       await emailSender.sendEmail(
-        recipientEmail: (await _firestore.collection('users').doc(masterId).get()).get('email'),
+        recipientEmail: (await _firestore.collection('users').doc(slaveId).get()).get('email'),
         subject: 'Connection Request Accepted',
         body: 'Hello,\n\nYour connection request has been accepted.\n\nBest regards,\nGIU Changing Group App Team',
       );
@@ -114,10 +114,10 @@ class ConnectionService {
     }
     await _firestore.collection('connectionRequests').doc(connectionId).update({'status': 'rejected'});
 
-    String masterId = (await _firestore.collection('requests').doc(requestId).get()).get('userId');
+    String slaveId = connectionSnapshot.get('connectionSenderId');
 
     await emailSender.sendEmail(
-      recipientEmail: (await _firestore.collection('users').doc(masterId).get()).get('email'),
+      recipientEmail: (await _firestore.collection('users').doc(slaveId).get()).get('email'),
       subject: 'Connection Request Rejected',
       body: 'Hello,\n\nYour connection request has been rejected.\n\nBest regards,\nGIU Changing Group App Team',
     );
