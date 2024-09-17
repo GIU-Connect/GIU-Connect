@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:group_changing_app/src/services/request_service.dart';
-import 'package:logger/logger.dart';
 import '../utils/email_sender.dart';
 
 class ConnectionService {
@@ -83,8 +81,11 @@ class ConnectionService {
 
   Future<void> acceptConnection(String requestId, String connectionId) async {
     try {
-      DocumentSnapshot requestSnapshot = await _firestore.collection('requests').doc(requestId).get();
-      DocumentSnapshot connectionSnapshot = await _firestore.collection('connectionRequests').doc(connectionId).get();
+      final requestSnapshotFuture = _firestore.collection('requests').doc(requestId).get();
+      final connectionSnapshotFuture = _firestore.collection('connectionRequests').doc(connectionId).get();
+
+      final requestSnapshot = await requestSnapshotFuture;
+      final connectionSnapshot = await connectionSnapshotFuture;
 
       String masterId = requestSnapshot.get('userId');
       String slaveId = connectionSnapshot.get('connectionSenderId');
@@ -93,16 +94,31 @@ class ConnectionService {
         throw Exception('Only pending connection requests can be accepted.');
       }
 
-      await _updateRequestsToInactiveUsingMethods(masterId);
-      await _updateRequestsToInactiveUsingMethods(slaveId);
+      WriteBatch batch = _firestore.batch();
 
-      await _firestore.collection('connectionRequests').doc(connectionId).update({'status': 'accepted'});
+      await _updateRequestsToInactiveUsingMethods(masterId, batch);
+      await _updateRequestsToInactiveUsingMethods(slaveId, batch);
 
-      await emailSender.sendEmail(
-        recipientEmail: (await _firestore.collection('users').doc(slaveId).get()).get('email'),
-        subject: 'Connection Request Accepted',
-        body: 'Hello,\n\nYour connection request has been accepted.\n\nBest regards,\nGIU Changing Group App Team',
-      );
+      QuerySnapshot connectionRequests =
+          await _firestore.collection('connectionRequests').where('requestId', isEqualTo: requestId).get();
+      for (var doc in connectionRequests.docs) {
+        batch.update(doc.reference, {'status': 'inactive'});
+      }
+      DocumentReference connectionRef = _firestore.collection('connectionRequests').doc(connectionId);
+      batch.update(connectionRef, {'status': 'accepted'});
+
+      await batch.commit();
+
+      Future<void> sendEmails() async {
+        String slaveEmail = (await _firestore.collection('users').doc(slaveId).get()).get('email');
+        await emailSender.sendEmail(
+          recipientEmail: slaveEmail,
+          subject: 'Connection Request Accepted',
+          body: 'Hello,\n\nYour connection request has been accepted.\n\nBest regards,\nGIU Changing Group App Team',
+        );
+      }
+
+      sendEmails();
     } catch (e) {
       throw Exception('Error accepting connection: $e');
     }
@@ -131,18 +147,16 @@ class ConnectionService {
         .where('status', whereIn: ['active', 'pending', 'rejected']).snapshots();
   }
 
-  Future<void> _updateRequestsToInactiveUsingMethods(String userId) async {
+  Future<void> _updateRequestsToInactiveUsingMethods(String userId, WriteBatch batch) async {
     try {
       QuerySnapshot requests = await _firestore.collection('requests').where('userId', isEqualTo: userId).get();
       QuerySnapshot connectionRequests =
           await _firestore.collection('connectionRequests').where('connectionSenderId', isEqualTo: userId).get();
-
       for (var doc in requests.docs) {
-        RequestService requestService = RequestService();
-        await requestService.deleteRequest(doc.id);
+        batch.update(doc.reference, {'status': 'inactive'});
       }
       for (var doc in connectionRequests.docs) {
-        await deleteConnection(doc.id);
+        batch.update(doc.reference, {'status': 'inactive'});
       }
     } catch (e) {
       throw Exception('Error updating requests to inactive using methods: $e');

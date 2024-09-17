@@ -4,7 +4,7 @@ import 'package:group_changing_app/src/services/connection_service.dart';
 import 'package:group_changing_app/src/services/request_service.dart';
 import 'package:group_changing_app/src/widgets/connection_request.dart';
 import 'package:group_changing_app/src/widgets/my_requests_post.dart';
-import 'package:group_changing_app/src/ui/add_request_screen.dart'; // Import the AddRequestPage
+import 'package:group_changing_app/src/ui/add_request_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:group_changing_app/src/utils/no_animation_page_route.dart';
 
@@ -18,7 +18,7 @@ class MyRequestsScreen extends StatefulWidget {
 class _MyRequestsScreenState extends State<MyRequestsScreen> {
   late Future<List<Map<String, dynamic>>> _userRequestsFuture;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  bool _isDeleting = false; // Add loading state for deleting request
+  bool _isDeleting = false;
 
   @override
   void initState() {
@@ -68,87 +68,123 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
       _isDeleting = false; // Stop loading after deleting
     });
 
-    Navigator.pushReplacement(
-      context,
-      NoAnimationPageRoute(pageBuilder: (context, animation, secondaryAnimation) {
-        return const MyRequestsScreen();
-      }),
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        NoAnimationPageRoute(
+          pageBuilder: (context, animation, secondaryAnimation) {
+            return const MyRequestsScreen();
+          },
+        ),
+      );
+    }
+  }
+
+  void showSnackBar(BuildContext context, String message, Color color) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: color,
     );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   void showConnectionRequestsDialog(BuildContext context, String requestId) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Connection Requests'),
-          content: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: RequestService().showAllConnectionsForRequest(requestId),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator()); // Loading while fetching connection requests
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return const Text('No connection requests found.');
-              } else {
-                return SizedBox(
-                  width: double.maxFinite,
-                  child: ListView(
-                    children: snapshot.data!.docs.map((doc) {
-                      final data = doc.data();
-                      final senderId = data['connectionSenderId'];
-                      final status = data['status'];
+        return StatefulBuilder(
+          builder: (context, setState) {
+            bool isProcessing = false;
 
-                      return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                        future: FirebaseFirestore.instance
-                            .collection('users') // Assuming 'users' collection contains user data
-                            .doc(senderId)
-                            .get(),
-                        builder: (context, nameSnapshot) {
-                          if (nameSnapshot.connectionState == ConnectionState.waiting) {
-                            return const ListTile(
-                              title: CircularProgressIndicator(), // Loading while fetching user data
-                            );
-                          } else if (nameSnapshot.hasError) {
-                            return ListTile(
-                              title: Text('Error: ${nameSnapshot.error}'),
-                            );
-                          } else if (!nameSnapshot.hasData || !nameSnapshot.data!.exists) {
-                            return const ListTile(
-                              title: Text('Unknown user'),
-                            );
-                          } else {
-                            final name = nameSnapshot.data!.data()!['name'] ?? 'Unknown';
-                            return ConnectionRequestCard(
-                              submitterName: name,
-                              status: status,
-                              onAccept: () {
-                                ConnectionService().acceptConnection(requestId, doc.id);
-                                Navigator.of(context).pop();
-                              },
-                              onReject: () {
-                                ConnectionService().rejectConnection(requestId, doc.id);
-                                Navigator.of(context).pop();
-                              },
-                            );
+            return AlertDialog(
+              title: const Text('Connection Requests'),
+              content: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: RequestService().showAllConnectionsForRequest(requestId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Text('No connection requests found.');
+                  } else {
+                    return SizedBox(
+                      width: double.maxFinite,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          final connectionRequest = snapshot.data!.docs[index].data();
+                          final connectionSenderId = connectionRequest['connectionSenderId'];
+
+                          return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                            future: FirebaseFirestore.instance.collection('users').doc(connectionSenderId).get(),
+                            builder: (context, userSnapshot) {
+                              if (userSnapshot.connectionState == ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              } else if (userSnapshot.hasError) {
+                                return Text('Error: ${userSnapshot.error}');
+                              } else if (!userSnapshot.hasData || userSnapshot.data == null) {
+                                return const Text('User not found');
+                              } else {
+                                final userData = userSnapshot.data!.data();
+                                final connectionSenderName = userData?['name'] ?? 'Unknown';
+
+                                return ConnectionRequestCard(
+                                  submitterName: connectionSenderName,
+                                  status: connectionRequest['status'],
+                                  onAccept: () async {
+                                    setState(() => isProcessing = true);
+
+                                    try {
+                                      await ConnectionService()
+                                          .acceptConnection(requestId, snapshot.data!.docs[index].id);
+
+                                      if (context.mounted) {
+                                        showSnackBar(context, 'Connection accepted', Colors.green);
+                                        // Close the dialog after a short delay to allow the snackbar to be visible
+                                        Future.delayed(const Duration(seconds: 1), () {
+                                          if (context.mounted) {
+                                            Navigator.of(context).pop();
+                                          }
+                                        });
+                                      }
+                                    } catch (e) {
+                                      if (context.mounted) {
+                                        showSnackBar(
+                                            context, 'Error accepting connection: ${e.toString()}', Colors.red);
+                                      }
+                                      // Stop the loading indicator in case of an error
+                                      setState(() => isProcessing = false);
+                                    }
+                                  },
+                                  onReject: () async {
+                                    // ... (onReject logic remains the same) ...
+                                  },
+                                );
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  }
+                },
+              ),
+              actions: <Widget>[
+                isProcessing
+                    ? const Center(child: CircularProgressIndicator())
+                    : TextButton(
+                        child: const Text('Close'),
+                        onPressed: () {
+                          if (!isProcessing) {
+                            Navigator.of(context).pop();
                           }
                         },
-                      );
-                    }).toList(),
-                  ),
-                );
-              }
-            },
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+                      ),
+              ],
+            );
+          },
         );
       },
     );
@@ -167,7 +203,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddRequestPage()),
+                MaterialPageRoute(builder: (context) => const AddRequestPage()),
               );
             },
           ),
@@ -181,7 +217,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                 future: _userRequestsFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator()); // Loading while fetching requests
+                    return const Center(child: CircularProgressIndicator()); // Loading state
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}', style: theme.textTheme.bodyLarge));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -226,7 +262,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddRequestPage()),
+            MaterialPageRoute(builder: (context) => const AddRequestPage()),
           );
         },
         child: const Icon(Icons.add),

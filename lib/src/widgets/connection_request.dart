@@ -1,81 +1,104 @@
 import 'package:flutter/material.dart';
 
-class ConnectionRequestCard extends StatelessWidget {
+class ConnectionRequestCard extends StatefulWidget {
   final String submitterName;
-  final String status; // Add the status field
-  final VoidCallback onAccept;
-  final VoidCallback onReject;
+  final String status;
+  final Future<void> Function() onAccept;
+  final Future<void> Function() onReject;
 
-  const ConnectionRequestCard({super.key, 
+  const ConnectionRequestCard({
+    super.key,
     required this.submitterName,
-    required this.status, // Status is required now
+    required this.status,
     required this.onAccept,
     required this.onReject,
   });
 
-  // A function to determine the color based on the status
-  Color _getStatusColor() {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return Colors.yellow;
-      case 'rejected':
-        return Colors.red;
-      case 'accepted':
-        return Colors.green;
-      case 'inactive':
-        return Colors.grey;
-      default:
-        return Colors.grey; // Default to grey if the status is unknown
-    }
-  }
+  @override
+  ConnectionRequestCardState createState() => ConnectionRequestCardState();
+}
+
+class ConnectionRequestCardState extends State<ConnectionRequestCard> {
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(8.0),
+      elevation: 3, // Add slight elevation for visual depth
+      margin: const EdgeInsets.symmetric(vertical: 8), // Add spacing between cards
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Row(
-              children: [
-                // Circle with dynamic color based on status
-                Container(
-                  width: 16.0,
-                  height: 16.0,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _getStatusColor(), // Circle color from status
-                  ),
-                ),
-                const SizedBox(width: 10.0), // Spacing between circle and text
-                Text(
-                  submitterName,
-                  style: const TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Submitter Name
+            Text(
+              'Submitter: ${widget.submitterName}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            const SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                ElevatedButton(
-                  onPressed: onAccept,
-                  child: const Text('Accept'),
-                ),
-                ElevatedButton(
-                  onPressed: onReject,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                  ),
-                  child: const Text('Reject'),
-                ),
-              ],
+
+            // Status
+            const SizedBox(height: 8),
+            Text(
+              'Status: ${widget.status}',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
             ),
+
+            const SizedBox(height: 16),
+
+            // Action Buttons (conditional rendering)
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // Accept Button
+                      ElevatedButton(
+                        onPressed: () async {
+                          setState(() => _isLoading = true);
+                          try {
+                            await widget.onAccept();
+                          } finally {
+                            if (mounted) {
+                              setState(() => _isLoading = false);
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Accept'),
+                      ),
+
+                      const SizedBox(width: 12), // Add spacing between buttons
+
+                      // Reject Button
+                      OutlinedButton(
+                        onPressed: () async {
+                          setState(() => _isLoading = true);
+                          try {
+                            await widget.onReject();
+                          } finally {
+                            if (mounted) {
+                              setState(() => _isLoading = false);
+                            }
+                          }
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          side: const BorderSide(color: Colors.red),
+                        ),
+                        child: const Text('Reject'),
+                      ),
+                    ],
+                  ),
           ],
         ),
       ),

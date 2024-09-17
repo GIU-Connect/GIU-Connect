@@ -190,6 +190,11 @@ class RequestService {
 
   // get all connection requests for a request
   Stream<QuerySnapshot<Map<String, dynamic>>> showAllConnectionsForRequest(String requestId) {
-    return FirebaseFirestore.instance.collection('connections').where('requestId', isEqualTo: requestId).snapshots();
+    var connectionRequests = FirebaseFirestore.instance
+        .collection('connectionRequests')
+        .where('requestId', isEqualTo: requestId)
+        .where('status', isEqualTo: 'pending')
+        .snapshots();
+    return connectionRequests;
   }
 }
