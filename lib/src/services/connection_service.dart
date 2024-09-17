@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../utils/email_sender.dart';
+import 'package:async/async.dart';
 
 class ConnectionService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -39,6 +40,7 @@ class ConnectionService {
           .collection('connectionRequests')
           .where('requestId', isEqualTo: requestId)
           .where('connectionSenderId', isEqualTo: connectionSenderId)
+          .where('connectionReceiverId', isEqualTo: userId)
           .get();
 
       if (existingRequests.docs.isNotEmpty) {
@@ -48,6 +50,7 @@ class ConnectionService {
       await _firestore.collection('connectionRequests').add({
         'requestId': requestId,
         'connectionSenderId': connectionSenderId,
+        'connectionReceiverId': userId,
         'status': 'pending',
       });
 
@@ -141,10 +144,18 @@ class ConnectionService {
   }
 
   Future<Stream<QuerySnapshot<Map<String, dynamic>>>> showAllConnectionsForUser(String userId) async {
-    return _firestore
+    final sentConnectionsStream = _firestore
         .collection('connectionRequests')
         .where('connectionSenderId', isEqualTo: userId)
         .where('status', whereIn: ['active', 'pending', 'rejected']).snapshots();
+
+    final receivedConnectionsStream = _firestore
+        .collection('connectionRequests')
+        .where('connectionReceiverId', isEqualTo: userId)
+        .where('status', whereIn: ['active', 'pending', 'rejected']).snapshots();
+
+    // Combine the two streams
+    return StreamGroup.merge([sentConnectionsStream, receivedConnectionsStream]);
   }
 
   Future<void> _updateRequestsToInactiveUsingMethods(String userId, WriteBatch batch) async {
