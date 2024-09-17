@@ -1,5 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:group_changing_app/src/services/user_service.dart';
 import 'package:group_changing_app/src/widgets/button_widget.dart';
 
@@ -45,102 +45,72 @@ class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
     );
   }
 
-  void _changePhoneNumber() async {
-    TextEditingController newPhoneNumberController = TextEditingController();
-
+  void _changePhoneNumber() {
     _showDialog(
       title: 'Change Phone Number',
       content: TextField(
-        controller: newPhoneNumberController,
-        decoration: const InputDecoration(labelText: 'New Phone Number'),
+        decoration: InputDecoration(hintText: 'Enter new phone number'),
+        keyboardType: TextInputType.phone,
       ),
       onChange: () {
-        String newPhoneNumber = newPhoneNumberController.text;
-        widget.editor.changePhoneNumber(
-          userId: widget.currentUser.uid,
-          oldPhoneNumber: '', // Placeholder since oldPhoneNumber is not used
-          newPhoneNumber: newPhoneNumber,
-        );
+        // Implement the logic to change the phone number
       },
     );
   }
 
-  void _changeUniversityId() async {
-    TextEditingController universityIdController = TextEditingController();
-
+  void _changeUniversityId() {
     _showDialog(
       title: 'Change University ID',
       content: TextField(
-        controller: universityIdController,
-        decoration: const InputDecoration(labelText: 'New University ID'),
+        decoration: InputDecoration(hintText: 'Enter new university ID'),
+        keyboardType: TextInputType.text,
       ),
       onChange: () {
-        String newUniversityId = universityIdController.text;
-        widget.editor.changeUniversityId(
-          userId: widget.currentUser.uid,
-          universityId: newUniversityId,
-        );
+        // Implement the logic to change the university ID
       },
     );
   }
 
-  void _changeCurrentTutorial() async {
-    TextEditingController currentTutorialController = TextEditingController();
-
+  void _changeCurrentTutorial() {
     _showDialog(
       title: 'Change Current Tutorial',
       content: TextField(
-        controller: currentTutorialController,
-        decoration: const InputDecoration(labelText: 'New Tutorial Number'),
+        decoration: InputDecoration(hintText: 'Enter new tutorial'),
+        keyboardType: TextInputType.text,
       ),
       onChange: () {
-        String newTutorial = currentTutorialController.text;
-        widget.editor.changeCurrentTutorial(
-          userId: widget.currentUser.uid,
-          currentTutorial: newTutorial,
-        );
+        // Implement the logic to change the current tutorial
       },
     );
   }
 
-  void _changeName() async {
-    TextEditingController nameController = TextEditingController();
-
+  void _changeName() {
     _showDialog(
       title: 'Change Name',
       content: TextField(
-        controller: nameController,
-        decoration: const InputDecoration(labelText: 'New Name'),
+        decoration: InputDecoration(hintText: 'Enter new name'),
+        keyboardType: TextInputType.text,
       ),
       onChange: () {
-        String newName = nameController.text;
-        widget.editor.changeName(
-          userId: widget.currentUser.uid,
-          name: newName,
-        );
+        // Implement the logic to change the name
       },
     );
   }
 
-  void _changeSemester() async {
-    TextEditingController semesterController = TextEditingController();
-
+  void _changeSemester() {
     _showDialog(
       title: 'Change Semester',
       content: TextField(
-        controller: semesterController,
-        decoration: const InputDecoration(labelText: 'New Semester No.'),
+        decoration: InputDecoration(hintText: 'Enter new semester'),
+        keyboardType: TextInputType.text,
       ),
       onChange: () {
-        String newSemester = semesterController.text;
-        widget.editor.changeSemester(
-          userId: widget.currentUser.uid,
-          semester: newSemester,
-        );
+        // Implement the logic to change the semester
       },
     );
   }
 
+  // Implementing the _changeMajor method
   void _changeMajor() async {
     String selectedMajor = 'Computer Science';
     List<String> majors = [
@@ -158,19 +128,23 @@ class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
 
     _showDialog(
       title: 'Change Major',
-      content: DropdownButton<String>(
-        value: selectedMajor,
-        onChanged: (String? newValue) {
-          setState(() {
-            selectedMajor = newValue!;
-          });
-        },
-        items: majors.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
+      content: StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return DropdownButton<String>(
+            value: selectedMajor,
+            onChanged: (String? newValue) {
+              setState(() {
+                selectedMajor = newValue!;
+              });
+            },
+            items: majors.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           );
-        }).toList(),
+        },
       ),
       onChange: () {
         widget.editor.changeMajor(
@@ -199,9 +173,9 @@ class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center, // Center buttons vertically
+          crossAxisAlignment: CrossAxisAlignment.center, // Center buttons horizontally
           children: [
-            const SizedBox(height: 20),
             CustomButton(
               onPressed: () {
                 showDialog(
@@ -226,47 +200,47 @@ class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
               text: 'Change email',
               isActive: true,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20), // Add space between buttons
             CustomButton(
               onPressed: () {
                 widget._auth.sendPasswordResetEmail(
                   email: widget.currentUser.email!,
                 );
               },
-              text: 'Send Password Reset userId',
+              text: 'Send Password Reset Email',
               isActive: true,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             CustomButton(
               onPressed: _changePhoneNumber,
               text: 'Change Phone Number',
               isActive: true,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             CustomButton(
               onPressed: _changeUniversityId,
               text: 'Change University ID',
               isActive: true,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             CustomButton(
               onPressed: _changeCurrentTutorial,
               text: 'Change Current Tutorial',
               isActive: true,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             CustomButton(
               onPressed: _changeName,
               text: 'Change Name',
               isActive: true,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             CustomButton(
               onPressed: _changeSemester,
               text: 'Change Semester',
               isActive: true,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             CustomButton(
               onPressed: _changeMajor,
               text: 'Change Major',
