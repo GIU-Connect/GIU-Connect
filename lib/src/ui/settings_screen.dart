@@ -98,8 +98,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               AnimatedHoverButton(
                 onPressed: () {
+                  // get the current user id
+                  FirebaseAuth auth = FirebaseAuth.instance;
+                  String userId = auth.currentUser!.uid;
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => MyConnectionsScreen()),
+                    MaterialPageRoute(builder: (context) => MyConnectionScreen(userId: userId)),
                   );
                 },
                 text: 'My Connections',
