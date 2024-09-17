@@ -121,7 +121,7 @@ class SignInScreenState extends State<SignInScreen> {
     _checkUserStatus();
     // if logged in redirect to HomePageScreen
     if (_isLoggedIn && _isEmailVerified) {
-      return const HomePageScreen();
+      return HomePageScreen();
     }
     return Scaffold(
       backgroundColor: Colors.black,

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../utils/email_sender.dart';
-import 'package:async/async.dart';
 
 class ConnectionService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -143,19 +143,50 @@ class ConnectionService {
     );
   }
 
-  Future<Stream<QuerySnapshot<Map<String, dynamic>>>> showAllConnectionsForUser(String userId) async {
-    final sentConnectionsStream = _firestore
-        .collection('connectionRequests')
-        .where('connectionSenderId', isEqualTo: userId)
-        .where('status', whereIn: ['active', 'pending', 'rejected']).snapshots();
+  Future<List<Map<String, dynamic>>> getAllConnections(String userId) async {
+    try {
+      // Get all connections where the user is the sender
+      QuerySnapshot sentConnections = await _firestore
+          .collection('connectionRequests')
+          .where('connectionSenderId', isEqualTo: userId)
+          .where('status', whereIn: ['accepted', 'pending']).get();
 
-    final receivedConnectionsStream = _firestore
-        .collection('connectionRequests')
-        .where('connectionReceiverId', isEqualTo: userId)
-        .where('status', whereIn: ['active', 'pending', 'rejected']).snapshots();
+      // Get all connections where the user is the receiver
+      QuerySnapshot receivedConnections = await _firestore
+          .collection('connectionRequests')
+          .where('connectionReceiverId', isEqualTo: userId)
+          .where('status', whereIn: ['accepted', 'pending']).get();
 
-    // Combine the two streams
-    return StreamGroup.merge([sentConnectionsStream, receivedConnectionsStream]);
+      List<Map<String, dynamic>> connections = [];
+
+      // Fetch user details for connections where user is the sender
+      for (var doc in sentConnections.docs) {
+        String receiverId = doc.get('connectionReceiverId');
+        DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(receiverId).get();
+        connections.add({
+          'connectionId': doc.id,
+          'userId': receiverId,
+          'userDetails': userSnapshot.data(),
+          'role': 'receiver', // Current user is the sender, so the other user is the receiver
+        });
+      }
+
+      // Fetch user details for connections where user is the receiver
+      for (var doc in receivedConnections.docs) {
+        String senderId = doc.get('connectionSenderId');
+        DocumentSnapshot userSnapshot = await _firestore.collection('users').doc(senderId).get();
+        connections.add({
+          'connectionId': doc.id,
+          'userId': senderId,
+          'userDetails': userSnapshot.data(),
+          'role': 'sender', // Current user is the receiver, so the other user is the sender
+        });
+      }
+
+      return connections;
+    } catch (e) {
+      throw Exception('Error fetching connections: $e');
+    }
   }
 
   Future<void> _updateRequestsToInactiveUsingMethods(String userId, WriteBatch batch) async {

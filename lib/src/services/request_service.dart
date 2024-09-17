@@ -106,6 +106,7 @@ class RequestService {
         .where('germanLevel', isEqualTo: germanLevel)
         .where('englishLevel', isEqualTo: englishLevel)
         .where('semester', isEqualTo: semester)
+        .where('status', isEqualTo: 'active')
         .get();
 
     // Include the document ID in the result

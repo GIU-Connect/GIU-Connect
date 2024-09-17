@@ -4,7 +4,6 @@ import 'package:group_changing_app/src/ui/edit_account_info_screen.dart';
 import 'package:group_changing_app/src/ui/my_connections_screen.dart';
 import 'package:group_changing_app/src/ui/my_requests_screen.dart';
 import 'package:group_changing_app/src/ui/sign_up_screen.dart';
-import 'package:group_changing_app/src/widgets/button_widget.dart';
 
 class SettingsScreen extends StatefulWidget {
   SettingsScreen({super.key});
@@ -12,106 +11,122 @@ class SettingsScreen extends StatefulWidget {
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  User currentUser = FirebaseAuth.instance.currentUser!;
+  final User currentUser = FirebaseAuth.instance.currentUser!;
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
+    // Get the user's display name
+    String? displayName = widget.currentUser.displayName;
+
+    // Get the first two letters of the name or "Us" if the name is too short
+    String initials = displayName != null && displayName.length >= 2 ? displayName.substring(0, 2).toUpperCase() : 'Us';
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.black, // Set the AppBar background color to black
+          backgroundColor: Theme.of(context).primaryColor,
           title: const Text(
             'Settings',
-            style: TextStyle(
-              color: Colors.white, // Set the text color to white
-              fontWeight: FontWeight.bold, // Set the font to bold
-              fontSize: 20,
-            ),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.white),
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(20.0), // Padding for better spacing
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, // Align items to the left
-            children: [
-              const SizedBox(height: 20),
-
-              // Display the user's email in a modern text style
-              Text(
-                'Email: ${widget.currentUser.email}',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // Sign Out Button
-              CustomButton(
-                onPressed: () {
-                  widget._auth.signOut();
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const SignUpScreen()),
-                    (Route<dynamic> route) => false,
-                  );
-                },
-                text: 'Sign Out',
-                isActive: true,
-              ),
-
-              const SizedBox(height: 20),
-
-              // Navigate to My Requests screen
-              CustomButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => MyRequestsScreen()),
-                  );
-                },
-                text: 'My Requests',
-                isActive: true,
-              ),
-
-              const SizedBox(height: 20),
-
-              CustomButton(
-                onPressed: () async {
-                  await widget._auth.currentUser!.reload();
-                  if (widget._auth.currentUser!.emailVerified) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => EditAccountInfoScreen()),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Please verify your email first.'),
+        body: Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          padding: const EdgeInsets.all(20.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Theme.of(context).hintColor,
+                      child: Text(
+                        initials,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
+                    ),
+                    const SizedBox(width: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          displayName ?? 'User',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
+                const Divider(color: Colors.grey),
+                const SizedBox(height: 20),
+                ListTile(
+                  leading: const Icon(Icons.logout),
+                  title: const Text('Sign Out'),
+                  onTap: () {
+                    widget._auth.signOut();
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                      (Route<dynamic> route) => false,
                     );
-                  }
-                },
-                text: 'Change account info',
-                isActive: true,
-              ),
-
-              const SizedBox(height: 20),
-
-              CustomButton(
-                onPressed: () {
-                  // get the current user id
-                  FirebaseAuth auth = FirebaseAuth.instance;
-                  String userId = auth.currentUser!.uid;
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => MyConnectionScreen(userId: userId)),
-                  );
-                },
-                text: 'My Connections',
-                isActive: true,
-              ),
-            ],
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.list),
+                  title: const Text('My Requests'),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const MyRequestsScreen()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.edit),
+                  title: const Text('Change account info'),
+                  onTap: () async {
+                    await widget._auth.currentUser!.reload();
+                    if (widget._auth.currentUser!.emailVerified) {
+                      if (context.mounted) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => EditAccountInfoScreen()),
+                        );
+                      }
+                    } else {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please verify your email first.'),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.people),
+                  title: const Text('My Connections'),
+                  onTap: () {
+                    FirebaseAuth auth = FirebaseAuth.instance;
+                    String userId = auth.currentUser!.uid;
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => MyConnectionScreen(userId: userId)),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

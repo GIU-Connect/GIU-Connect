@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:group_changing_app/src/ui/add_request_screen.dart'; // Import the AddRequestPage
+import 'package:group_changing_app/src/ui/add_request_screen.dart';
 import 'package:group_changing_app/src/ui/search_screen.dart';
 import 'package:group_changing_app/src/ui/settings_screen.dart';
 import 'package:group_changing_app/src/widgets/post.dart';
@@ -11,14 +11,15 @@ class HomePageScreen extends StatefulWidget {
   const HomePageScreen({super.key});
 
   @override
-  State<HomePageScreen> createState() => _HomePageScreenState();
+  HomePageScreenState createState() => HomePageScreenState();
 }
 
-class _HomePageScreenState extends State<HomePageScreen> {
+class HomePageScreenState extends State<HomePageScreen> with SingleTickerProviderStateMixin {
   User? currentUser;
   late Future<List<Map<String, dynamic>>> activeRequestsFuture;
-  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final Map<String, bool> _loadingStates = {};
+  bool _isSearchExpanded = false;
 
   @override
   void initState() {
@@ -27,7 +28,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     activeRequestsFuture = RequestService().getActiveRequests();
   }
 
-  void _handleConnectionRequest(String requestId) async {
+  Future<void> _handleConnectionRequest(String requestId) async {
     setState(() {
       _loadingStates[requestId] = true;
     });
@@ -60,30 +61,40 @@ class _HomePageScreenState extends State<HomePageScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      key: _scaffoldMessengerKey,
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Home Page', style: theme.textTheme.titleLarge),
         actions: [
-          IconButton(
-            icon: Icon(Icons.search, color: theme.iconTheme.color),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SearchScreen()),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.settings, color: theme.iconTheme.color),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SettingsScreen()),
-              );
-            },
+          Builder(
+            builder: (context) => IconButton(
+              icon: Icon(Icons.search, color: theme.iconTheme.color),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
           ),
         ],
       ),
+      drawer: Drawer(child: SettingsScreen()),
+      endDrawer: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        width: _isSearchExpanded ? MediaQuery.of(context).size.width * 0.75 : 250,
+        onEnd: () {},
+        child: Drawer(
+          child: SearchScreen(
+            onSearchResults: () {
+              setState(() {
+                _isSearchExpanded = true;
+              });
+            },
+          ),
+        ),
+      ),
+      onEndDrawerChanged: (isOpened) {
+        if (!isOpened) {
+          setState(() {
+            _isSearchExpanded = false;
+          });
+        }
+      },
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
         child: FutureBuilder<List<Map<String, dynamic>>>(

@@ -20,14 +20,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Group Changing App',
       theme: ThemeData(
-        // Define the color scheme
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.white,
-          primary: Colors.grey[900]!,
-          secondary: Colors.blue,
-        ),
-        // Define the default font family
-        fontFamily: 'Roboto',
+        // Use a dark color scheme with a primary blue accent
+        brightness: Brightness.dark, // Set overall brightness to dark
+        primaryColor: Colors.grey[900], // Dark background color
+        hintColor: Colors.blue, // Use blue for accents
+        // make
+
         // Define default text styles
         textTheme: const TextTheme(
           displayLarge: TextStyle(fontSize: 96.0, fontWeight: FontWeight.bold, color: Colors.white),
@@ -38,14 +36,17 @@ class MyApp extends StatelessWidget {
           titleLarge: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.white),
           bodyLarge: TextStyle(fontSize: 16.0, fontWeight: FontWeight.normal, color: Colors.white),
           bodyMedium: TextStyle(fontSize: 14.0, fontWeight: FontWeight.normal, color: Colors.white),
-          bodySmall: TextStyle(fontSize: 12.0, fontWeight: FontWeight.normal, color: Colors.white70),
+          bodySmall: TextStyle(
+              fontSize: 12.0,
+              fontWeight: FontWeight.normal,
+              color: Colors.grey), // Slightly lighter for less important text
           labelLarge: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.white),
         ),
+
         // Define default button styles
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
             textStyle: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
           ),
         ),
@@ -55,28 +56,38 @@ class MyApp extends StatelessWidget {
             textStyle: const TextStyle(fontSize: 14.0),
           ),
         ),
+
+        // Input decoration theme
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: Colors.transparent,
-          labelStyle: TextStyle(color: Colors.grey[500]),
+          fillColor: Colors.grey[800], // Slightly lighter background for input fields
+          labelStyle: TextStyle(color: Colors.grey[400]),
           errorStyle: const TextStyle(color: Colors.red),
-          border: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey[700]!),
+            borderRadius: BorderRadius.circular(8.0),
           ),
-          focusedBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.blue),
+          focusedBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Colors.blue),
+            borderRadius: BorderRadius.circular(8.0),
           ),
         ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF212121), // Dark Grey 900
-          titleTextStyle: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.white),
-          iconTheme: IconThemeData(color: Colors.white),
+
+        // AppBar theme
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.grey[900],
+          titleTextStyle: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
+
+        // Floating action button theme
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: Colors.purple,
+          backgroundColor: Colors.blue,
           foregroundColor: Colors.white,
         ),
-        scaffoldBackgroundColor: Colors.black, // Set background color to black
+
+        // Scaffold background color
+        scaffoldBackgroundColor: Colors.grey[900], // Dark background
       ),
       home: const SignInScreen(),
     );

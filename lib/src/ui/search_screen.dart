@@ -1,119 +1,200 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:group_changing_app/src/services/connection_service.dart';
 import 'package:group_changing_app/src/services/request_service.dart';
-import 'package:group_changing_app/src/ui/search_result_screen.dart';
+import 'package:group_changing_app/src/widgets/button_widget.dart';
+
+import 'package:group_changing_app/src/widgets/post.dart';
 
 class SearchScreen extends StatefulWidget {
-  SearchScreen({super.key});
+  final VoidCallback onSearchResults;
+
+  const SearchScreen({super.key, required this.onSearchResults});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
-
-  final RequestService requestService = RequestService();
-  final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+  SearchScreenState createState() => SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
-  String major = '';
-  String currentTutNo = '';
-  String desiredTutNo = '';
-  String germanLevel = 'G1';
-  String englishLevel = 'AE';
-  String semester = '1';
+class SearchScreenState extends State<SearchScreen> with SingleTickerProviderStateMixin {
+  final _formKey = GlobalKey<FormState>();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  late Future<DocumentSnapshot> _userData;
+
+  String _desiredTutNo = '';
+  String _currentTutNo = '';
+  String _germanLevel = 'G1';
+  String _englishLevel = 'AE';
+  final TextEditingController _desiredTutNoController = TextEditingController();
+
+  bool _isLoading = false;
+  List<Object?> _searchResults = [];
+
+  late final AnimationController _animationController;
+  late final Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+    _userData = _firestore.collection('users').doc(currentUserId).get();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeIn,
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Search in Available Requests'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              decoration:
-                  const InputDecoration(labelText: 'From Tutorial No.', hintText: 'The tutorial you want to switch to'),
-              onChanged: (value) {
-                setState(() {
-                  currentTutNo = value;
-                });
-              },
-            ),
-            TextField(
-              decoration:
-                  const InputDecoration(labelText: 'To Tutorial No.', hintText: 'The tutorial you are currently in'),
-              onChanged: (value) {
-                setState(() {
-                  desiredTutNo = value;
-                });
-              },
-            ),
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'German Level'),
-              value: germanLevel,
-              items: ['G1', 'G2', 'G3', 'G4', 'No German']
-                  .map((level) => DropdownMenuItem(
-                        value: level,
-                        child: Text(level),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  germanLevel = value!;
-                });
-              },
-            ),
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'English Level'),
-              value: englishLevel,
-              items: ['AE', 'AS', 'SM', 'CPS', 'RPW', 'No English']
-                  .map((level) => DropdownMenuItem(
-                        value: level,
-                        child: Text(level),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  englishLevel = value!;
-                });
-              },
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                int? currentTut = int.tryParse(currentTutNo);
-                int? desiredTut = int.tryParse(desiredTutNo);
+    return Row(
+      children: [
+        SizedBox(
+          width: 250,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 32),
+                  FutureBuilder<DocumentSnapshot>(
+                    future: _userData,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (snapshot.hasData && snapshot.data!.exists) {
+                        final data = snapshot.data!.data() as Map<String, dynamic>;
+                        _currentTutNo = data['currentTutorial'] ?? '';
+                        _germanLevel = data['germanLevel'] ?? 'G1';
+                        _englishLevel = data['englishLevel'] ?? 'AE';
 
-                // Handle the case where parsing fails (null means invalid input)
-                if (currentTut == null || desiredTut == null) {
-                  // Show a message if input is invalid
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter valid tutorial numbers.')),
-                  );
-                  return;
-                }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            TextFormField(
+                              controller: _desiredTutNoController,
+                              decoration: InputDecoration(
+                                labelText: 'To Tutorial No.',
+                                hintText: 'Enter your desired tutorial number',
+                                prefixIcon: const Icon(Icons.swap_vert),
+                                border: const OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                ),
+                                filled: true,
+                                fillColor: Colors.transparent,
+                                hintStyle: TextStyle(color: Colors.grey[400]),
+                                labelStyle: TextStyle(color: Colors.grey[400]),
+                              ),
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your desired tutorial number';
+                                }
+                                return null;
+                              },
+                              onChanged: (value) {
+                                setState(() {
+                                  _desiredTutNo = value;
+                                });
+                              },
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            const SizedBox(height: 32),
+                            CustomButton(
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
 
-                final results = await widget.requestService.search(
-                  widget.currentUserId,
-                  currentTut,
-                  desiredTut,
-                  germanLevel,
-                  englishLevel,
-                );
+                                  final desiredTut = int.tryParse(_desiredTutNo);
+                                  final currentTut = int.tryParse(_currentTutNo);
+                                  widget.onSearchResults();
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SearchResultScreen(results: results),
+                                  final results = await RequestService().search(
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                    currentTut!,
+                                    desiredTut!,
+                                    _germanLevel,
+                                    _englishLevel,
+                                  );
+
+                                  setState(() {
+                                    _isLoading = false;
+                                    _searchResults = results;
+                                    _animationController.forward(from: 0.0);
+                                  });
+                                }
+                              },
+                              text: 'Search',
+                              isActive: true,
+                              isLoading: _isLoading,
+                            ),
+                          ],
+                        );
+                      } else {
+                        return const Center(child: Text('User data not found.'));
+                      }
+                    },
                   ),
-                );
-              },
-              child: const Text('Search'),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
-      ),
+        Expanded(
+          child: _searchResults.isNotEmpty
+              ? FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: ListView.builder(
+                    itemCount: _searchResults.length,
+                    itemBuilder: (context, index) {
+                      final result = _searchResults[index];
+                      if (result == null || (result is Map && result.isEmpty)) {
+                        return const Center(child: Text('No results found'));
+                      }
+
+                      final resultMap = result as Map<String, dynamic>;
+
+                      return Post(
+                        phoneNumber: resultMap['phoneNumber'],
+                        semester: resultMap['semester'],
+                        submitterName: resultMap['name'],
+                        major: resultMap['major'],
+                        currentTutNo: resultMap['currentTutNo'],
+                        desiredTutNo: resultMap['desiredTutNo'],
+                        englishLevel: resultMap['englishLevel'],
+                        germanLevel: resultMap['germanLevel'],
+                        isActive: resultMap['status'] == 'active',
+                        buttonText: 'Connect',
+                        isLoading: false,
+                        onPressed: () {
+                          ConnectionService().sendConnectionRequest(
+                            resultMap['id'],
+                            resultMap['userId'],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                )
+              : Container(),
+        ),
+      ],
     );
   }
 }

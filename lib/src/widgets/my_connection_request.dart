@@ -3,8 +3,8 @@ import 'package:group_changing_app/src/widgets/button_widget.dart';
 
 class MyConnectionRequest extends StatefulWidget {
   final String requestOwner;
-  final int fromTut;
-  final int toTut;
+  final String fromTut;
+  final String toTut;
   final VoidCallback onDelete;
 
   const MyConnectionRequest({
