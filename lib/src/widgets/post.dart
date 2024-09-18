@@ -12,7 +12,7 @@ class Post extends StatelessWidget {
   final String germanLevel;
   final bool isActive;
   final String buttonText;
-  final bool isLoading; // New parameter for loading state
+  final bool isLoading;
   final VoidCallback onPressed;
 
   const Post({
@@ -27,7 +27,7 @@ class Post extends StatelessWidget {
     required this.germanLevel,
     required this.isActive,
     required this.buttonText,
-    required this.isLoading, // Add isLoading parameter
+    required this.isLoading,
     required this.onPressed,
   });
 
@@ -35,172 +35,127 @@ class Post extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
+    final isLargeScreen = screenWidth > 600;
 
     return Card(
-      color: Colors.grey[900],
+      color: Colors.grey[850],
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(16.0),
       ),
-      elevation: 5.0,
+      elevation: 8.0,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-        child: screenWidth > 1000 ? _buildLargeScreenLayout(theme) : _buildSmallScreenLayout(theme),
-      ),
-    );
-  }
-
-  Widget _buildLargeScreenLayout(ThemeData theme) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CircleAvatar(
-          backgroundColor: theme.colorScheme.primary,
-          child: Text(
-            submitterName.isNotEmpty ? submitterName[0].toUpperCase() : '?',
-            style: const TextStyle(color: Colors.white),
-          ),
-        ),
-        const SizedBox(width: 12.0),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                submitterName,
-                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text('Major: $major', style: theme.textTheme.bodyLarge),
-              Text('Semester: $semester', style: theme.textTheme.bodyLarge),
-            ],
-          ),
-        ),
-        SizedBox(
-          width: 400,
-          height: 80,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(4.0),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 4.0),
-                    child: Text(
-                      'Current Tutorial: $currentTutNo',
-                      style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white),
-                    ),
-                  ),
-                  const SizedBox(width: 10.0),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(4.0),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
-                    child: Text(
-                      'Desired Tutorial: $desiredTutNo',
-                      style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white),
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
-        ),
-        const Spacer(),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('English: $englishLevel', style: theme.textTheme.bodyLarge),
-            Text('German: $germanLevel', style: theme.textTheme.bodyLarge),
-            Center(
-              child: CustomButton(
-                text: buttonText,
-                isActive: isActive,
-                isLoading: isLoading, // Pass loading state
-                onPressed: onPressed,
-              ),
-            )
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSmallScreenLayout(ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(
                   backgroundColor: theme.colorScheme.primary,
+                  radius: isLargeScreen ? 40.0 : 24.0,
                   child: Text(
                     submitterName.isNotEmpty ? submitterName[0].toUpperCase() : '?',
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: isLargeScreen ? 24.0 : 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 12.0),
+                const SizedBox(width: 16.0),
                 Expanded(
-                  child: Text(
-                    submitterName,
-                    style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        submitterName,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: isLargeScreen ? 24.0 : 18.0,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4.0),
+                      Text(
+                        'Major: $major',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontSize: isLargeScreen ? 16.0 : 14.0,
+                        ),
+                      ),
+                      Text(
+                        'Semester: $semester',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontSize: isLargeScreen ? 16.0 : 14.0,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            Text('Major: $major', style: theme.textTheme.bodyLarge),
-            Text('Semester: $semester', style: theme.textTheme.bodyLarge),
+            const SizedBox(height: 24.0),
+            Center(child: _buildTutorialInfo(theme)),
+            const SizedBox(height: 24.0),
+            Center(child: _buildLanguageAndButton(context, theme)),
           ],
         ),
-        const SizedBox(height: 12.0),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(4.0),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              child: Text(
-                'Current: $currentTutNo',
-                style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white),
-              ),
-            ),
-            const SizedBox(width: 8.0),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(4.0),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              child: Text(
-                'Desired: $desiredTutNo',
-                style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12.0),
-        Text('English: $englishLevel', style: theme.textTheme.bodyLarge),
-        Text('German: $germanLevel', style: theme.textTheme.bodyLarge),
-        Center(
-          child: CustomButton(
-            text: buttonText,
-            isActive: isActive,
-            isLoading: isLoading, // Pass loading state
-            onPressed: onPressed,
+      ),
+    );
+  }
+
+  /// Builds the tutorial number information
+  Widget _buildTutorialInfo(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _buildTutorialBadge('Current Tutorial: $currentTutNo', Colors.green, theme),
+        _buildTutorialBadge('Desired Tutorial: $desiredTutNo', Colors.orange, theme),
+      ],
+    );
+  }
+
+  /// Creates a badge for tutorial information
+  Widget _buildTutorialBadge(String text, Color color, ThemeData theme) {
+    return Container(
+      width: 200.0, // Fixed width for any text
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 6.0),
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Text(
+        text,
+        style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),
+        textAlign: TextAlign.center, // Center the text within the fixed width
+      ),
+    );
+  }
+
+  /// Builds the language proficiency and action button
+  Widget _buildLanguageAndButton(BuildContext context, ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          'English: $englishLevel',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontSize: MediaQuery.of(context).size.width > 600 ? 16.0 : 14.0,
           ),
+        ),
+        Text(
+          'German: $germanLevel',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontSize: MediaQuery.of(context).size.width > 600 ? 16.0 : 14.0,
+          ),
+        ),
+        const SizedBox(height: 16.0),
+        CustomButton(
+          text: buttonText,
+          isActive: isActive,
+          isLoading: isLoading,
+          onPressed: onPressed,
         ),
       ],
     );

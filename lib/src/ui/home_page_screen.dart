@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:group_changing_app/src/ui/add_request_screen.dart';
-import 'package:group_changing_app/src/ui/search_screen.dart';
 import 'package:group_changing_app/src/ui/settings_screen.dart';
 import 'package:group_changing_app/src/widgets/post.dart';
 import 'package:group_changing_app/src/services/connection_service.dart';
 import 'package:group_changing_app/src/services/request_service.dart';
+import 'search_screen.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({super.key});
@@ -56,14 +56,38 @@ class HomePageScreenState extends State<HomePageScreen> with SingleTickerProvide
     );
   }
 
+  void _clearSearchContent() {
+    setState(() {
+      _isSearchExpanded = false;
+    });
+
+    // Notify the SearchScreen to clear its content
+    if (endDrawerKey.currentState != null && endDrawerKey.currentState!.isEndDrawerOpen) {
+      endDrawerKey.currentState!.closeEndDrawer();
+      // Wait for the drawer to close before notifying the SearchScreen
+      Future.delayed(const Duration(milliseconds: 300), () {
+        ((endDrawerKey.currentWidget as Drawer?)?.child as SearchScreen?)?.onSearchClose();
+      });
+    }
+  }
+
+  final GlobalKey<ScaffoldState> endDrawerKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
 
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Home Page', style: theme.textTheme.titleLarge),
+        title: Text(
+          'Home Page',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontSize: isMobile ? 20 : 24,
+          ),
+        ),
         actions: [
           Builder(
             builder: (context) => IconButton(
@@ -75,68 +99,73 @@ class HomePageScreenState extends State<HomePageScreen> with SingleTickerProvide
       ),
       drawer: Drawer(child: SettingsScreen()),
       endDrawer: AnimatedContainer(
+        color: theme.primaryColor,
+        key: endDrawerKey,
         duration: const Duration(milliseconds: 250),
-        width: _isSearchExpanded ? MediaQuery.of(context).size.width * 0.75 : 250,
-        onEnd: () {},
+        width: _isSearchExpanded ? screenWidth * 0.75 : (isMobile ? 200 : 250),
         child: Drawer(
-          child: SearchScreen(
-            onSearchResults: () {
-              setState(() {
-                _isSearchExpanded = true;
-              });
-            },
+          child: SingleChildScrollView(
+            child: SearchScreen(
+              onSearchResults: () {
+                setState(() {
+                  _isSearchExpanded = true;
+                });
+              },
+              onSearchClose: _clearSearchContent,
+            ),
           ),
         ),
       ),
       onEndDrawerChanged: (isOpened) {
         if (!isOpened) {
-          setState(() {
-            _isSearchExpanded = false;
-          });
+          _clearSearchContent();
         }
       },
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: FutureBuilder<List<Map<String, dynamic>>>(
-          future: activeRequestsFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}', style: theme.textTheme.bodyLarge));
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(child: Text('No requests available.', style: theme.textTheme.bodyLarge));
-            }
+      body: Container(
+        color: theme.scaffoldBackgroundColor,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 32),
+          child: FutureBuilder<List<Map<String, dynamic>>>(
+            future: activeRequestsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}', style: theme.textTheme.bodyLarge));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(child: Text('No requests available.', style: theme.textTheme.bodyLarge));
+              }
 
-            final requests = snapshot.data!;
+              final requests = snapshot.data!;
 
-            return ListView.builder(
-              itemCount: requests.length,
-              itemBuilder: (context, index) {
-                final request = requests[index];
-                final requestId = request['id'];
-                final isLoading = _loadingStates[requestId] ?? false;
+              return ListView.builder(
+                itemCount: requests.length,
+                itemBuilder: (context, index) {
+                  final request = requests[index];
+                  final requestId = request['id'];
+                  final isLoading = _loadingStates[requestId] ?? false;
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: Post(
-                    phoneNumber: request['phoneNumber'],
-                    semester: request['semester'],
-                    submitterName: request['name'],
-                    major: request['major'],
-                    currentTutNo: request['currentTutNo'],
-                    desiredTutNo: request['desiredTutNo'],
-                    englishLevel: request['englishLevel'],
-                    germanLevel: request['germanLevel'],
-                    isActive: request['status'] == 'active',
-                    buttonText: 'Connect',
-                    isLoading: isLoading,
-                    onPressed: () => _handleConnectionRequest(requestId),
-                  ),
-                );
-              },
-            );
-          },
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: isMobile ? 8 : 16),
+                    child: Post(
+                      phoneNumber: request['phoneNumber'],
+                      semester: request['semester'],
+                      submitterName: request['name'],
+                      major: request['major'],
+                      currentTutNo: request['currentTutNo'],
+                      desiredTutNo: request['desiredTutNo'],
+                      englishLevel: request['englishLevel'],
+                      germanLevel: request['germanLevel'],
+                      isActive: request['status'] == 'active',
+                      buttonText: 'Connect',
+                      isLoading: isLoading,
+                      onPressed: () => _handleConnectionRequest(requestId),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
