@@ -117,14 +117,20 @@ class HomePageScreenState extends State<HomePageScreen> with SingleTickerProvide
         ],
       ),
       drawer: AnimatedContainer(
-        color: theme.primaryColor,
+        color: Colors.transparent,
         key: drawerKey,
         duration: const Duration(milliseconds: 250),
         width: isSettingsExpanded ? (isMobile ? screenWidth : screenWidth * 0.75) : 250,
-        child: Drawer(
-          child: SettingsScreen(
-            onSettingsToggle: _toggleSettingsExpanded,
-            onSettingsClose: _toggleSettingsExpanded,
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topRight: Radius.circular(16.0),
+            bottomRight: Radius.circular(16.0),
+          ),
+          child: Drawer(
+            child: SettingsScreen(
+              onSettingsToggle: _toggleSettingsExpanded,
+              onSettingsClose: _toggleSettingsExpanded,
+            ),
           ),
         ),
       ),
@@ -132,19 +138,25 @@ class HomePageScreenState extends State<HomePageScreen> with SingleTickerProvide
         if (!isOpened) {_clearSettingContent()}
       },
       endDrawer: AnimatedContainer(
-        color: theme.primaryColor,
+        color: Colors.transparent,
         key: endDrawerKey,
         duration: const Duration(milliseconds: 250),
         width: _isSearchExpanded ? screenWidth * 0.75 : (isMobile ? 200 : 250),
-        child: Drawer(
-          child: SingleChildScrollView(
-            child: SearchScreen(
-              onSearchResults: () {
-                setState(() {
-                  _isSearchExpanded = true;
-                });
-              },
-              onSearchClose: _clearSearchContent,
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16.0),
+            bottomLeft: Radius.circular(16.0),
+          ),
+          child: Drawer(
+            child: SingleChildScrollView(
+              child: SearchScreen(
+                onSearchResults: () {
+                  setState(() {
+                    _isSearchExpanded = true;
+                  });
+                },
+                onSearchClose: _clearSearchContent,
+              ),
             ),
           ),
         ),
