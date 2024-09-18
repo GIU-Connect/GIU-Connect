@@ -86,6 +86,7 @@ class ConnectionService {
     try {
       final requestSnapshotFuture = _firestore.collection('requests').doc(requestId).get();
       final connectionSnapshotFuture = _firestore.collection('connectionRequests').doc(connectionId).get();
+      
 
       final requestSnapshot = await requestSnapshotFuture;
       final connectionSnapshot = await connectionSnapshotFuture;
@@ -102,6 +103,9 @@ class ConnectionService {
       await _updateRequestsToInactiveUsingMethods(masterId, batch);
       await _updateRequestsToInactiveUsingMethods(slaveId, batch);
 
+      DocumentSnapshot masterSnapshot = await _firestore.collection('users').doc(masterId).get();
+      DocumentSnapshot slaveSnapshot = await _firestore.collection('users').doc(slaveId).get();
+
       QuerySnapshot connectionRequests =
           await _firestore.collection('connectionRequests').where('requestId', isEqualTo: requestId).get();
       for (var doc in connectionRequests.docs) {
@@ -112,14 +116,26 @@ class ConnectionService {
 
       await batch.commit();
 
+      String masterName = masterSnapshot.get('name');
+      String masterPhoneNumber = masterSnapshot.get('phoneNumber');
+
       Future<void> sendEmails() async {
         String slaveEmail = (await _firestore.collection('users').doc(slaveId).get()).get('email');
         await emailSender.sendEmail(
           recipientEmail: slaveEmail,
           subject: 'Connection Request Accepted',
-          body: 'Hello,\n\nYour connection request has been accepted.\n\nBest regards,\nGIU Changing Group App Team',
+          body: 'Hello,\n\nYour connection request on $masterName has been accepted.\nPlease contact him on his Phone Number : $masterPhoneNumber.\n\nBest regards,\nGIU Changing Group App Team',
         );
       }
+
+      String slaveName = slaveSnapshot.get('name');
+      String slavePhoneNumber = slaveSnapshot.get('phoneNumber');
+
+      await emailSender.sendEmail(
+        recipientEmail: masterSnapshot.get('email'),
+        subject: 'Connection Request Accepted successfully, $slaveName, $slavePhoneNumber',
+        body: 'Hello,\n\nYou have successfully accepted $slaveName connection request.\nPlease contact him on his Phone Number : $slavePhoneNumber.\n\nBest regards,\nGIU Changing Group App Team',
+      );
 
       sendEmails();
     } catch (e) {
@@ -191,6 +207,8 @@ class ConnectionService {
 
   Future<void> _updateRequestsToInactiveUsingMethods(String userId, WriteBatch batch) async {
     try {
+      DocumentReference userRef = _firestore.collection('users').doc(userId);
+      batch.update(userRef, {'numberOfActiveRequests': 0});
       QuerySnapshot requests = await _firestore.collection('requests').where('userId', isEqualTo: userId).get();
       QuerySnapshot connectionRequests =
           await _firestore.collection('connectionRequests').where('connectionSenderId', isEqualTo: userId).get();
