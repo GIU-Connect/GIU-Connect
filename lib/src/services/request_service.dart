@@ -101,8 +101,8 @@ class RequestService {
     QuerySnapshot querySnapshot = await firestore
         .collection('requests')
         .where('major', isEqualTo: major)
-        .where('currentTutNo', isEqualTo: currentTutNo)
-        .where('desiredTutNo', isEqualTo: desiredTutNo)
+        .where('currentTutNo', isEqualTo: desiredTutNo)
+        .where('desiredTutNo', isEqualTo: currentTutNo)
         .where('germanLevel', isEqualTo: germanLevel)
         .where('englishLevel', isEqualTo: englishLevel)
         .where('semester', isEqualTo: semester)
