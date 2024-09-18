@@ -101,83 +101,80 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
       padding: const EdgeInsets.all(20.0),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Theme.of(context).hintColor,
-                  child: Text(
-                    initials,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start, // Align to the top-left
+        children: [
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 30,
+                backgroundColor: Theme.of(context).hintColor,
+                child: Text(
+                  initials,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-                const SizedBox(width: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      displayName ?? 'User',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+              ),
+              const SizedBox(width: 20),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    displayName ?? 'User',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(height: 8),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 30),
-            const Divider(color: Colors.grey),
-            const SizedBox(height: 20),
-            _buildListTile(
-              icon: Icons.list,
-              title: 'My Requests',
-              onTap: () {
-                _navigateToScreen(const MyRequestsScreen());
-              },
-            ),
-            _buildListTile(
-              icon: Icons.people,
-              title: 'My Connections',
-              onTap: () {
-                FirebaseAuth auth = FirebaseAuth.instance;
-                String userId = auth.currentUser!.uid;
-                _navigateToScreen(MyConnectionScreen(userId: userId));
-              },
-            ),
-            _buildListTile(
-              icon: Icons.edit,
-              title: 'Change account info',
-              onTap: () {
-                _navigateToScreen(EditAccountInfoScreen());
-              },
-            ),
-            _buildListTile(
-              icon: Icons.logout,
-              title: 'Sign Out',
-              iconColor: Colors.red,
-              titleColor: Colors.red,
-              onTap: () {
-                _auth.signOut();
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const SignUpScreen()),
-                  (Route<dynamic> route) => false,
-                );
-              },
-            ),
-          ],
-        ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 30),
+          const Divider(color: Colors.grey),
+          const SizedBox(height: 20),
+          _buildListTile(
+            icon: Icons.list,
+            title: 'My Requests',
+            onTap: () {
+              _navigateToScreen(const MyRequestsScreen());
+            },
+          ),
+          _buildListTile(
+            icon: Icons.people,
+            title: 'My Connections',
+            onTap: () {
+              FirebaseAuth auth = FirebaseAuth.instance;
+              String userId = auth.currentUser!.uid;
+              _navigateToScreen(MyConnectionScreen(userId: userId));
+            },
+          ),
+          _buildListTile(
+            icon: Icons.edit,
+            title: 'Change account info',
+            onTap: () {
+              _navigateToScreen(EditAccountInfoScreen());
+            },
+          ),
+          _buildListTile(
+            icon: Icons.logout,
+            title: 'Sign Out',
+            iconColor: Colors.red,
+            titleColor: Colors.red,
+            onTap: () {
+              _auth.signOut();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                (Route<dynamic> route) => false,
+              );
+            },
+          ),
+        ],
       ),
     );
   }
