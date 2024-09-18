@@ -28,7 +28,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     String? displayName = currentUser.displayName;
-    String initials = displayName != null && displayName.length >= 2 ? displayName.substring(0, 2).toUpperCase() : 'Us';
+
+    // Extract the first name by splitting the displayName at the space
+    String firstName = displayName != null && displayName.isNotEmpty ? displayName.split(' ').first : 'User';
+
+    // Get initials for avatar (if name exists)
+    String initials = firstName.isNotEmpty ? firstName.substring(0, 2).toUpperCase() : 'US';
+
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
 
@@ -61,7 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         body: isMobile
             ? Stack(
                 children: [
-                  _buildSettingsContent(context, initials, displayName),
+                  _buildSettingsContent(context, initials, firstName),
                   if (_showContent)
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
@@ -79,7 +85,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   SizedBox(
                     width: 250,
-                    child: _buildSettingsContent(context, initials, displayName),
+                    child: _buildSettingsContent(context, initials, firstName),
                   ),
                   Expanded(
                     flex: 3,
@@ -100,7 +106,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildSettingsContent(BuildContext context, String initials, String? displayName) {
+  Widget _buildSettingsContent(BuildContext context, String initials, String firstName) {
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
       padding: const EdgeInsets.all(20.0),
@@ -127,7 +133,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    displayName ?? 'User',
+                    firstName,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/services/auth_service.dart';
 import 'package:group_changing_app/src/ui/forget_password_screen.dart';
 import 'package:group_changing_app/src/ui/home_page_screen.dart';
-import 'package:group_changing_app/src/ui/sign_up_screen.dart'; // Import the SignUpScreen
+import 'package:group_changing_app/src/ui/sign_up_screen.dart';
 import 'package:group_changing_app/src/widgets/button_widget.dart';
 import 'package:group_changing_app/src/widgets/input_field.dart';
 import 'package:group_changing_app/src/utils/no_animation_page_route.dart';
@@ -119,91 +119,148 @@ class SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     _checkUserStatus();
-    // if logged in redirect to HomePageScreen
     if (_isLoggedIn && _isEmailVerified) {
       return const HomePageScreen();
     }
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Center(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // Check if the device is a mobile or a larger screen (tablet/desktop)
+          bool isMobile = constraints.maxWidth < 600;
+
+          return Center(
+            child: SingleChildScrollView(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                constraints: const BoxConstraints(maxWidth: 500),
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 16 : 32, // Adjust padding based on screen size
+                  vertical: 12,
+                ),
+                constraints: BoxConstraints(maxWidth: isMobile ? 400 : 500), // Adjust width for larger screens
                 child: Form(
                   key: _formKey,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      const Text(
+                      Text(
                         'Sign In',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                        style: TextStyle(
+                          fontSize: isMobile ? 20 : 24, // Larger font for bigger screens
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       Text(
                         'Enter your credentials to access your account',
-                        style: TextStyle(fontSize: 16, color: Colors.white.withAlpha((255 * .6).toInt())),
+                        style: TextStyle(
+                          fontSize: isMobile ? 14 : 16, // Slightly larger for bigger screens
+                          color: Colors.white.withAlpha((255 * .6).toInt()),
+                        ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
                       InputField(
                         labelText: 'Email',
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        // Remove errorText from InputField
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       InputField(
                         labelText: 'Password',
                         controller: _passwordController,
                         obscureText: true,
-                        // Remove errorText from InputField
                       ),
-                      const SizedBox(height: 24),
-                      CustomButton(
-                        onPressed: _signIn,
-                        text: 'Sign In',
-                        isActive: true,
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: CustomButton(
+                          onPressed: _signIn,
+                          text: 'Sign In',
+                          isActive: true,
+                          isLoading: _isLoading,
+                        ),
                       ),
-                      const SizedBox(height: 24),
-                      CustomButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const ForgetPasswordScreen()),
-                          );
-                        },
-                        text: 'Forgot Password?',
-                        isActive: true,
-                      ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 8),
+                      // Conditional rendering based on isMobile
+                      if (isMobile)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const ForgetPasswordScreen()),
+                                );
+                              },
+                              child: const Text(
+                                'Forgot Password?',
+                                style: TextStyle(color: Colors.orange),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                                );
+                              },
+                              child: const Text(
+                                "Don't have an account? Sign Up",
+                                style: TextStyle(color: Colors.orange),
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const ForgetPasswordScreen()),
+                                );
+                              },
+                              child: const Text(
+                                'Forgot Password?',
+                                style: TextStyle(color: Colors.orange),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                                );
+                              },
+                              child: const Text(
+                                "Don't have an account? Sign Up",
+                                style: TextStyle(color: Colors.orange),
+                              ),
+                            ),
+                          ],
+                        ),
+                      const SizedBox(height: 16),
                       if (_isLoggedIn && !_isEmailVerified)
                         CustomButton(
                           onPressed: _resendEmailVerification,
                           text: 'Resend Verification Email',
                           isActive: true,
+                          isLoading: _isLoading,
                         ),
-                      const SizedBox(height: 24),
-                      // New Link Text
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const SignUpScreen()), // Navigate to SignUpScreen
-                          );
-                        },
-                        child: const Text(
-                          "Don't have an account? Sign Up",
-                          style: TextStyle(color: Colors.blueAccent),
-                        ),
-                      ),
                     ],
                   ),
                 ),
               ),
             ),
+          );
+        },
+      ),
     );
   }
 }

@@ -4,9 +4,7 @@ import 'package:group_changing_app/src/services/connection_service.dart';
 import 'package:group_changing_app/src/services/request_service.dart';
 import 'package:group_changing_app/src/widgets/connection_request.dart';
 import 'package:group_changing_app/src/widgets/my_requests_post.dart';
-import 'package:group_changing_app/src/ui/add_request_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:group_changing_app/src/utils/no_animation_page_route.dart';
 
 class MyRequestsScreen extends StatefulWidget {
   const MyRequestsScreen({super.key});
@@ -69,14 +67,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
     });
 
     if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        NoAnimationPageRoute(
-          pageBuilder: (context, animation, secondaryAnimation) {
-            return const MyRequestsScreen();
-          },
-        ),
-      );
+      showSnackBar(context, 'Request deleted', Colors.green);
     }
   }
 

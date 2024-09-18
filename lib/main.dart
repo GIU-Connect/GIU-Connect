@@ -20,10 +20,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Group Changing App',
       theme: ThemeData(
-        // Use a dark color scheme with a primary blue accent
+        // Use a dark color scheme with a primary orange accent
         brightness: Brightness.dark, // Set overall brightness to dark
         primaryColor: Colors.grey[900], // Dark background color
-        hintColor: Colors.blue, // Use blue for accents
+        hintColor: Colors.orange, // Use orange for accents
         // make
 
         // Define default text styles
@@ -46,13 +46,13 @@ class MyApp extends StatelessWidget {
         // Define default button styles
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
+            backgroundColor: Colors.orange,
             textStyle: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
           ),
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            foregroundColor: Colors.blueAccent,
+            foregroundColor: Colors.orangeAccent,
             textStyle: const TextStyle(fontSize: 14.0),
           ),
         ),
@@ -68,7 +68,7 @@ class MyApp extends StatelessWidget {
             borderRadius: BorderRadius.circular(8.0),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: const BorderSide(color: Colors.blue),
+            borderSide: const BorderSide(color: Colors.orange),
             borderRadius: BorderRadius.circular(8.0),
           ),
         ),
@@ -82,7 +82,7 @@ class MyApp extends StatelessWidget {
 
         // Floating action button theme
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: Colors.blue,
+          backgroundColor: Colors.orange,
           foregroundColor: Colors.white,
         ),
 

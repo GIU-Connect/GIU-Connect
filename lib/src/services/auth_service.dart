@@ -18,6 +18,8 @@ class AuthService {
     required String name,
     required String semester,
     required String confirmPassword,
+    required String germanLevel,
+    required String englishLevel,
   }) async {
     try {
       // Check if email is a student email
@@ -39,6 +41,9 @@ class AuthService {
         password: password,
       );
 
+      // Update the user's display name
+      await userCredential.user!.updateDisplayName(name);
+
       // Write user data to Firestore
       final userId = userCredential.user!.uid;
       await _firestore.collection('users').doc(userId).set({
@@ -50,6 +55,8 @@ class AuthService {
         'name': name,
         'semester': semester,
         'numberOfActiveRequests': 0,
+        'germanLevel': germanLevel,
+        'englishLevel': englishLevel,
       });
 
       // Send email verification

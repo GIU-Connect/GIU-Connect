@@ -29,6 +29,7 @@ class SearchScreenState extends State<SearchScreen> with SingleTickerProviderSta
 
   bool _isLoading = false;
   List<Object?> _searchResults = [];
+  bool _hasSearched = false; // New flag to track search state
 
   late final AnimationController _animationController;
   late final Animation<double> _fadeAnimation;
@@ -125,6 +126,7 @@ class SearchScreenState extends State<SearchScreen> with SingleTickerProviderSta
                                     if (_formKey.currentState!.validate()) {
                                       setState(() {
                                         _isLoading = true;
+                                        _hasSearched = true; // Update to true after search
                                       });
 
                                       final desiredTut = int.tryParse(_desiredTutNo);
@@ -164,14 +166,35 @@ class SearchScreenState extends State<SearchScreen> with SingleTickerProviderSta
             Container(
               color: Theme.of(context).scaffoldBackgroundColor, // Set background color to scaffold color
               height: MediaQuery.of(context).size.height,
-
-              child: SizedBox(
-                width: isMobile ? screenWidth : null, // Take full width on mobile
-                child: _searchResults.isNotEmpty
-                    ? FadeTransition(
+              child: Column(
+                children: [
+                  if (!_hasSearched)
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        'Please search to find tutorials',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  if (!_isLoading && _hasSearched && _searchResults.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        'No results found',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  if (_searchResults.isNotEmpty)
+                    Expanded(
+                      child: FadeTransition(
                         opacity: _fadeAnimation,
                         child: ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: _searchResults.length,
                           itemBuilder: (context, index) {
@@ -203,12 +226,9 @@ class SearchScreenState extends State<SearchScreen> with SingleTickerProviderSta
                             );
                           },
                         ),
-                      )
-                    : Container(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        padding: const EdgeInsets.all(16.0),
-                        height: MediaQuery.of(context).size.height,
                       ),
+                    ),
+                ],
               ),
             )
           ],

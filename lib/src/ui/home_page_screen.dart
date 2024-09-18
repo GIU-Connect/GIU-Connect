@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:group_changing_app/src/ui/add_request_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:group_changing_app/src/ui/settings_screen.dart';
 import 'package:group_changing_app/src/widgets/post.dart';
 import 'package:group_changing_app/src/services/connection_service.dart';
@@ -22,12 +22,37 @@ class HomePageScreenState extends State<HomePageScreen> with SingleTickerProvide
   final Map<String, bool> _loadingStates = {};
   bool _isSearchExpanded = false;
   bool isSettingsExpanded = false;
+  bool _isFABExpanded = false;
+  final TextEditingController _tutorialNumberController = TextEditingController();
+  final RequestService _requestService = RequestService();
+  bool _isLoading = false;
+  String _userEnglishLevel = '';
+  String _userGermanLevel = '';
 
   @override
   void initState() {
     super.initState();
     currentUser = FirebaseAuth.instance.currentUser;
     activeRequestsFuture = RequestService().getActiveRequests();
+
+    _fetchUserLevels();
+  }
+
+  Future<void> _fetchUserLevels() async {
+    if (currentUser != null) {
+      try {
+        final userDoc = await FirebaseFirestore.instance.collection('users').doc(currentUser!.uid).get();
+        if (userDoc.exists) {
+          setState(() {
+            _userEnglishLevel = userDoc['englishLevel'] ?? 'No English';
+            _userGermanLevel = userDoc['germanLevel'] ?? 'No German';
+          });
+        }
+      } catch (e) {
+        // Handle error
+        print('Error fetching user levels: $e');
+      }
+    }
   }
 
   Future<void> _handleConnectionRequest(String requestId) async {
@@ -43,6 +68,65 @@ class HomePageScreenState extends State<HomePageScreen> with SingleTickerProvide
     } finally {
       setState(() {
         _loadingStates[requestId] = false;
+      });
+    }
+  }
+
+  Future<void> _addRequest() async {
+    if (currentUser == null) {
+      _showSnackBar('User not logged in', isError: true);
+      return;
+    }
+
+    if (_tutorialNumberController.text.isEmpty) {
+      _showSnackBar('Please fill all fields', isError: true);
+      return;
+    }
+
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(currentUser!.uid).get();
+      if (!userDoc.exists) {
+        _showSnackBar('User data not found', isError: true);
+        return;
+      }
+      final name = userDoc['name'] as String;
+      final currentTutNo = userDoc['currentTutorial'] as String;
+      final major = userDoc['major'] as String;
+      final semester = userDoc['semester'] as String;
+      final phoneNumber = userDoc['phoneNumber'] as String;
+
+      if (currentTutNo.toString() == _tutorialNumberController.text) {
+        _showSnackBar('Current and Desired Tutorial Numbers cannot be the same', isError: true);
+        return;
+      }
+
+      await _requestService.addRequest(
+        phoneNumber: phoneNumber,
+        userId: currentUser!.uid,
+        name: name,
+        major: major,
+        currentTutNo: int.parse(currentTutNo),
+        desiredTutNo: int.parse(_tutorialNumberController.text),
+        englishLevel: _userEnglishLevel,
+        germanLevel: _userGermanLevel,
+        semester: semester,
+      );
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePageScreen()),
+        );
+      }
+    } catch (e) {
+      _showSnackBar(e.toString(), isError: true);
+    } finally {
+      setState(() {
+        _isLoading = false;
       });
     }
   }
@@ -91,7 +175,6 @@ class HomePageScreenState extends State<HomePageScreen> with SingleTickerProvide
   }
 
   final GlobalKey<ScaffoldState> endDrawerKey = GlobalKey<ScaffoldState>();
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -134,8 +217,10 @@ class HomePageScreenState extends State<HomePageScreen> with SingleTickerProvide
           ),
         ),
       ),
-      onDrawerChanged: (isOpened) => {
-        if (!isOpened) {_clearSettingContent()}
+      onDrawerChanged: (isOpened) {
+        if (!isOpened) {
+          _clearSettingContent();
+        }
       },
       endDrawer: AnimatedContainer(
         color: Colors.transparent,
@@ -213,17 +298,73 @@ class HomePageScreenState extends State<HomePageScreen> with SingleTickerProvide
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddRequestPage()),
-          );
-        },
-        backgroundColor: Colors.blue,
-        tooltip: 'Add Request',
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: _isLoading
+          ? const CircularProgressIndicator()
+          : AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: _isFABExpanded ? 350 : 150,
+              height: 50,
+              decoration: BoxDecoration(
+                color: _isFABExpanded
+                    ? theme.inputDecorationTheme.fillColor
+                    : theme.floatingActionButtonTheme.backgroundColor,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: _isFABExpanded
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[800],
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: TextField(
+                                controller: _tutorialNumberController,
+                                decoration: InputDecoration(
+                                  hintText: 'Enter Desired Tutorial Number',
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                                  hintStyle: TextStyle(color: Colors.grey[400]),
+                                ),
+                                keyboardType: TextInputType.number,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.check, color: Colors.white),
+                          onPressed: _addRequest,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          onPressed: () {
+                            setState(() {
+                              _isFABExpanded = false;
+                              _tutorialNumberController.clear();
+                            });
+                          },
+                        ),
+                      ],
+                    )
+                  : FloatingActionButton.extended(
+                      onPressed: () {
+                        setState(() {
+                          _isFABExpanded = !_isFABExpanded;
+                          if (!_isFABExpanded) {
+                            _tutorialNumberController.clear();
+                          }
+                        });
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('Add Request'),
+                    ),
+            ),
     );
   }
 }
