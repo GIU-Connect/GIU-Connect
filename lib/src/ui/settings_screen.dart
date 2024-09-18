@@ -73,19 +73,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const Divider(color: Colors.grey),
                 const SizedBox(height: 20),
                 ListTile(
-                  leading: const Icon(Icons.logout),
-                  title: const Text('Sign Out'),
-                  onTap: () {
-                    widget._auth.signOut();
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => const SignUpScreen()),
-                      (Route<dynamic> route) => false,
-                    );
-                  },
-                ),
-                ListTile(
                   leading: const Icon(Icons.list),
-                  title: const Text('My Requests'),
+                  title: const Text('My Requests', style: TextStyle(color: Colors.white)),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) => const MyRequestsScreen()),
@@ -93,8 +82,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
                 ListTile(
+                  leading: const Icon(Icons.people),
+                  title: const Text('My Connections', style: TextStyle(color: Colors.white)),
+                  onTap: () {
+                    FirebaseAuth auth = FirebaseAuth.instance;
+                    String userId = auth.currentUser!.uid;
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => MyConnectionScreen(userId: userId)),
+                    );
+                  },
+                ),
+                ListTile(
                   leading: const Icon(Icons.edit),
-                  title: const Text('Change account info'),
+                  title: const Text('Change account info', style: TextStyle(color: Colors.white)),
                   onTap: () async {
                     await widget._auth.currentUser!.reload();
                     if (widget._auth.currentUser!.emailVerified) {
@@ -115,13 +115,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.people),
-                  title: const Text('My Connections'),
+                  leading: const Icon(Icons.logout),
+                  title: const Text('Sign Out', style: TextStyle(color: Colors.red)),
                   onTap: () {
-                    FirebaseAuth auth = FirebaseAuth.instance;
-                    String userId = auth.currentUser!.uid;
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => MyConnectionScreen(userId: userId)),
+                    widget._auth.signOut();
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                      (Route<dynamic> route) => false,
                     );
                   },
                 ),

@@ -244,13 +244,16 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                           englishLevel: request['englishLevel'],
                           germanLevel: request['germanLevel'],
                           isActive: request['status'] == 'active',
-                          buttonText: 'Delete Request',
-                          deleteButtonFunction: () {
+                          buttonText1: 'Delete',
+                          onPressed1: () {
                             showDeleteConfirmationDialog(context, requestId);
                           },
-                          connectionRequestButtonFunction: () {
+                          buttonText2: 'View Connections',
+                          onPressed2: () {
                             showConnectionRequestsDialog(context, requestId);
                           },
+                          isLoading1: false,
+                          isLoading2: false,
                         ),
                       );
                     },
