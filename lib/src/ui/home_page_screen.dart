@@ -18,8 +18,10 @@ class HomePageScreenState extends State<HomePageScreen> with SingleTickerProvide
   User? currentUser;
   late Future<List<Map<String, dynamic>>> activeRequestsFuture;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> drawerKey = GlobalKey<ScaffoldState>();
   final Map<String, bool> _loadingStates = {};
   bool _isSearchExpanded = false;
+  bool isSettingsExpanded = false;
 
   @override
   void initState() {
@@ -61,14 +63,18 @@ class HomePageScreenState extends State<HomePageScreen> with SingleTickerProvide
       _isSearchExpanded = false;
     });
 
-    // Notify the SearchScreen to clear its content
     if (endDrawerKey.currentState != null && endDrawerKey.currentState!.isEndDrawerOpen) {
       endDrawerKey.currentState!.closeEndDrawer();
-      // Wait for the drawer to close before notifying the SearchScreen
       Future.delayed(const Duration(milliseconds: 300), () {
         ((endDrawerKey.currentWidget as Drawer?)?.child as SearchScreen?)?.onSearchClose();
       });
     }
+  }
+
+  void _toggleSettingsExpanded() {
+    setState(() {
+      isSettingsExpanded = !isSettingsExpanded;
+    });
   }
 
   final GlobalKey<ScaffoldState> endDrawerKey = GlobalKey<ScaffoldState>();
@@ -97,7 +103,20 @@ class HomePageScreenState extends State<HomePageScreen> with SingleTickerProvide
           ),
         ],
       ),
-      drawer: Drawer(child: SettingsScreen()),
+      drawer: AnimatedContainer(
+        color: theme.primaryColor,
+        key: drawerKey,
+        duration: const Duration(milliseconds: 250),
+        width: isSettingsExpanded ? (isMobile ? screenWidth : screenWidth * 0.75) : 250,
+        child: Drawer(
+          child: SettingsScreen(
+            onSettingsToggle: _toggleSettingsExpanded,
+          ),
+        ),
+      ),
+      onDrawerChanged: (isOpened) => {
+        if (!isOpened) {_toggleSettingsExpanded()}
+      },
       endDrawer: AnimatedContainer(
         color: theme.primaryColor,
         key: endDrawerKey,

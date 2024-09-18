@@ -197,17 +197,6 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('My Requests', style: theme.textTheme.titleLarge),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add, color: theme.iconTheme.color),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AddRequestPage()),
-              );
-            },
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -260,15 +249,6 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                   );
                 },
               ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddRequestPage()),
-          );
-        },
-        child: const Icon(Icons.add),
       ),
     );
   }

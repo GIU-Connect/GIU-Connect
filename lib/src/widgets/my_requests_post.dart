@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:group_changing_app/src/widgets/button_widget.dart'; // Assuming you have a CustomButton widget
+import 'package:group_changing_app/src/widgets/button_widget.dart';
 
 class MyRequestsPost extends StatelessWidget {
   final String phoneNumber;
@@ -57,47 +57,55 @@ class MyRequestsPost extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  backgroundColor: theme.colorScheme.primary,
-                  radius: isLargeScreen ? 40.0 : 24.0,
-                  child: Text(
-                    submitterName.isNotEmpty ? submitterName[0].toUpperCase() : '?',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: isLargeScreen ? 24.0 : 20.0,
-                      fontWeight: FontWeight.bold,
+                // Updated CircleAvatar with Flexible for responsiveness
+                Flexible(
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 16.0), // Added margin
+                    child: CircleAvatar(
+                      backgroundColor: theme.colorScheme.primary,
+                      radius: isLargeScreen ? 40.0 : 24.0,
+                      child: Text(
+                        submitterName.isNotEmpty ? submitterName[0].toUpperCase() : '?',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isLargeScreen ? 24.0 : 20.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16.0),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        submitterName,
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: isLargeScreen ? 24.0 : 18.0,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+
+                // Use Flexible/Expanded to avoid overflow
+                Flexible(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      submitterName,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: isLargeScreen ? 24.0 : 18.0,
                       ),
-                      const SizedBox(height: 4.0),
-                      Text(
-                        'Major: $major',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontSize: isLargeScreen ? 16.0 : 14.0,
-                        ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4.0),
+                    Text(
+                      'Major: $major',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontSize: isLargeScreen ? 16.0 : 14.0,
                       ),
-                      Text(
-                        'Semester: $semester',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontSize: isLargeScreen ? 16.0 : 14.0,
-                        ),
+                      overflow: TextOverflow.ellipsis, // Avoid text overflow
+                    ),
+                    Text(
+                      'Semester: $semester',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontSize: isLargeScreen ? 16.0 : 14.0,
                       ),
-                    ],
-                  ),
-                ),
+                      overflow: TextOverflow.ellipsis, // Avoid text overflow
+                    ),
+                  ],
+                )),
               ],
             ),
             const SizedBox(height: 24.0),
@@ -141,37 +149,44 @@ class MyRequestsPost extends StatelessWidget {
 
   /// Builds the language proficiency and action buttons
   Widget _buildLanguageAndButtons(BuildContext context, ThemeData theme) {
+    final isLargeScreen = MediaQuery.of(context).size.width > 600;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           'English: $englishLevel',
           style: theme.textTheme.titleMedium?.copyWith(
-            fontSize: MediaQuery.of(context).size.width > 600 ? 16.0 : 14.0,
+            fontSize: isLargeScreen ? 16.0 : 14.0,
           ),
         ),
         Text(
           'German: $germanLevel',
           style: theme.textTheme.titleMedium?.copyWith(
-            fontSize: MediaQuery.of(context).size.width > 600 ? 16.0 : 14.0,
+            fontSize: isLargeScreen ? 16.0 : 14.0,
           ),
         ),
         const SizedBox(height: 16.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CustomButton(
-              text: buttonText1,
-              isActive: isActive,
-              isLoading: isLoading1,
-              onPressed: onPressed1,
+            // Wrap the buttons with Expanded/Flexible to prevent overflow
+            Flexible(
+              child: CustomButton(
+                text: buttonText1,
+                isActive: isActive,
+                isLoading: isLoading1,
+                onPressed: onPressed1,
+              ),
             ),
             const SizedBox(width: 8.0),
-            CustomButton(
-              text: buttonText2,
-              isActive: isActive,
-              isLoading: isLoading2,
-              onPressed: onPressed2,
+            Flexible(
+              child: CustomButton(
+                text: buttonText2,
+                isActive: isActive,
+                isLoading: isLoading2,
+                onPressed: onPressed2,
+              ),
             ),
           ],
         ),

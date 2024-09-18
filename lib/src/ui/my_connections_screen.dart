@@ -47,7 +47,6 @@ class MyConnectionScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 Map<String, dynamic> connection = connections[index];
                 String connectionId = connection['connectionId'];
-                String role = connection['role'];
                 Map<String, dynamic> userDetails = connection['userDetails'];
                 Logger().i('User details: $userDetails');
 
