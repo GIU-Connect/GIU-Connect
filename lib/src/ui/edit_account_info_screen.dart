@@ -8,8 +8,8 @@ class EditAccountInfoScreen extends StatefulWidget {
 
   @override
   State<EditAccountInfoScreen> createState() => _EditAccountInfoScreenState();
-  User currentUser = FirebaseAuth.instance.currentUser!;
-  EditAccountInfoService editor = EditAccountInfoService();
+  final User currentUser = FirebaseAuth.instance.currentUser!;
+  final EditAccountInfoService editor = EditAccountInfoService();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 }
 
@@ -46,66 +46,98 @@ class _EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
   }
 
   void _changePhoneNumber() {
+    final TextEditingController controller = TextEditingController();
     _showDialog(
       title: 'Change Phone Number',
-      content: const TextField(
-        decoration: InputDecoration(hintText: 'Enter new phone number'),
+      content: TextField(
+        controller: controller,
+        decoration: const InputDecoration(hintText: 'Enter new phone number'),
         keyboardType: TextInputType.phone,
       ),
       onChange: () {
-        // Implement the logic to change the phone number
+        final newPhoneNumber = controller.text;
+        widget.editor.changePhoneNumber(
+          userId: widget.currentUser.uid,
+          oldPhoneNumber: widget.currentUser.phoneNumber ?? '',
+          newPhoneNumber: newPhoneNumber,
+        );
       },
     );
   }
 
   void _changeUniversityId() {
+    final TextEditingController controller = TextEditingController();
     _showDialog(
       title: 'Change University ID',
-      content: const TextField(
-        decoration: InputDecoration(hintText: 'Enter new university ID'),
+      content: TextField(
+        controller: controller,
+        decoration: const InputDecoration(hintText: 'Enter new university ID'),
         keyboardType: TextInputType.text,
       ),
       onChange: () {
-        // Implement the logic to change the university ID
+        final newUniversityId = controller.text;
+        widget.editor.changeUniversityId(
+          userId: widget.currentUser.uid,
+          universityId: newUniversityId,
+        );
       },
     );
   }
 
   void _changeCurrentTutorial() {
+    final TextEditingController controller = TextEditingController();
     _showDialog(
       title: 'Change Current Tutorial',
-      content: const TextField(
-        decoration: InputDecoration(hintText: 'Enter new tutorial'),
+      content: TextField(
+        controller: controller,
+        decoration: const InputDecoration(hintText: 'Enter new tutorial'),
         keyboardType: TextInputType.text,
       ),
       onChange: () {
-        // Implement the logic to change the current tutorial
+        final newTutorial = controller.text;
+        widget.editor.changeCurrentTutorial(
+          userId: widget.currentUser.uid,
+          currentTutorial: newTutorial,
+        );
+
       },
     );
   }
 
   void _changeName() {
+    final TextEditingController controller = TextEditingController();
     _showDialog(
       title: 'Change Name',
-      content: const TextField(
-        decoration: InputDecoration(hintText: 'Enter new name'),
+      content: TextField(
+        controller: controller,
+        decoration: const InputDecoration(hintText: 'Enter new name'),
         keyboardType: TextInputType.text,
       ),
       onChange: () {
-        // Implement the logic to change the name
+        final newName = controller.text;
+        widget.editor.changeName(
+          userId: widget.currentUser.uid,
+          name: newName,
+        );
       },
     );
   }
 
   void _changeSemester() {
+    final TextEditingController controller = TextEditingController();
     _showDialog(
       title: 'Change Semester',
-      content: const TextField(
-        decoration: InputDecoration(hintText: 'Enter new semester'),
+      content: TextField(
+        controller: controller,
+        decoration: const InputDecoration(hintText: 'Enter new semester'),
         keyboardType: TextInputType.text,
       ),
       onChange: () {
-        // Implement the logic to change the semester
+        final newSemester = controller.text;
+        widget.editor.changeSemester(
+          userId: widget.currentUser.uid,
+          semester: newSemester,
+        );
       },
     );
   }

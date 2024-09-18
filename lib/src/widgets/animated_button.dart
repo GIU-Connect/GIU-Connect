@@ -6,10 +6,10 @@ class AnimatedHoverButton extends StatefulWidget {
   final String text;
 
   const AnimatedHoverButton({
-    Key? key,
+    super.key,
     required this.onPressed,
     required this.text,
-  }) : super(key: key);
+  });
 
   @override
   State<AnimatedHoverButton> createState() => _AnimatedHoverButtonState();

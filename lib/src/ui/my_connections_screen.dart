@@ -6,7 +6,7 @@ import '../widgets/my_connection_request.dart'; // Adjust the path as needed
 class MyConnectionScreen extends StatelessWidget {
   final String userId;
 
-  MyConnectionScreen({required this.userId});
+  const MyConnectionScreen({super.key, required this.userId});
 
   Future<List<Map<String, dynamic>>> _fetchConnections() async {
     ConnectionService connectionService = ConnectionService();
@@ -28,17 +28,17 @@ class MyConnectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Connections'),
+        title: const Text('My Connections'),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _fetchConnections(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No connections found.'));
+            return const Center(child: Text('No connections found.'));
           } else {
             List<Map<String, dynamic>> connections = snapshot.data!;
 

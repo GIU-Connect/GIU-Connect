@@ -8,12 +8,12 @@ class MyConnectionRequest extends StatefulWidget {
   final VoidCallback onDelete;
 
   const MyConnectionRequest({
-    Key? key,
+    super.key,
     required this.requestOwner,
     required this.fromTut,
     required this.toTut,
     required this.onDelete,
-  }) : super(key: key);
+  });
 
   @override
   _MyConnectionRequestState createState() => _MyConnectionRequestState();
