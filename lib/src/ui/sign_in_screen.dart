@@ -124,7 +124,7 @@ class SignInScreenState extends State<SignInScreen> {
       return const HomePageScreen();
     }
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).primaryColor,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Center(

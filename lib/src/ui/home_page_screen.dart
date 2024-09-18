@@ -71,6 +71,19 @@ class HomePageScreenState extends State<HomePageScreen> with SingleTickerProvide
     }
   }
 
+  void _clearSettingContent() {
+    setState(() {
+      isSettingsExpanded = false;
+    });
+
+    if (drawerKey.currentState != null && drawerKey.currentState!.isDrawerOpen) {
+      drawerKey.currentState!.openEndDrawer();
+      Future.delayed(const Duration(milliseconds: 300), () {
+        ((drawerKey.currentWidget as Drawer?)?.child as SettingsScreen?)?.onSettingsClose();
+      });
+    }
+  }
+
   void _toggleSettingsExpanded() {
     setState(() {
       isSettingsExpanded = !isSettingsExpanded;
@@ -111,11 +124,12 @@ class HomePageScreenState extends State<HomePageScreen> with SingleTickerProvide
         child: Drawer(
           child: SettingsScreen(
             onSettingsToggle: _toggleSettingsExpanded,
+            onSettingsClose: _toggleSettingsExpanded,
           ),
         ),
       ),
       onDrawerChanged: (isOpened) => {
-        if (!isOpened) {_toggleSettingsExpanded()}
+        if (!isOpened) {_clearSettingContent()}
       },
       endDrawer: AnimatedContainer(
         color: theme.primaryColor,

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:group_changing_app/src/ui/edit_account_info_screen.dart';
@@ -9,8 +7,13 @@ import 'package:group_changing_app/src/ui/sign_up_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   final VoidCallback onSettingsToggle;
+  final VoidCallback onSettingsClose;
 
-  const SettingsScreen({super.key, required this.onSettingsToggle});
+  const SettingsScreen({
+    Key? key,
+    required this.onSettingsToggle,
+    required this.onSettingsClose,
+  }) : super(key: key);
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -25,7 +28,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     String? displayName = currentUser.displayName;
-    String initials = displayName != null && displayName.length >= 2 ? displayName.substring(0, 2).toUpperCase() : 'Us';
+    String initials =
+        (displayName != null && displayName.isNotEmpty) ? displayName.substring(0, 2).toUpperCase() : 'Us';
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
 
@@ -33,15 +37,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).primaryColor,
-          title: _showContent
-              ? const Text(
-                  'Back',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.white),
-                )
-              : const Text(
-                  'Settings',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.white),
-                ),
+          title: Text(
+            _showContent ? 'Back' : 'Settings',
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+              color: Colors.white,
+            ),
+          ),
           leading: _showContent
               ? IconButton(
                   icon: const Icon(Icons.arrow_back),
@@ -63,10 +66,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
                       transitionBuilder: (child, animation) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
+                        return FadeTransition(opacity: animation, child: child);
                       },
                       child: _currentContent,
                     ),
@@ -79,14 +79,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: _buildSettingsContent(context, initials, displayName),
                   ),
                   Expanded(
-                    flex: 3,
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
                       transitionBuilder: (child, animation) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
+                        return FadeTransition(opacity: animation, child: child);
                       },
                       child: _currentContent,
                     ),
@@ -99,12 +95,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildSettingsContent(BuildContext context, String initials, String? displayName) {
     return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
       padding: const EdgeInsets.all(20.0),
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, // Align to the top-left
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
           Row(
             children: [
               CircleAvatar(
@@ -130,7 +125,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
                 ],
               ),
             ],
@@ -141,25 +135,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildListTile(
             icon: Icons.list,
             title: 'My Requests',
-            onTap: () {
-              _navigateToScreen(const MyRequestsScreen());
-            },
+            onTap: () => _navigateToScreen(const MyRequestsScreen()),
           ),
           _buildListTile(
             icon: Icons.people,
             title: 'My Connections',
-            onTap: () {
-              FirebaseAuth auth = FirebaseAuth.instance;
-              String userId = auth.currentUser!.uid;
-              _navigateToScreen(MyConnectionScreen(userId: userId));
-            },
+            onTap: () => _navigateToScreen(
+              MyConnectionScreen(userId: currentUser.uid),
+            ),
           ),
           _buildListTile(
             icon: Icons.edit,
             title: 'Change account info',
-            onTap: () {
-              _navigateToScreen(EditAccountInfoScreen());
-            },
+            onTap: () => _navigateToScreen(EditAccountInfoScreen()),
           ),
           _buildListTile(
             icon: Icons.logout,
@@ -170,7 +158,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _auth.signOut();
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => const SignUpScreen()),
-                (Route<dynamic> route) => false,
+                (route) => false,
               );
             },
           ),
@@ -180,52 +168,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _navigateToScreen(Widget newScreen) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 600;
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
-    if (isMobile) {
-      setState(() {
-        _currentContent = newScreen;
-        _showContent = true;
-      });
-      widget.onSettingsToggle();
-    } else {
-      if (_currentContent.runtimeType == newScreen.runtimeType) {
-        setState(() {
-          _currentContent = const SizedBox();
-        });
+    setState(() {
+      _currentContent = newScreen;
+      _showContent = isMobile;
+    });
 
-        Future.delayed(const Duration(milliseconds: 300), () {
-          setState(() {
-            _currentContent = const SizedBox();
-          });
-
-          widget.onSettingsToggle();
-        });
-      } else if (_currentContent.runtimeType != newScreen.runtimeType &&
-          _currentContent.runtimeType != const SizedBox().runtimeType) {
-        setState(() {
-          _currentContent = const SizedBox();
-        });
-
-        Future.delayed(const Duration(milliseconds: 300), () {
-          setState(() {
-            _currentContent = const SizedBox();
-          });
-
-          Future.delayed(Duration.zero, () {
-            setState(() {
-              _currentContent = newScreen;
-            });
-          });
-        });
-      } else {
-        setState(() {
-          _currentContent = newScreen;
-        });
-        widget.onSettingsToggle();
-      }
-    }
+    if (!isMobile) widget.onSettingsToggle();
   }
 
   Widget _buildListTile({
