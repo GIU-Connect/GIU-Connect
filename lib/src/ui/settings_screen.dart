@@ -160,7 +160,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () {
               FirebaseAuth auth = FirebaseAuth.instance;
               String userId = auth.currentUser!.uid;
-              _navigateToScreen(MyConnectionScreen(userId: userId));
+              _navigateToScreen(MyConnectionsScreen(userId: userId));
             },
           ),
           _buildListTile(
