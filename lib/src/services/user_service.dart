@@ -8,98 +8,26 @@ class EditAccountInfoService {
     required String field,
     required String newValue,
   }) async {
-    QuerySnapshot querySnapshot = await _firestore
-        .collection('requests')
-        .where('userId', isEqualTo: userId)
-        .get();
+    QuerySnapshot querySnapshot = await _firestore.collection('requests').where('userId', isEqualTo: userId).get();
 
     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
       await doc.reference.update({field: newValue});
     }
   }
 
-  Future<void> changePhoneNumber({
+  Future<void> applyAll({
     required String userId,
-    required String oldPhoneNumber,
-    required String newPhoneNumber,
+    required Map<String, dynamic> newValues,
   }) async {
-    await _firestore.collection('users').doc(userId).update({
-      'phoneNumber': newPhoneNumber,
-    });
-    await applyChangesToMyRequests(
-      userId: userId,
-      field: 'phoneNumber',
-      newValue: newPhoneNumber,
-    );
-  }
+    QuerySnapshot querySnapshot = await _firestore.collection('requests').where('userId', isEqualTo: userId).get();
 
-  Future<void> changeUniversityId({
-    required String userId,
-    required String universityId,
-  }) async {
-    await _firestore.collection('users').doc(userId).update({
-      'universityId': universityId,
-    });
-    await applyChangesToMyRequests(
-      userId: userId,
-      field: 'universityId',
-      newValue: universityId,
-    );
-  }
+    // Batch write for efficiency
+    WriteBatch batch = _firestore.batch();
 
-  Future<void> changeCurrentTutorial({
-    required String userId,
-    required String currentTutorial,
-  }) async {
-    await _firestore.collection('users').doc(userId).update({
-      'currentTutorial': currentTutorial,
-    });
-    await applyChangesToMyRequests(
-      userId: userId,
-      field: 'currentTutorial',
-      newValue: currentTutorial,
-    );
-  }
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      batch.update(doc.reference, newValues);
+    }
 
-  Future<void> changeName({
-    required String userId,
-    required String name,
-  }) async {
-    await _firestore.collection('users').doc(userId).update({
-      'name': name,
-    });
-    await applyChangesToMyRequests(
-      userId: userId,
-      field: 'name',
-      newValue: name,
-    );
-  }
-
-  Future<void> changeSemester({
-    required String userId,
-    required String semester,
-  }) async {
-    await _firestore.collection('users').doc(userId).update({
-      'semester': semester,
-    });
-    await applyChangesToMyRequests(
-      userId: userId,
-      field: 'semester',
-      newValue: semester,
-    );
-  }
-
-  Future<void> changeMajor({
-    required String userId,
-    required String major,
-  }) async {
-    await _firestore.collection('users').doc(userId).update({
-      'major': major,
-    });
-    await applyChangesToMyRequests(
-      userId: userId,
-      field: 'major',
-      newValue: major,
-    );
+    await batch.commit();
   }
 }

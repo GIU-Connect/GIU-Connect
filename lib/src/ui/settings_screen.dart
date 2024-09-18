@@ -167,7 +167,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             icon: Icons.edit,
             title: 'Change account info',
             onTap: () {
-              _navigateToScreen(EditAccountInfoScreen());
+              FirebaseAuth auth = FirebaseAuth.instance;
+              String userId = auth.currentUser!.uid;
+              _navigateToScreen(EditAccountInfoScreen(
+                userId: userId,
+              ));
             },
           ),
           _buildListTile(
