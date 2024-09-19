@@ -46,24 +46,25 @@ For security reasons, the Firebase API keys for the production database are not 
 2. **Configure Your Project:**
    - Once your project is created, navigate to the project dashboard.
    - Click on "Project Settings" (the gear icon next to "Project Overview").
-   - Under the "General" tab, scroll down to the "Your apps" section and click on "Web" to add a new web app.
 
-3. **Obtain Your API Keys:**
-   - After registering your app, you'll see your Firebase SDK configuration. Copy the `apiKey`, `authDomain`, `projectId`, and other necessary details.
+3. **Add Your App:**
+   - Depending on your testing platform (Web, iOS, Android, etc.), follow these steps:
+     - **For Web:**
+       - Under the "General" tab, scroll down to the "Your apps" section and click on "Web" to add a new web app.
+     - **For iOS:**
+       - Click on "iOS" to register your app. Provide your iOS bundle ID.
+     - **For Android:**
+       - Click on "Android" to register your app. Provide your Android package name.
 
-4. **Set Up Your Environment:**
-   - In the root directory of your cloned repository, create a `.env` file.
-   - Add your Firebase API keys in the following format:
-     ```
-     FIREBASE_API_KEY=your_api_key
-     FIREBASE_AUTH_DOMAIN=your_auth_domain
-     FIREBASE_PROJECT_ID=your_project_id
-     ```
-   - Make sure to replace `your_api_key`, `your_auth_domain`, and `your_project_id` with the actual values from your Firebase project.
+4. **Obtain Your API Keys:**
+   - After registering your app, you'll see your Firebase SDK configuration. Copy the `apiKey`, `authDomain`, `projectId`, and other necessary details based on the platform you chose.
 
-5. **Test Your Changes:**
+5. **Set Up Your Environment:**
+   - In the root directory of your cloned repository, open the `.env` file located in `assets/`.
+   - Make sure to replace the placeholders with the actual values from your Firebase project in the right place (eg: If you made a web app in firebase, you should replace in your the web app section in .env).
+
+6. **Test Your Changes:**
    - You can now run the application locally using your new Firebase project. Ensure that all functionalities are working as expected before submitting your contributions.
-
 By following these steps, you'll have a secure environment to test your contributions without exposing sensitive information. Thank you for understanding!
 
 ### Other Ways to Contribute 🤝
