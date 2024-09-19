@@ -1,4 +1,4 @@
-assets/.env
+*/assets/.env
 .env
 .vscode
 pubspec.lock
