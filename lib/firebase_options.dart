@@ -6,8 +6,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
-    dotenv.load(); // Load the environment variables
-
     if (kIsWeb) {
       return FirebaseOptions(
         apiKey: dotenv.env['WEB_API_KEY']!,
