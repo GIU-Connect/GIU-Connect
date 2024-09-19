@@ -1,5 +1,4 @@
-assets/.env
-.env
+
 .vscode
 pubspec.lock
 .metadata
