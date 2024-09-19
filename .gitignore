@@ -2,6 +2,7 @@ assets/.env
 .vscode
 pubspec.lock
 .metadata
+files_to_remove.txt
 
 
 # Miscellaneous
