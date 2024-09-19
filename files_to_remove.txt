@@ -1,3 +1,0 @@
-ios/Runner/GoogleService-Info.plist
-lib/firebase_options.dart
-macos/Runner/GoogleService-Info.plist
