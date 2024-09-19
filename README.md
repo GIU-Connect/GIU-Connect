@@ -91,7 +91,7 @@ For security reasons, the Firebase API keys for the production database are not 
        - Click on "Android" to register your app. Provide your Android package name.
 
 4. **Obtain Your API Keys:**
-   - After registering your app, you'll see your Firebase SDK configuration. Copy the `apiKey`, `authDomain`, `projectId`, and other necessary details based on the platform you chose.
+   - After registering your app, you'll see your Firebase SDK configuration. Copy the `apiKey`, `authDomain`, `projectId`, `storageBucket`, `messagingSender`, `appId`, `measurementId` and other necessary details based on the platform you chose.
 
 5. **Enable Authentication:**
    - Navigate to the **Authentication** section in the Firebase Console.
