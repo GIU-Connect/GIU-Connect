@@ -41,23 +41,6 @@ For security reasons, the Firebase API keys for the production database are not 
 
 1. **Create a Firebase Project:**
    - Go to the [Firebase Console](https://console.firebase.google.com/).
-### How to Contribute
-
-1. **Identify an Area of Contribution:** You can help by fixing bugs, adding new features, improving documentation, or suggesting enhancements.
-2. **Fork the Repository:** Create your own copy of the repository by forking it.
-3. **Create a New Branch:** 
-   ```git checkout -b feature/your-feature-name``` Replace your-feature-name with a descriptive name for your feature.)
-4. **Make Your Changes:** Implement your changes and test thoroughly.
-5. **Commit Your Changes:** Write clear and concise commit messages to explain your modifications.
-6. **Push Your Branch:** ```git push origin feature/your-feature-name```
-7. **Submit a Pull Request:** Open a pull request on the main repository, detailing the changes made and their benefits.
-
-### Important Note on Firebase API Keys 🔑
-
-For security reasons, the Firebase API keys for the production database are not provided in this repository. To contribute and test your changes, please follow these steps to create a new Firebase project:
-
-1. **Create a Firebase Project:**
-   - Go to the [Firebase Console](https://console.firebase.google.com/).
    - Click on "Add Project" and follow the prompts to create a new project.
 
 2. **Configure Your Project:**
