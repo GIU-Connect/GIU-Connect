@@ -1,6 +1,9 @@
-
+/assets/.env
 .vscode
 pubspec.lock
+.metadata
+
+
 # Miscellaneous
 *.class
 *.log
