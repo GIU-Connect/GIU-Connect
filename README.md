@@ -102,7 +102,7 @@ For security reasons, the Firebase API keys for the production database are not 
    - Click on "Create Database" and choose the appropriate rules for your project (start in test mode if needed).
 
 7. **Set Up Your Environment:**
-   - In the root directory of your cloned repository, create or open the `.env` file located in `assets/`.
+   - In the root directory of your cloned repository, create an `.env` file in the `assets/` folder, then copy the contents from `.env.example` into your `.env` file. Your `.env` will be ignored when pushing changes.
    - Make sure to replace the placeholders with the actual values from your Firebase project.
 
 8. **Test Your Changes:**
