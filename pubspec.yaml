@@ -48,6 +48,7 @@ dependencies:
   async: ^2.8.2
   animations: ^2.0.0
   sizer: ^2.0.15
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:

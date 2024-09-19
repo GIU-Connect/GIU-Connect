@@ -1,3 +1,5 @@
+import 'package:logger/logger.dart';
+
 class AuthExceptionHandler {
   static AuthResultStatus handleException(e) {
     AuthResultStatus status;
@@ -77,7 +79,12 @@ class AuthExceptionHandler {
       case 'user-token-expired':
         status = AuthResultStatus.userTokenExpired;
         break;
+      case 'api-key-not-valid.-please-pass-a-valid-api-key.':
+        status = AuthResultStatus.invalidApiKey;
+        Logger().e('API key is not valid');
+        break;
       default:
+        Logger().e('Case ${e.code} is not yet implemented');
         status = AuthResultStatus.undefined;
     }
 
@@ -136,6 +143,7 @@ class AuthExceptionHandler {
         return 'An error occurred while accessing the keychain. Please try again.';
       case AuthResultStatus.userTokenExpired:
         return 'The user’s credential has expired. Please sign in again.';
+
       default:
         return 'An undefined error occurred.';
     }
