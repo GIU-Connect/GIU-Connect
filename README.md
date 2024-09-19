@@ -4,7 +4,7 @@
 
 ## GIU-Connect Demo 🎥
 
-![GIU-Connect Demo](https://github.com/AlyAbdelmoneim/Group_Changing_Website/media/GIU-Connect-Demo.gif)
+![](https://github.com/AlyAbdelmoneim/Group_Changing_Website/blob/master/media/GIU-Connect-Demo.gif)
 
 ## GIU-Connect Screenshot 🖼️
 
