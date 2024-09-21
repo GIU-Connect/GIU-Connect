@@ -6,12 +6,13 @@ import 'package:group_changing_app/src/ui/sign_in_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: 'assets/.env');
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   print('Firebase initialized');
+
   runApp(const MyApp());
 }
 
@@ -24,13 +25,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Group Changing App',
       theme: ThemeData(
-        // Use a dark color scheme with a primary orange accent
-        brightness: Brightness.dark, // Set overall brightness to dark
-        primaryColor: Colors.grey[900], // Dark background color
-        hintColor: Colors.orange, // Use orange for accents
-        // make
+        brightness: Brightness.dark,
+        dialogBackgroundColor: Colors.grey[900],
+        primaryColor: Colors.grey[900], // Main primary color
+        hintColor: Colors.orange,
 
-        // Define default text styles
         textTheme: const TextTheme(
           displayLarge: TextStyle(fontSize: 96.0, fontWeight: FontWeight.bold, color: Colors.white),
           displayMedium: TextStyle(fontSize: 60.0, fontWeight: FontWeight.bold, color: Colors.white),
@@ -40,14 +39,10 @@ class MyApp extends StatelessWidget {
           titleLarge: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.white),
           bodyLarge: TextStyle(fontSize: 16.0, fontWeight: FontWeight.normal, color: Colors.white),
           bodyMedium: TextStyle(fontSize: 14.0, fontWeight: FontWeight.normal, color: Colors.white),
-          bodySmall: TextStyle(
-              fontSize: 12.0,
-              fontWeight: FontWeight.normal,
-              color: Colors.grey), // Slightly lighter for less important text
+          bodySmall: TextStyle(fontSize: 12.0, fontWeight: FontWeight.normal, color: Colors.grey),
           labelLarge: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.white),
         ),
 
-        // Define default button styles
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.orange,
@@ -61,10 +56,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
-        // Input decoration theme
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: Colors.grey[800], // Slightly lighter background for input fields
+          fillColor: Colors.grey[800],
           labelStyle: TextStyle(color: Colors.grey[400]),
           errorStyle: const TextStyle(color: Colors.red),
           border: OutlineInputBorder(
@@ -77,21 +71,20 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
-        // AppBar theme
+        // Apply the AppBarTheme globally
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.grey[900],
-          titleTextStyle: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+          backgroundColor: Colors.grey[900], // This ensures all AppBars use this color
+          titleTextStyle: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.white),
           iconTheme: const IconThemeData(color: Colors.white),
+          elevation: 0, // Remove shadow for a flatter look (optional)
         ),
 
-        // Floating action button theme
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Colors.orange,
           foregroundColor: Colors.white,
         ),
 
-        // Scaffold background color
-        scaffoldBackgroundColor: Colors.grey[900], // Dark background
+        scaffoldBackgroundColor: Colors.grey[900],
       ),
       home: const SignInScreen(),
     );
