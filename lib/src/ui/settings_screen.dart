@@ -37,33 +37,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).primaryColor,
-          title: _showContent
-              ? const Text(
-                  'Back',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.white),
-                )
-              : const Text(
-                  'Settings',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.white),
-                ),
-          leading: _showContent
-              ? IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    setState(() {
-                      _showContent = false;
-                      _currentContent = const SizedBox();
-                    });
-                    widget.onSettingsToggle();
-                  },
-                )
-              : null,
-        ),
-        body: isMobile
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColor,
+        title: _showContent
+            ? const Text(
+                'Back',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.white),
+              )
+            : const Text(
+                'Settings',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.white),
+              ),
+        leading: _showContent
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  setState(() {
+                    _showContent = false;
+                    _currentContent = const SizedBox();
+                  });
+                  widget.onSettingsToggle();
+                },
+              )
+            : null,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 16.0), // Add padding to move content below the status bar
+        child: isMobile
             ? Stack(
                 children: [
                   _buildSettingsContent(context, initials, firstName),
@@ -110,7 +111,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       color: Theme.of(context).scaffoldBackgroundColor,
       padding: const EdgeInsets.all(20.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, // Align to the top-left
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
           Row(

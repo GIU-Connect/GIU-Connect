@@ -64,174 +64,176 @@ class SearchScreenState extends State<SearchScreen> with SingleTickerProviderSta
     return Container(
       color: Theme.of(context).primaryColor, // Set background color to primary color
       child: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(
-              width: isMobile ? double.infinity : 250, // Adjust width for mobile
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(height: 32),
-                      FutureBuilder<DocumentSnapshot>(
-                        future: _userData,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(child: Text('Error: ${snapshot.error}'));
-                          } else if (snapshot.hasData && snapshot.data!.exists) {
-                            final data = snapshot.data!.data() as Map<String, dynamic>;
-                            _currentTutNo = data['currentTutorial'] ?? '';
-                            _germanLevel = data['germanLevel'] ?? 'G1';
-                            _englishLevel = data['englishLevel'] ?? 'AE';
+        child: SafeArea(
+          child: Column(
+            children: [
+              SizedBox(
+                width: isMobile ? double.infinity : 250, // Adjust width for mobile
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 32),
+                        FutureBuilder<DocumentSnapshot>(
+                          future: _userData,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Error: ${snapshot.error}'));
+                            } else if (snapshot.hasData && snapshot.data!.exists) {
+                              final data = snapshot.data!.data() as Map<String, dynamic>;
+                              _currentTutNo = data['currentTutorial'] ?? '';
+                              _germanLevel = data['germanLevel'] ?? 'G1';
+                              _englishLevel = data['englishLevel'] ?? 'AE';
 
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                TextFormField(
-                                  controller: _desiredTutNoController,
-                                  decoration: InputDecoration(
-                                    labelText: 'To Tutorial No.',
-                                    hintText: 'Enter your desired tutorial number',
-                                    prefixIcon: const Icon(Icons.swap_vert),
-                                    border: const OutlineInputBorder(
-                                      borderSide: BorderSide.none,
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  TextFormField(
+                                    controller: _desiredTutNoController,
+                                    decoration: InputDecoration(
+                                      labelText: 'To Tutorial No.',
+                                      hintText: 'Enter your desired tutorial number',
+                                      prefixIcon: const Icon(Icons.swap_vert),
+                                      border: const OutlineInputBorder(
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.transparent,
+                                      hintStyle: TextStyle(color: Colors.grey[400]),
+                                      labelStyle: TextStyle(color: Colors.grey[400]),
                                     ),
-                                    filled: true,
-                                    fillColor: Colors.transparent,
-                                    hintStyle: TextStyle(color: Colors.grey[400]),
-                                    labelStyle: TextStyle(color: Colors.grey[400]),
+                                    keyboardType: TextInputType.number,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter your desired tutorial number';
+                                      }
+                                      return null;
+                                    },
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _desiredTutNo = value;
+                                      });
+                                    },
+                                    style: const TextStyle(color: Colors.white),
                                   ),
-                                  keyboardType: TextInputType.number,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter your desired tutorial number';
-                                    }
-                                    return null;
-                                  },
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _desiredTutNo = value;
-                                    });
-                                  },
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                                const SizedBox(height: 32),
-                                CustomButton(
-                                  onPressed: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      setState(() {
-                                        _isLoading = true;
-                                        _hasSearched = true; // Update to true after search
-                                      });
+                                  const SizedBox(height: 32),
+                                  CustomButton(
+                                    onPressed: () async {
+                                      if (_formKey.currentState!.validate()) {
+                                        setState(() {
+                                          _isLoading = true;
+                                          _hasSearched = true; // Update to true after search
+                                        });
 
-                                      final desiredTut = int.tryParse(_desiredTutNo);
-                                      final currentTut = int.tryParse(_currentTutNo);
-                                      widget.onSearchResults();
-                                      final results = await RequestService().search(
-                                        FirebaseAuth.instance.currentUser!.uid,
-                                        currentTut!,
-                                        desiredTut!,
-                                        _germanLevel,
-                                        _englishLevel,
-                                      );
+                                        final desiredTut = int.tryParse(_desiredTutNo);
+                                        final currentTut = int.tryParse(_currentTutNo);
+                                        widget.onSearchResults();
+                                        final results = await RequestService().search(
+                                          FirebaseAuth.instance.currentUser!.uid,
+                                          currentTut!,
+                                          desiredTut!,
+                                          _germanLevel,
+                                          _englishLevel,
+                                        );
 
-                                      setState(() {
-                                        _isLoading = false;
-                                        _searchResults = results;
-                                        _animationController.forward(from: 0.0);
-                                      });
-                                    }
-                                  },
-                                  text: 'Search',
-                                  isActive: true,
-                                  isLoading: _isLoading,
-                                ),
-                              ],
-                            );
-                          } else {
-                            return const Center(child: Text('User data not found.'));
-                          }
-                        },
-                      ),
-                    ],
+                                        setState(() {
+                                          _isLoading = false;
+                                          _searchResults = results;
+                                          _animationController.forward(from: 0.0);
+                                        });
+                                      }
+                                    },
+                                    text: 'Search',
+                                    isActive: true,
+                                    isLoading: _isLoading,
+                                  ),
+                                ],
+                              );
+                            } else {
+                              return const Center(child: Text('User data not found.'));
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Container(
-              color: Theme.of(context).scaffoldBackgroundColor, // Set background color to scaffold color
-              height: MediaQuery.of(context).size.height,
-              child: Column(
-                children: [
-                  if (!_hasSearched)
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        'Please search to find tutorials',
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyLarge?.color,
-                          fontSize: 14,
+              Container(
+                color: Theme.of(context).scaffoldBackgroundColor, // Set background color to scaffold color
+                height: MediaQuery.of(context).size.height,
+                child: Column(
+                  children: [
+                    if (!_hasSearched)
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          'Please search to find tutorials',
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
-                    ),
-                  if (!_isLoading && _hasSearched && _searchResults.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        'No results found',
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyLarge?.color,
-                          fontSize: 16,
+                    if (!_isLoading && _hasSearched && _searchResults.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          'No results found',
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
-                    ),
-                  if (_searchResults.isNotEmpty)
-                    Expanded(
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: _searchResults.length,
-                          itemBuilder: (context, index) {
-                            final result = _searchResults[index];
-                            if (result == null || (result is Map && result.isEmpty)) {
-                              return const Center(child: Text('No results found'));
-                            }
+                    if (_searchResults.isNotEmpty)
+                      Expanded(
+                        child: FadeTransition(
+                          opacity: _fadeAnimation,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _searchResults.length,
+                            itemBuilder: (context, index) {
+                              final result = _searchResults[index];
+                              if (result == null || (result is Map && result.isEmpty)) {
+                                return const Center(child: Text('No results found'));
+                              }
 
-                            final resultMap = result as Map<String, dynamic>;
+                              final resultMap = result as Map<String, dynamic>;
 
-                            return Post(
-                              phoneNumber: resultMap['phoneNumber'],
-                              semester: resultMap['semester'],
-                              submitterName: resultMap['name'],
-                              major: resultMap['major'],
-                              currentTutNo: resultMap['currentTutNo'],
-                              desiredTutNo: resultMap['desiredTutNo'],
-                              englishLevel: resultMap['englishLevel'],
-                              germanLevel: resultMap['germanLevel'],
-                              isActive: resultMap['status'] == 'active',
-                              buttonText: 'Connect',
-                              isLoading: false,
-                              onPressed: () {
-                                ConnectionService().sendConnectionRequest(
-                                  resultMap['id'],
-                                  resultMap['userId'],
-                                );
-                              },
-                            );
-                          },
+                              return Post(
+                                phoneNumber: resultMap['phoneNumber'],
+                                semester: resultMap['semester'],
+                                submitterName: resultMap['name'],
+                                major: resultMap['major'],
+                                currentTutNo: resultMap['currentTutNo'],
+                                desiredTutNo: resultMap['desiredTutNo'],
+                                englishLevel: resultMap['englishLevel'],
+                                germanLevel: resultMap['germanLevel'],
+                                isActive: resultMap['status'] == 'active',
+                                buttonText: 'Connect',
+                                isLoading: false,
+                                onPressed: () {
+                                  ConnectionService().sendConnectionRequest(
+                                    resultMap['id'],
+                                    resultMap['userId'],
+                                  );
+                                },
+                              );
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                ],
-              ),
-            )
-          ],
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
