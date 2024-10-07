@@ -258,7 +258,9 @@ class SignUpScreenState extends State<SignUpScreen> {
                           'Engineering',
                           'Business Informatics',
                           'Business Administration',
-                          'Pharmaceutical Engineering'
+                          'Pharmaceutical Engineering',
+                          'Physical Therapy',
+                          'Architecture',
                         ],
                         onChanged: (value) => setState(() => major = value as String),
                       ),
