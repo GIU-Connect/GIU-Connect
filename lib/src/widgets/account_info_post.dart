@@ -68,6 +68,8 @@ class AccountInfoPost extends StatelessWidget {
               'Business Administration',
               'Pharmaceutical Engineer',
               'Engineering',
+              'Physical Therapy',
+              'Architecture',
             ],
             onChanged: onChangeMajor,
           ),

@@ -42,6 +42,12 @@ class ConnectionService {
       if (requestData['desiredTutNo'].toString() != userSnapshot.get('currentTutorial').toString()) {
         throw Exception('Cannot send connection request: user has a different desired tutorial number.');
       }
+      if (requestData['englishLevel'].toString() != userSnapshot.get('englishLevel').toString()) {
+        throw Exception('Cannot send connection request: user has a different english level.');
+      }
+      if (requestData['germanLevel'].toString() != userSnapshot.get('germanLevel').toString()) {
+        throw Exception('Cannot send connection request: user has a different german level.');
+      }
 
       QuerySnapshot existingRequests = await _firestore
           .collection('connectionRequests')
