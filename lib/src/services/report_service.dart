@@ -1,10 +1,8 @@
 import '../utils/email_sender.dart';
 
 class ReportService {
-  final EmailSender emailSender = EmailSender(
-    apiUrl: 'https://email-sender-red.vercel.app/send-email',
-    authToken: '123456',
-  );
+final emailSender = EmailSender(authToken: '36187ca7-6a5c-45df-be9d-4d879881dc8e');
+
 
   Future<void> sendReport(String message, String senderName) async {
     try {

@@ -1,13 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../utils/email_sender.dart';
+
+import 'dart:html' as html;
+
+// void enableCors() {
+//   html.window.fetch("https://email-sender-orcin-mu.vercel.app/send-email/", {
+//     "mode": "cors"
+//   });
+// }
+
 
 class ConnectionService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final EmailSender emailSender = EmailSender(
-    apiUrl: 'https://email-sender-orcin-mu.vercel.app/send-email',
-    authToken: '123456',
-  );
+  final emailSender = EmailSender(authToken: dotenv.env['EMAIL_SENDER_API'] ?? 'default_value');
+
 
   Future<void> sendConnectionRequest(String requestId, String connectionSenderId) async {
     try {
