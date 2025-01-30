@@ -5,7 +5,7 @@ import '../utils/email_sender.dart';
 class ConnectionService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final EmailSender emailSender = EmailSender(
-    apiUrl: 'https://email-sender-red.vercel.app/send-email',
+    apiUrl: 'https://email-sender-orcin-mu.vercel.app/send-email',
     authToken: '123456',
   );
 
