@@ -32,7 +32,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // Extract the first name by splitting the displayName at the space
     String firstName = (displayName != null && displayName.isNotEmpty) ? displayName.split(' ').first : 'User';
     // Get initials for avatar (if name exists)
-    String initials = firstName.isNotEmpty ? firstName.substring(0, 2).toUpperCase() : 'US';
+    String initials = firstName.isNotEmpty 
+    ? firstName.substring(0, firstName.length > 1 ? 2 : 1).toUpperCase() 
+    : 'US';
 
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;

@@ -20,6 +20,7 @@ class EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
   final _submitterNameController = TextEditingController();
   final _currentTutNoController = TextEditingController();
   final _desiredTutNoController = TextEditingController();
+  final _tutNoController = TextEditingController();
 
   String _semester = '';
   String _major = '';
@@ -49,10 +50,12 @@ class EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
         _submitterNameController.text = data['submitterName'] ?? '';
         _currentTutNoController.text = (data['currentTutNo'] ?? 0).toString();
         _desiredTutNoController.text = (data['desiredTutNo'] ?? 0).toString();
+        _tutNoController.text = (data['currentTutorial'] ?? 0).toString();
         _semester = data['semester'] ?? '';
         _major = data['major'] ?? '';
         _englishLevel = data['englishLevel'] ?? '';
         _germanLevel = data['germanLevel'] ?? '';
+        
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -82,6 +85,7 @@ class EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
         'major': _major,
         'englishLevel': _englishLevel,
         'germanLevel': _germanLevel,
+        'currentTutorial': _currentTutNoController.text,
       };
 
       // Update only if the values have changed
@@ -175,10 +179,12 @@ class EditAccountInfoScreenState extends State<EditAccountInfoScreen> {
                           semester: _semester,
                           englishLevel: _englishLevel,
                           germanLevel: _germanLevel,
+                          currentTutNo: userDoc['currentTutorial'] ?? 0,
                           onChangeMajor: (newValue) => setState(() => _major = newValue ?? ''),
                           onChangeSemester: (newValue) => setState(() => _semester = newValue ?? ''),
                           onChangeEnglishLevel: (newValue) => setState(() => _englishLevel = newValue ?? ''),
                           onChangeGermanLevel: (newValue) => setState(() => _germanLevel = newValue ?? ''),
+                          onChangeTutNo: (newValue) => setState(() => _tutNoController.text = newValue ?? ''),
                         ),
                         const SizedBox(height: 20.0),
                         CustomButton(

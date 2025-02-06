@@ -9,10 +9,12 @@ class AccountInfoPost extends StatelessWidget {
   final String semester;
   final String englishLevel;
   final String germanLevel;
+  final String currentTutNo;
   final ValueChanged<String?> onChangeMajor;
   final ValueChanged<String?> onChangeSemester;
   final ValueChanged<String?> onChangeEnglishLevel;
   final ValueChanged<String?> onChangeGermanLevel;
+  final ValueChanged<String?> onChangeTutNo;
 
   const AccountInfoPost({
     Key? key,
@@ -23,10 +25,12 @@ class AccountInfoPost extends StatelessWidget {
     required this.semester,
     required this.englishLevel,
     required this.germanLevel,
+    required this.currentTutNo,
     required this.onChangeMajor,
     required this.onChangeSemester,
     required this.onChangeEnglishLevel,
     required this.onChangeGermanLevel,
+    required this.onChangeTutNo,
   }) : super(key: key);
 
   @override
@@ -72,6 +76,14 @@ class AccountInfoPost extends StatelessWidget {
               'Architecture',
             ],
             onChanged: onChangeMajor,
+          ),
+          const SizedBox(height: 16),
+            TextFormField(
+            initialValue: currentTutNo,
+            decoration: const InputDecoration(
+              labelText: 'Tutorial Number',
+            ),
+            onChanged: (value) => onChangeTutNo(value),
           ),
           const SizedBox(height: 16),
           DropdownWidget(
