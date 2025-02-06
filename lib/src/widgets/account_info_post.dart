@@ -77,14 +77,14 @@ class AccountInfoPost extends StatelessWidget {
             ],
             onChanged: onChangeMajor,
           ),
-          const SizedBox(height: 16),
-            TextFormField(
-            initialValue: currentTutNo,
-            decoration: const InputDecoration(
-              labelText: 'Tutorial Number',
-            ),
-            onChanged: (value) => onChangeTutNo(value),
-          ),
+          // const SizedBox(height: 16),
+          //   TextFormField(
+          //   initialValue: currentTutNo,
+          //   decoration: const InputDecoration(
+          //     labelText: 'Tutorial Number',
+          //   ),
+          //   onChanged: (value) => onChangeTutNo(value),
+          // ),
           const SizedBox(height: 16),
           DropdownWidget(
             hint: 'English Level',
